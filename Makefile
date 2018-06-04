@@ -1,6 +1,6 @@
 NAME	=rtv1
 CC		=gcc
-CFLAGS	=-Wall -Wextra -Werror -g -O3
+CFLAGS	=-Wall -Wextra -Werror -g -O3 -mavx
 
 SRCDIR	=./src/
 OBJDIR	=./obj/
@@ -9,7 +9,12 @@ LIBFTDIR=./libft/
 SDLDIR	=./sdl2/
 
 SRC		=$(addprefix $(SRCDIR),	\
-			main.c)
+			main.c				\
+			render.c			\
+			sphere.c			\
+			triangle.c			\
+			cube.c				\
+			vec4f.c)
 OBJ		=$(SRC:$(SRCDIR)%.c=$(OBJDIR)%.o)
 INCLUDE	=-I$(INCLDIR) -I$(LIBFTDIR)
 HEADERS	=$(addprefix $(INCLDIR), rtv1.h)

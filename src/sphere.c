@@ -45,6 +45,7 @@ bool		sphere_intersect(void *data, t_vec4f ray_start, t_vec4f ray,
 	*intersect = (t_vec4f){ray_start[0] + t * ray[0],
 					ray_start[1] + t * ray[1],
 					ray_start[2] + t * ray[2], 0};
+	return (true);
 }
 
 SDL_Color	*sphere_color(void *data, t_vec4f intersect)

@@ -13,9 +13,9 @@
 #  include "SDL2/SDL.h"
 # endif
 
-# define SQR(n)	(pow(n, 2))
-# define MIN(t1, t2) = (t1 < t2) ? (t1) : (t2)
-# define MAX(t1, t2) = (t1 > t2) ? (t1) : (t2);
+# define SQR(n)			(pow(n, 2))
+# define MIN(t1, t2)	(t1 < t2) ? (t1) : (t2)
+# define MAX(t1, t2)	(t1 > t2) ? (t1) : (t2);
 # define EPSILON 0.00001
 
 typedef double	t_vec4f __attribute__((vector_size(sizeof(double) * 4)));
@@ -27,7 +27,7 @@ typedef int		t_vec2i __attribute__((vector_size(sizeof(int) * 2)));
 # define TITLE	"rtv1"
 # define W		640
 # define H		480
-# define OBJ	5
+# define OBJ	2
 
 typedef struct	s_sphere
 {
@@ -41,6 +41,7 @@ typedef struct	s_triang
 	t_vec4f		*a;
 	t_vec4f		*b;
 	t_vec4f		*c;
+	t_vec4f		*normal_vec;
 	SDL_Color	*color;
 	double		dist;
 }				t_triang;
@@ -49,7 +50,7 @@ typedef struct	s_obj
 {
 	void		*data;
 	bool		(*intersects)(void *data, t_vec4f ray_start,
-			t_vec4f ray, t_vec4f intersect);
+			t_vec4f ray, t_vec4f *intersect);
 	SDL_Color	*(*get_color)(void *data, t_vec4f intersect);
 	t_vec4f		(*normal_vec)(void *data, t_vec4f intersect);
 	void		(*cleanup)(void *data);
@@ -58,6 +59,8 @@ typedef struct	s_obj
 typedef struct	s_main
 {
 	SDL_Window	*window;
+	SDL_Surface	*screen;
+	int			bpp;
 	t_vec4f		*camera;
 	t_vec4f		*ray;
 	t_obj		*objects[OBJ];
@@ -93,4 +96,6 @@ double			vec4f_dotprod(t_vec4f a, t_vec4f b);
 **	render.c
 */
 void			render(t_main *m);
+void			set_pixel(t_main *m, int x, int y, unsigned int p);
+
 #endif

@@ -18,30 +18,46 @@
 # define MAX(t1, t2)	(t1 > t2) ? (t1) : (t2);
 # define EPSILON 0.00001
 
-typedef double	t_vec4f __attribute__((vector_size(sizeof(double) * 4)));
-typedef int		t_vec4i __attribute__((vector_size(sizeof(int) * 4)));
-
-typedef double	t_vec2f __attribute__((vector_size(sizeof(double) * 2)));
-typedef int		t_vec2i __attribute__((vector_size(sizeof(int) * 2)));
+/*
+**	typedef double	t_vec4f __attribute__((vector_size(sizeof(double) * 4)));
+**	typedef int		t_vec4i __attribute__((vector_size(sizeof(int) * 4)));
+**	
+**	typedef double	t_vec2f __attribute__((vector_size(sizeof(double) * 2)));
+**	typedef int		t_vec2i __attribute__((vector_size(sizeof(int) * 2)));
+*/
 
 # define TITLE	"rtv1"
 # define W		640
 # define H		480
 # define OBJ	2
 
+typedef struct	s_vec3f
+{
+	double		x;
+	double		y;
+	double		z;
+}				t_vec3f;
+
+typedef struct	s_vec3i
+{
+	int			x;
+	int			y;
+	int			z;
+}				t_vec3i;
+
 typedef struct	s_sphere
 {
-	t_vec4f		*center;
+	t_vec3f		*center;
 	float		radius;
 	SDL_Color	*color;
 }				t_sphere;
 
 typedef struct	s_triang
 {
-	t_vec4f		*a;
-	t_vec4f		*b;
-	t_vec4f		*c;
-	t_vec4f		*normal_vec;
+	t_vec3f		*a;
+	t_vec3f		*b;
+	t_vec3f		*c;
+	t_vec3f		*normal_vec;
 	SDL_Color	*color;
 	double		dist;
 }				t_triang;
@@ -49,10 +65,10 @@ typedef struct	s_triang
 typedef struct	s_obj
 {
 	void		*data;
-	bool		(*intersects)(void *data, t_vec4f ray_start,
-			t_vec4f ray, t_vec4f *intersect);
-	SDL_Color	*(*get_color)(void *data, t_vec4f intersect);
-	t_vec4f		(*normal_vec)(void *data, t_vec4f intersect);
+	bool		(*intersects)(void *data, t_vec3f ray_start,
+			t_vec3f ray, t_vec3f *intersect);
+	SDL_Color	*(*get_color)(void *data, t_vec3f intersect);
+	t_vec3f		(*normal_vec)(void *data, t_vec3f intersect);
 	void		(*cleanup)(void *data);
 }				t_obj;
 
@@ -60,38 +76,39 @@ typedef struct	s_main
 {
 	SDL_Window	*window;
 	SDL_Surface	*screen;
+	bool		running;
 	int			bpp;
-	t_vec4f		*camera;
-	t_vec4f		*ray;
+	t_vec3f		*camera;
+	t_vec3f		*ray;
 	t_obj		*objects[OBJ];
 }				t_main;
 
 /*
 **	sphere.c
 */
-t_obj			*new_sphere(t_vec4f *center, float radius, SDL_Color *color);
-SDL_Color		*sphere_color(void *data, t_vec4f intersect);
-t_vec4f			sphere_normalvec(void *data, t_vec4f intersect);
+t_obj			*new_sphere(t_vec3f *center, float radius, SDL_Color *color);
+SDL_Color		*sphere_color(void *data, t_vec3f intersect);
+t_vec3f			sphere_normalvec(void *data, t_vec3f intersect);
 void			sphere_cleanup(void *data);
-bool			sphere_intersect(void *data, t_vec4f ray_start, t_vec4f ray,
-				t_vec4f *intersect);
+bool			sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
+				t_vec3f *intersect);
 /*
 **	triangle.c
 */
-t_obj			*new_triangle(t_vec4f *a, t_vec4f *b, t_vec4f *c,
+t_obj			*new_triangle(t_vec3f *a, t_vec3f *b, t_vec3f *c,
 			SDL_Color *color);
-SDL_Color		*triangle_color(void *data, t_vec4f intersect);
-t_vec4f			triangle_normalvec(void *data, t_vec4f intersect);
+SDL_Color		*triangle_color(void *data, t_vec3f intersect);
+t_vec3f			triangle_normalvec(void *data, t_vec3f intersect);
 void			triangle_cleanup(void *data);
-bool			triangle_intersect(void *data, t_vec4f ray_start, t_vec4f ray,
-				t_vec4f *intersect);
+bool			triangle_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
+				t_vec3f *intersect);
 /*
 **	vec4f.c
 */
-t_vec4f			get_vec4f(t_vec4f p0, t_vec4f p1);
-void			vec4f_normalize(t_vec4f *vec);
-float			vec4f_length(t_vec4f vec);
-double			vec4f_dotprod(t_vec4f a, t_vec4f b);
+t_vec3f			get_vec3f(t_vec3f p0, t_vec3f p1);
+void			vec3f_normalize(t_vec3f *vec);
+float			vec3f_length(t_vec3f vec);
+double			vec3f_dotprod(t_vec3f a, t_vec3f b);
 /*
 **	render.c
 */

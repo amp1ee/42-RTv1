@@ -1,0 +1,40 @@
+#include "rtv1.h"
+
+float		vec3f_length(t_vec3f vec)
+{
+	float	res;
+
+	res = sqrt(SQR(vec.x) + SQR(vec.y) + SQR(vec.z));
+	return (res);
+}
+
+double		vec3f_dotprod(t_vec3f a, t_vec3f b)
+{
+	double	dprod;
+
+	dprod = a.x * b.x +
+			a.y * b.y +
+			a.z * b.z;
+	return (dprod);
+}
+
+t_vec3f		get_vec3f(t_vec3f p0, t_vec3f p1)
+{
+	t_vec3f	v;
+
+	v = (t_vec3f){
+		p1.x - p0.x,
+		p1.y - p0.y,
+		p1.z - p0.z
+	};
+	return (v);
+}
+
+void		vec3f_normalize(t_vec3f *vec)
+{
+	const float	vlen = vec3f_length(*vec);
+	
+	vec->x /= vlen;
+	vec->y /= vlen;
+	vec->z /= vlen;
+}

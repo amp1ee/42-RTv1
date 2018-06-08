@@ -1,21 +1,27 @@
 #include "rtv1.h"
 
-void	game_quit(t_main *m)
+bool	game_quit(t_main *m)
 {
+	SDL_PixelFormat* pixelFormat = m->screen->format;
+	Uint32 pixelFormatEnum = pixelFormat->format;
+	const char* surfacePixelFormatName = SDL_GetPixelFormatName(pixelFormatEnum);
+	SDL_Log("The surface's pixelformat is %s", surfacePixelFormatName);
+
 	SDL_DestroyWindow(m->window);
 	SDL_Quit();
-	exit(0);
+	return (false);
 }
 
-void	handle_events(t_main *m)
+bool	handle_events(t_main *m)
 {
 	SDL_Event	e;
 
 	while (SDL_PollEvent(&e))
 	{
 		if (e.type == SDL_QUIT || e.key.keysym.sym == SDLK_ESCAPE)
-			game_quit(m);
+			return (game_quit(m));
 	}
+	return (true);
 }
 
 int		main(void)
@@ -31,27 +37,24 @@ int		main(void)
 		printf("Error\n");
 		return (1);
 	}
-	m->objects[0] = new_sphere(&(t_vec4f){5.0, 2.0, 3.0, 0.0}, 2.0,
+	m->objects[0] = new_sphere(&(t_vec3f){5.0, 2.0, 3.0}, 2.0,
 		&(SDL_Color){255, 0, 0, 255});
-	m->objects[1] = new_sphere(&(t_vec4f){1.0, 3.0, 5.0, 2.0}, 3.0,
+	m->objects[1] = new_sphere(&(t_vec3f){1.0, 3.0, 5.0}, 3.0,
 		&(SDL_Color){255, 0, 0, 255});
-/*	m->objects[2] = new_triangle(&(t_vec4f){3.0, 4.0, 1.0, 0.0},
-		&(t_vec4f){7.0, 8.0, 9.0, 0.0},
-		&(t_vec4f){12.0, 9.0, 7.0, 0.0},
+/*	m->objects[2] = new_triangle(&(t_vec3f){3.0, 4.0, 1.0, 0.0},
+		&(t_vec3f){7.0, 8.0, 9.0, 0.0},
+		&(t_vec3f){12.0, 9.0, 7.0, 0.0},
 		&(SDL_Color){0, 255, 0, 255});*/
-	m->camera = &(t_vec4f){0, 0, -100, 0};
-	m->ray = &(t_vec4f){0, -1, 0, 0};
+	m->camera = &(t_vec3f){0, 0, -100};
+	m->ray = &(t_vec3f){0, -1, 0};
 	m->bpp = m->screen->format->BytesPerPixel;
-	while (true)
+	SDL_RaiseWindow(m->window);
+	m->running = true;
+	while (m->running)
 	{
 		render(m);
-		handle_events(m);
+		m->running = handle_events(m);
 	}
-
-	SDL_PixelFormat* pixelFormat = m->screen->format;
-	Uint32 pixelFormatEnum = pixelFormat->format;
-	const char* surfacePixelFormatName = SDL_GetPixelFormatName(pixelFormatEnum);
-	SDL_Log("The surface's pixelformat is %s", surfacePixelFormatName);
-	
+	exit(0);
 	return (0);
 }

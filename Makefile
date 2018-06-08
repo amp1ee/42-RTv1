@@ -14,7 +14,7 @@ SRC		=$(addprefix $(SRCDIR),	\
 			sphere.c			\
 			\
 			cube.c				\
-			vec4f.c)
+			vec3f.c)
 OBJ		=$(SRC:$(SRCDIR)%.c=$(OBJDIR)%.o)
 INCLUDE	=-I$(INCLDIR) -I$(LIBFTDIR)
 HEADERS	=$(addprefix $(INCLDIR), rtv1.h)

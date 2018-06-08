@@ -1,6 +1,6 @@
 #include "rtv1.h"
 
-t_obj		*new_sphere(t_vec4f *center, float radius, SDL_Color *color)
+t_obj		*new_sphere(t_vec3f *center, float radius, SDL_Color *color)
 {
 	t_sphere	*sph;
 	t_obj		*obj;
@@ -20,19 +20,19 @@ t_obj		*new_sphere(t_vec4f *center, float radius, SDL_Color *color)
 	return (obj);
 }
 
-bool		sphere_intersect(void *data, t_vec4f ray_start, t_vec4f ray,
-				t_vec4f *intersect)
+bool		sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
+				t_vec3f *intersect)
 {
 	const t_sphere	*sph = data;
-	const t_vec4f	center = *sph->center;
-	const float		a = ray[0] * ray[0] + ray[1] * ray[1] + ray[2] * ray[2];
-	const float		b = 2 * (ray[0] * (ray_start[0] - center[0]))
-					+ ray[1] * (ray_start[1] - center[1])
-					+ ray[2] * (ray_start[2] - center[2]);
-	const float		c = SQR(center[0]) + SQR(center[1]) + SQR(center[2])
-					+ SQR(ray_start[0]) + SQR(ray_start[1]) + SQR(ray_start[2])
-					- 2 * (ray_start[0] * center[0] + ray_start[1] * center[1]
-					+ ray_start[2] * center[2]);
+	const t_vec3f	center = *sph->center;
+	const float		a = ray.x * ray.x + ray.y * ray.y + ray.z * ray.z;
+	const float		b = 2 * (ray.x * (ray_start.x - center.x))
+					+ ray.y * (ray_start.y - center.y)
+					+ ray.z * (ray_start.z - center.z);
+	const float		c = SQR(center.x) + SQR(center.y) + SQR(center.z)
+					+ SQR(ray_start.x) + SQR(ray_start.y) + SQR(ray_start.z)
+					- 2 * (ray_start.x * center.x + ray_start.y * center.y
+					+ ray_start.z * center.z);
 	const float		d = SQR(b) - 4 * a * c;
 
 	if (d < 0)
@@ -42,13 +42,13 @@ bool		sphere_intersect(void *data, t_vec4f ray_start, t_vec4f ray,
 	const float		t = (MIN(t1, t2) > EPSILON) ? MIN(t1, t2) : MAX(t1, t2);
 	if (t < EPSILON)
 		return (false);
-	*intersect = (t_vec4f){ray_start[0] + t * ray[0],
-					ray_start[1] + t * ray[1],
-					ray_start[2] + t * ray[2], 0};
+	*intersect = (t_vec3f){	ray_start.x + t * ray.x,
+							ray_start.y + t * ray.y,
+							ray_start.z + t * ray.z};
 	return (true);
 }
 
-SDL_Color	*sphere_color(void *data, t_vec4f intersect)
+SDL_Color	*sphere_color(void *data, t_vec3f intersect)
 {
 	const t_sphere	*sphere = data;
 
@@ -56,13 +56,13 @@ SDL_Color	*sphere_color(void *data, t_vec4f intersect)
 	return (sphere->color);
 }
 
-t_vec4f		sphere_normalvec(void *data, t_vec4f intersect)
+t_vec3f		sphere_normalvec(void *data, t_vec3f intersect)
 {
 	const t_sphere	*sphere = data;
-	t_vec4f			n;
+	t_vec3f			n;
 
-	n = get_vec4f(*sphere->center, intersect);
-	vec4f_normalize(&n);
+	n = get_vec3f(*sphere->center, intersect);
+	vec3f_normalize(&n);
 	return (n);
 }
 

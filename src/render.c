@@ -21,9 +21,10 @@ void				render(t_main *m)
 	unsigned int	rgb;
 	t_obj			*o;
 	SDL_Color		*color;
-	t_vec4f			intersect;
+	t_vec3f			intersect;
 
-	ft_bzero(m->screen->pixels, W * H * m->bpp);
+	//ft_bzero(m->screen->pixels, W * H * m->bpp);
+	SDL_FillRect(m->screen, NULL, 0x000000);
 	y = 0;
 	while (y < H)
 	{

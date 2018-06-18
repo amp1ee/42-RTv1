@@ -15,7 +15,7 @@
 
 # define SQR(n)			(pow(n, 2))
 # define MIN(t1, t2)	(t1 < t2) ? (t1) : (t2)
-# define MAX(t1, t2)	(t1 > t2) ? (t1) : (t2);
+# define MAX(t1, t2)	(t1 > t2) ? (t1) : (t2)
 # define EPSILON 0.00001
 
 /*
@@ -27,6 +27,7 @@
 */
 
 # define TITLE	"rtv1"
+# define FOCUS	320
 # define W		640
 # define H		480
 # define OBJ	2
@@ -72,13 +73,28 @@ typedef struct	s_obj
 	void		(*cleanup)(void *data);
 }				t_obj;
 
+typedef struct	s_cam
+{
+	t_vec3f		*loc;
+	float		xang;
+	float		xcos;
+	float		xsin;
+	float		yang;
+	float		ycos;
+	float		ysin;
+	float		zang;
+	float		zcos;
+	float		zsin;
+	float		focus;
+}				t_cam;
+
 typedef struct	s_main
 {
 	SDL_Window	*window;
 	SDL_Surface	*screen;
 	bool		running;
 	int			bpp;
-	t_vec3f		*camera;
+	t_cam		*cam;
 	t_vec3f		*ray;
 	t_obj		*objects[OBJ];
 }				t_main;
@@ -114,5 +130,8 @@ double			vec3f_dotprod(t_vec3f a, t_vec3f b);
 */
 void			render(t_main *m);
 void			set_pixel(t_main *m, int x, int y, unsigned int p);
+
+unsigned int	trace(t_main *m, t_vec3f ray);
+
 
 #endif

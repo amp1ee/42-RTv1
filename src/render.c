@@ -14,37 +14,83 @@ void				set_pixel(t_main *m, int x, int y, unsigned int p)
 	}
 }
 
+static inline t_vec3f
+rot_vec_x(const t_vec3f p,
+				const float sin_al,
+				const float cos_al) {
+	const float y = p.y * cos_al - p.z * sin_al;
+	const float z = p.y * sin_al + p.z * cos_al;
+	return (t_vec3f){p.x, y, z};
+}
+
+static inline t_vec3f
+rot_vec_y(const t_vec3f p,
+				const float sin_al,
+				const float cos_al) {
+	const float x = p.x * cos_al - p.z * sin_al;
+	const float z = p.x * sin_al + p.z * cos_al;
+	return (t_vec3f){x, p.y, z};
+}
+
+static inline t_vec3f
+rot_vec_z(const t_vec3f p,
+				const float sin_al,
+				const float cos_al) {
+	const float x = p.x * cos_al - p.y * sin_al;
+	const float y = p.x * sin_al + p.y * cos_al;
+	return (t_vec3f){x, y, p.z};
+}
+
+unsigned int		trace(t_main *m, t_vec3f ray)
+{
+	t_vec3f 		r_vec;
+	SDL_Color		*color ;
+	t_obj			*o;
+	int				i;
+	t_vec3f			intersect;
+	const t_cam		*cam = m->cam;
+
+	r_vec = rot_vec_x(ray, cam->xsin, cam->xcos);
+	r_vec = rot_vec_z(r_vec, cam->zsin, cam->zcos);
+	r_vec = rot_vec_y(r_vec, cam->ysin, cam->ycos);
+	color = &(SDL_Color){255,192,128,0};
+	i = 0;
+	while (i < OBJ)
+	{
+		o = m->objects[i];
+		if (o->intersects(o->data, *m->cam->loc, r_vec, &intersect))
+		{
+			color = o->get_color(o->data, intersect);
+		}
+		i++;
+	}
+	return (color->r << 16 | color->g << 8 | color->b);
+}
+
 void				render(t_main *m)
 {
-	int				i;
-	int				x, y;
+	int				i, j;
+	float			x, y;
 	unsigned int	rgb;
-	t_obj			*o;
-	SDL_Color		*color;
-	t_vec3f			intersect;
+	//SDL_Color		*color;
 
-	//ft_bzero(m->screen->pixels, W * H * m->bpp);
 	SDL_FillRect(m->screen, NULL, 0x000000);
-	y = 0;
-	while (y < H)
+	i = 0;
+	while (i < W)
 	{
-		x = 0;
-		while (x < W)
+		j = 0;
+		while (j < H)
 		{
-			i = -1;
-			while (++i < OBJ)
-			{
-				o = m->objects[i];
-				if (o->intersects(o->data, *m->camera, *m->ray, &intersect))
-				{
-					color = o->get_color(o->data, intersect);
-					rgb = (color->r << 16) | (color->g << 8) | color->b;
-					set_pixel(m, x, y, rgb);
-				}
-			}
-			x++;
+			x = i - W / 2.0;
+			y = j - H / 2.0;
+			t_vec3f ray = (t_vec3f){x, y, 320};
+			//color = trace(m, ray);
+			//rgb = (color.r << 16 | color.g << 8 | color.b);
+			rgb = trace(m, ray);
+			set_pixel(m, i, j, rgb);
+			j++;
 		}
-		y++;
+		i++;
 	}
 	SDL_UpdateWindowSurface(m->window);
 }

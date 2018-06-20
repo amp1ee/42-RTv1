@@ -26,29 +26,25 @@ bool		sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 	const t_sphere	*sph = data;
 	const t_vec3f	center = *sph->center;
 	const float		r = sph->radius;
-	const float		a = SQR(ray.x) + SQR(ray.y) + SQR(ray.z);
-	const float		b = 2 * (ray.x * (ray_start.x - center.x))
-					+ ray.y * (ray_start.y - center.y)
-					+ ray.z * (ray_start.z - center.z);
-	const float		c = SQR(center.x) + SQR(center.y) + SQR(center.z)
-					+ SQR(ray_start.x) + SQR(ray_start.y) + SQR(ray_start.z)
-					- 2 * (ray_start.x * center.x + ray_start.y * center.y
-					+ ray_start.z * center.z) - SQR(r);
-	const float		d = SQR(b) - 4 * a * c;
-	(d>0)?printf("d=%.3f\n", d):0;
+	t_vec3f			k = get_vec3f(center, ray_start);
+	float			b = vec3f_dotprod(k, ray);
+	float			c = vec3f_dotprod(k, k) - SQR(r);
+	float			d = SQR(b) - c;
+	// (d>0)?printf("d=%.3f\n", d):0;
 	if (d < 0)
 		return (false);
-	const float		t1 = (-b + sqrt(d)) / (2 * a);
-	const float		t2 = (-b - sqrt(d)) / (2 * a);
-	const float		t = (MIN(t1, t2) > EPSILON) ? MIN(t1, t2) : MAX(t1, t2);
+	float sqrtd = sqrt(d);
+	const float		t1 = (-b + sqrtd);
+	const float		t2 = (-b - sqrtd);
+	const float		t = (MIN(t1, t2) >= 0) ? MIN(t1, t2) : MAX(t1, t2);
 	
-	printf("t=%f\n", t);
-	if (t < EPSILON)
-		return (false);
+	//printf("t=%f\n", t);
+	//if (t < EPSILON)
+	//	return (false);
 	*intersect = (t_vec3f){	ray_start.x + t * ray.x,
 							ray_start.y + t * ray.y,
 							ray_start.z + t * ray.z};
-	return (true);
+	return (t > 0);
 }
 
 SDL_Color	*sphere_color(void *data, t_vec3f intersect)

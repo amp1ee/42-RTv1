@@ -23,12 +23,21 @@ bool	handle_events(t_main *m)
 		else if (e.key.keysym.sym == SDLK_LEFT)
 			m->cam->xang += 2 * M_PI / 180.0;
 		else if (e.key.keysym.sym == SDLK_RIGHT)
-		{
 			m->cam->xang -= 2 * M_PI / 180.0;
-			printf("%f\n", m->cam->xang);
-		}
+		else if (e.key.keysym.sym == SDLK_UP)
+			m->cam->yang += 2 * M_PI / 180.0;
+		else if (e.key.keysym.sym == SDLK_DOWN)
+			m->cam->yang -= 2 * M_PI / 180.0;
+		else if (e.key.keysym.sym == SDLK_w)
+			m->cam->zang += 2 * M_PI / 180.0;
+		else if (e.key.keysym.sym == SDLK_s)
+			m->cam->zang -= 2 * M_PI / 180.0;
 		m->cam->xcos = cos(m->cam->xang);
 		m->cam->xsin = sin(m->cam->xang);
+		m->cam->ycos = cos(m->cam->yang);
+		m->cam->ysin = sin(m->cam->yang);
+		m->cam->zcos = cos(m->cam->zang);
+		m->cam->zsin = sin(m->cam->zang);
 	}
 	return (true);
 }
@@ -62,7 +71,7 @@ int		main(void)
 		|| !(m->window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED, W, H, 0))
 		|| !(m->screen = SDL_GetWindowSurface(m->window))
-		|| !(m->cam = init_cam(&(t_vec3f){0,500,0},
+		|| !(m->cam = init_cam(&(t_vec3f){500, 500, -300},
 					-M_PI/2.0,
 					0,
 					M_PI)))
@@ -70,9 +79,9 @@ int		main(void)
 		printf("Error\n");
 		return (1);
 	}
-	m->objects[0] = new_sphere(&(t_vec3f){0.0, 0.0, 0.0}, 50,
+	m->objects[0] = new_sphere(&(t_vec3f){0.0, 0.0, 0.0}, 5,
 		&(SDL_Color){255, 0, 0, 255});
-	m->objects[1] = new_sphere(&(t_vec3f){1.0, 3.0, 5.0}, 30,
+	m->objects[1] = new_sphere(&(t_vec3f){1.0, 3.0, 5.0}, 3,
 		&(SDL_Color){255, 0, 0, 255});
 /*	m->objects[2] = new_triangle(&(t_vec3f){3.0, 4.0, 1.0, 0.0},
 		&(t_vec3f){7.0, 8.0, 9.0, 0.0},

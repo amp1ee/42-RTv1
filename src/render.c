@@ -41,15 +41,26 @@ rot_vec_z(const t_vec3f p,
 	return (t_vec3f){x, y, p.z};
 }
 
+/*	float x = ray.x;
+	float y = ray.y;
+	float z = ray.z;
+	r_vec.x = cam->ycos * cam->zcos * x + cam->ycos * cam->zsin * y + cam->ysin * z;
+	r_vec.y = (-cam->xsin * cam->ysin * cam->zcos - cam->xcos * cam->zsin) * x +
+		(cam->xcos * cam->zcos - cam->xsin * cam->ysin * cam->zsin) * y + cam->xsin * cam->ycos * z;
+	r_vec.z = (-cam->ysin * cam->xcos * cam->zcos + cam->xsin * cam->zsin) * x + (-cam->ysin *
+		cam->xcos * cam->zsin - cam->xsin * cam->zcos) * y + cam->xcos * cam->ycos * z;
+*/
+
 unsigned int		trace(t_main *m, t_vec3f ray)
 {
 	t_vec3f 		r_vec;
-	SDL_Color		*color ;
+	SDL_Color		*color;
 	t_obj			*o;
 	int				i;
 	t_vec3f			intersect;
 	const t_cam		*cam = m->cam;
 
+	vec3f_normalize(&ray);
 	r_vec = rot_vec_x(ray, cam->xsin, cam->xcos);
 	r_vec = rot_vec_z(r_vec, cam->zsin, cam->zcos);
 	r_vec = rot_vec_y(r_vec, cam->ysin, cam->ycos);
@@ -81,9 +92,9 @@ void				render(t_main *m)
 		j = 0;
 		while (j < H)
 		{
-			x = i - W / 2.0;
-			y = j - H / 2.0;
-			t_vec3f ray = (t_vec3f){x, y, 320};
+			x = (i - W / 2.0);
+			y = (j - H / 2.0);
+			t_vec3f ray = (t_vec3f){x, y, 160};
 			//color = trace(m, ray);
 			//rgb = (color.r << 16 | color.g << 8 | color.b);
 			rgb = trace(m, ray);

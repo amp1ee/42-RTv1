@@ -79,15 +79,17 @@ int		main(void)
 		printf("Error\n");
 		return (1);
 	}
-	m->objects[0] = new_sphere(&(t_vec3f){0.0, 0.0, 0.0}, 5,
+
+	printf("%f\n", ASPECT);
+	m->objects[0] = new_sphere(&(t_vec3f){0.0, 0.0, 0.0}, 50,
 		&(SDL_Color){255, 0, 0, 255});
-	m->objects[1] = new_sphere(&(t_vec3f){1.0, 3.0, 5.0}, 3,
-		&(SDL_Color){255, 0, 0, 255});
+	m->objects[1] = new_sphere(&(t_vec3f){100.0, 3.0, 5.0}, 30,
+		&(SDL_Color){0, 255, 0, 255});
 /*	m->objects[2] = new_triangle(&(t_vec3f){3.0, 4.0, 1.0, 0.0},
 		&(t_vec3f){7.0, 8.0, 9.0, 0.0},
 		&(t_vec3f){12.0, 9.0, 7.0, 0.0},
 		&(SDL_Color){0, 255, 0, 255});*/
-	m->ray = &(t_vec3f){0, -1, 0};
+	m->ray = &(t_vec3f){0, 1, 0};
 	m->bpp = m->screen->format->BytesPerPixel;
 	SDL_RaiseWindow(m->window);
 	m->running = true;

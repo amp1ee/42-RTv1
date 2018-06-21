@@ -30,6 +30,7 @@
 # define FOCUS	320
 # define W		640
 # define H		480
+# define ASPECT	(H / (float)W)
 # define OBJ	2
 
 typedef struct	s_vec3f

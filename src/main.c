@@ -32,6 +32,18 @@ bool	handle_events(t_main *m)
 			m->cam->zang += 2 * M_PI / 180.0;
 		else if (e.key.keysym.sym == SDLK_s)
 			m->cam->zang -= 2 * M_PI / 180.0;
+		else if (e.key.keysym.sym == SDLK_KP_4)
+			m->cam->loc->x += 10;
+		else if (e.key.keysym.sym == SDLK_KP_6)
+			m->cam->loc->x -= 10;
+		else if (e.key.keysym.sym == SDLK_KP_2)
+			m->cam->loc->y += 10;
+		else if (e.key.keysym.sym == SDLK_KP_8)
+			m->cam->loc->y -= 10;
+		else if (e.key.keysym.sym == SDLK_z)
+			m->cam->loc->z += 10;
+		else if (e.key.keysym.sym == SDLK_x)
+			m->cam->loc->z -= 10;
 		m->cam->xcos = cos(m->cam->xang);
 		m->cam->xsin = sin(m->cam->xang);
 		m->cam->ycos = cos(m->cam->yang);
@@ -71,20 +83,26 @@ int		main(void)
 		|| !(m->window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED, W, H, 0))
 		|| !(m->screen = SDL_GetWindowSurface(m->window))
-		|| !(m->cam = init_cam(&(t_vec3f){500, 500, -300},
-					-M_PI/2.0,
+		|| !(m->cam = init_cam(&(t_vec3f){0, 0, 0},
+					-M_PI / 2.0,
 					0,
-					M_PI)))
+					-M_PI / 2.0)))
 	{
 		printf("Error\n");
 		return (1);
 	}
 
 	printf("%f\n", ASPECT);
-	m->objects[0] = new_sphere(&(t_vec3f){0.0, 0.0, 0.0}, 50,
+	m->objects[0] = new_sphere(&(t_vec3f){50.0, 0.0, 0.0}, 50,
 		&(SDL_Color){255, 0, 0, 255});
 	m->objects[1] = new_sphere(&(t_vec3f){100.0, 3.0, 5.0}, 30,
 		&(SDL_Color){0, 255, 0, 255});
+	m->objects[2] = new_sphere(&(t_vec3f){50.0, 0.0, 0.0}, 20,
+		&(SDL_Color){255, 255, 0, 255});
+	m->objects[3] = new_sphere(&(t_vec3f){125.0, 70.0, 50.0}, 10,
+		&(SDL_Color){0, 255, 255, 255});
+	m->objects[4] = new_sphere(&(t_vec3f){3.0, 30.0, 5.0}, 40,
+		&(SDL_Color){255, 0, 255, 255});
 /*	m->objects[2] = new_triangle(&(t_vec3f){3.0, 4.0, 1.0, 0.0},
 		&(t_vec3f){7.0, 8.0, 9.0, 0.0},
 		&(t_vec3f){12.0, 9.0, 7.0, 0.0},

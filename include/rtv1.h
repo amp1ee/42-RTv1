@@ -16,7 +16,7 @@
 # define SQR(n)			(pow(n, 2))
 # define MIN(t1, t2)	(t1 < t2) ? (t1) : (t2)
 # define MAX(t1, t2)	(t1 > t2) ? (t1) : (t2)
-# define EPSILON 0.00001
+# define EPSILON		0.00001
 
 /*
 **	typedef double	t_vec4f __attribute__((vector_size(sizeof(double) * 4)));
@@ -31,7 +31,7 @@
 # define W		640
 # define H		480
 # define ASPECT	(H / (float)W)
-# define OBJ	2
+# define OBJ	5
 
 typedef struct	s_vec3f
 {

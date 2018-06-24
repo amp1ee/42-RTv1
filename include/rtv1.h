@@ -125,7 +125,7 @@ bool			triangle_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 t_vec3f			get_vec3f(t_vec3f p0, t_vec3f p1);
 void			vec3f_normalize(t_vec3f *vec);
 float			vec3f_length(t_vec3f vec);
-double			vec3f_dotprod(t_vec3f a, t_vec3f b);
+float			vec3f_dotprod(t_vec3f a, t_vec3f b);
 t_vec3f			vec3f_cross(t_vec3f a, t_vec3f b);
 /*
 **	render.c

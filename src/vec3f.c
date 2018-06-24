@@ -18,9 +18,9 @@ t_vec3f		vec3f_cross(t_vec3f a, t_vec3f b)
 	return (xprod);
 }
 
-double		vec3f_dotprod(t_vec3f a, t_vec3f b)
+float		vec3f_dotprod(t_vec3f a, t_vec3f b)
 {
-	double	dprod;
+	float	dprod;
 
 	dprod = a.x * b.x +
 			a.y * b.y +

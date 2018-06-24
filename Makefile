@@ -24,8 +24,8 @@ LFLAGS	=-L$(LIBFTDIR) -lft -lm
 OSNAME	=$(shell uname -s)
 ifeq ($(OSNAME), Darwin)
 	CG_LIBS	=-framework OpenGL -framework AppKit -framework OpenCL	\
-				-framework SDL2 -F$(SDLDIR)
-	INCLUDES+=-F$(SDLDIR)							\
+				-framework SDL2 -F$(SDLDIR) -rpath $(SDLDIR)
+	INCLUDE	+=-F$(SDLDIR)							\
 				-I$(SDLDIR)SDL2.framework/Headers/
 else
 	CG_LIBS = `sdl2-config --libs`

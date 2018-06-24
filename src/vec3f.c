@@ -8,6 +8,16 @@ float		vec3f_length(t_vec3f vec)
 	return (res);
 }
 
+t_vec3f		vec3f_cross(t_vec3f a, t_vec3f b)
+{
+	t_vec3f	xprod;
+
+	xprod.x = a.y * b.z - a.z * b.y;
+	xprod.y = a.z * b.x - a.x * b.z;
+	xprod.z = a.x * b.y - a.y * b.x;
+	return (xprod);
+}
+
 double		vec3f_dotprod(t_vec3f a, t_vec3f b)
 {
 	double	dprod;

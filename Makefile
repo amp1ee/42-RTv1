@@ -12,7 +12,7 @@ SRC		=$(addprefix $(SRCDIR),	\
 			main.c				\
 			render.c			\
 			sphere.c			\
-			\
+			triangle.c			\
 			cube.c				\
 			vec3f.c)
 OBJ		=$(SRC:$(SRCDIR)%.c=$(OBJDIR)%.o)

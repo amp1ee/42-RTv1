@@ -31,7 +31,7 @@
 # define W		640
 # define H		480
 # define ASPECT	(H / (float)W)
-# define OBJ	5
+# define OBJ	6
 
 typedef struct	s_vec3f
 {
@@ -59,7 +59,7 @@ typedef struct	s_triang
 	t_vec3f		*a;
 	t_vec3f		*b;
 	t_vec3f		*c;
-	t_vec3f		*normal_vec;
+	t_vec3f		normal_vec;
 	SDL_Color	*color;
 	double		dist;
 }				t_triang;
@@ -126,6 +126,7 @@ t_vec3f			get_vec3f(t_vec3f p0, t_vec3f p1);
 void			vec3f_normalize(t_vec3f *vec);
 float			vec3f_length(t_vec3f vec);
 double			vec3f_dotprod(t_vec3f a, t_vec3f b);
+t_vec3f			vec3f_cross(t_vec3f a, t_vec3f b);
 /*
 **	render.c
 */

@@ -6,7 +6,6 @@ bool	game_quit(t_main *m)
 	Uint32 pixelFormatEnum = pixelFormat->format;
 	const char* surfacePixelFormatName = SDL_GetPixelFormatName(pixelFormatEnum);
 	SDL_Log("The surface's pixelformat is %s", surfacePixelFormatName);
-
 	SDL_DestroyWindow(m->window);
 	SDL_Quit();
 	return (false);
@@ -91,8 +90,6 @@ int		main(void)
 		printf("Error\n");
 		return (1);
 	}
-
-	printf("%f\n", ASPECT);
 	m->objects[0] = new_sphere(&(t_vec3f){50.0, 0.0, 0.0}, 50,
 		&(SDL_Color){255, 0, 0, 255});
 	m->objects[1] = new_sphere(&(t_vec3f){100.0, 3.0, 5.0}, 30,
@@ -103,10 +100,10 @@ int		main(void)
 		&(SDL_Color){0, 255, 255, 255});
 	m->objects[4] = new_sphere(&(t_vec3f){3.0, 30.0, 5.0}, 40,
 		&(SDL_Color){255, 0, 255, 255});
-/*	m->objects[2] = new_triangle(&(t_vec3f){3.0, 4.0, 1.0, 0.0},
-		&(t_vec3f){7.0, 8.0, 9.0, 0.0},
-		&(t_vec3f){12.0, 9.0, 7.0, 0.0},
-		&(SDL_Color){0, 255, 0, 255});*/
+	m->objects[5] = new_triangle(&(t_vec3f){3.0, 4.0, 1.0},
+		&(t_vec3f){7.0, 8.0, 9.0},
+		&(t_vec3f){12.0, 9.0, 7.0},
+		&(SDL_Color){0, 255, 0, 255});
 	m->ray = &(t_vec3f){0, 1, 0};
 	m->bpp = m->screen->format->BytesPerPixel;
 	SDL_RaiseWindow(m->window);

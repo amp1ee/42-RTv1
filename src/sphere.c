@@ -66,14 +66,19 @@ SDL_Color	*sphere_color(void *data, t_vec3f intersect)
 	return (sphere->color);
 }
 
-t_vec3f		sphere_normalvec(void *data, t_vec3f intersect)
+t_vec3f		*sphere_normalvec(void *data, t_vec3f intersect)
 {
 	const t_sphere	*sphere = data;
 	t_vec3f			n;
+	t_vec3f			*v;
 
 	n = get_vec3f(*sphere->center, intersect);
-	vec3f_normalize(&n);
-	return (n);
+	v = malloc(sizeof(t_vec3f));
+	v->x = n.x;
+	v->y = n.y;
+	v->z = n.z;
+	vec3f_normalize(v);
+	return (v);
 }
 
 void		sphere_cleanup(void *data)

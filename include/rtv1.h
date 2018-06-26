@@ -59,7 +59,7 @@ typedef struct	s_triang
 	t_vec3f		*a;
 	t_vec3f		*b;
 	t_vec3f		*c;
-	t_vec3f		normal_vec;
+	t_vec3f		*normal;
 	SDL_Color	*color;
 	double		dist;
 }				t_triang;
@@ -70,7 +70,7 @@ typedef struct	s_obj
 	bool		(*intersects)(void *data, t_vec3f ray_start,
 			t_vec3f ray, t_vec3f *intersect);
 	SDL_Color	*(*get_color)(void *data, t_vec3f intersect);
-	t_vec3f		(*normal_vec)(void *data, t_vec3f intersect);
+	t_vec3f		*(*normal_vec)(void *data, t_vec3f intersect);
 	void		(*cleanup)(void *data);
 }				t_obj;
 
@@ -105,7 +105,7 @@ typedef struct	s_main
 */
 t_obj			*new_sphere(t_vec3f *center, float radius, SDL_Color *color);
 SDL_Color		*sphere_color(void *data, t_vec3f intersect);
-t_vec3f			sphere_normalvec(void *data, t_vec3f intersect);
+t_vec3f			*sphere_normalvec(void *data, t_vec3f intersect);
 void			sphere_cleanup(void *data);
 bool			sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 				t_vec3f *intersect);
@@ -115,7 +115,7 @@ bool			sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 t_obj			*new_triangle(t_vec3f *a, t_vec3f *b, t_vec3f *c,
 			SDL_Color *color);
 SDL_Color		*triangle_color(void *data, t_vec3f intersect);
-t_vec3f			triangle_normalvec(void *data, t_vec3f intersect);
+t_vec3f			*triangle_normalvec(void *data, t_vec3f intersect);
 void			triangle_cleanup(void *data);
 bool			triangle_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 				t_vec3f *intersect);

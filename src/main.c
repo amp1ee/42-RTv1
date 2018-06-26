@@ -100,9 +100,9 @@ int		main(void)
 		&(SDL_Color){0, 255, 255, 255});
 	m->objects[4] = new_sphere(&(t_vec3f){3.0, 30.0, 5.0}, 40,
 		&(SDL_Color){255, 0, 255, 255});
-	m->objects[5] = new_triangle(&(t_vec3f){3.0, 4.0, 1.0},
-		&(t_vec3f){7.0, 8.0, 9.0},
-		&(t_vec3f){12.0, 9.0, 7.0},
+	m->objects[5] = new_triangle(&(t_vec3f){3.0, 4.0, 100.0},
+		&(t_vec3f){7.0, 80.0, 9.0},
+		&(t_vec3f){120.0, 9.0, 7.0},
 		&(SDL_Color){0, 255, 0, 255});
 	m->ray = &(t_vec3f){0, 1, 0};
 	m->bpp = m->screen->format->BytesPerPixel;

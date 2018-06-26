@@ -13,7 +13,9 @@ SRC		=$(addprefix $(SRCDIR),	\
 			render.c			\
 			sphere.c			\
 			triangle.c			\
-			cube.c				\
+			plane.c				\
+			cylinder.c			\
+			cone.c				\
 			vec3f.c)
 OBJ		=$(SRC:$(SRCDIR)%.c=$(OBJDIR)%.o)
 INCLUDE	=-I$(INCLDIR) -I$(LIBFTDIR)

@@ -1,24 +1,24 @@
 #include "rtv1.h"
 
-bool	game_quit(t_main *m)
+void	game_quit(t_main *m)
 {
+	m->running = false;
 	SDL_PixelFormat* pixelFormat = m->screen->format;
 	Uint32 pixelFormatEnum = pixelFormat->format;
 	const char* surfacePixelFormatName = SDL_GetPixelFormatName(pixelFormatEnum);
 	SDL_Log("The surface's pixelformat is %s", surfacePixelFormatName);
 	SDL_DestroyWindow(m->window);
 	SDL_Quit();
-	return (false);
 }
 
-bool	handle_events(t_main *m)
+void	handle_events(t_main *m)
 {
 	SDL_Event	e;
 
 	while (SDL_PollEvent(&e))
 	{
 		if (e.type == SDL_QUIT || e.key.keysym.sym == SDLK_ESCAPE)
-			return (game_quit(m));
+			game_quit(m);
 		else if (e.key.keysym.sym == SDLK_LEFT)
 			m->cam->xang += 2 * M_PI / 180.0;
 		else if (e.key.keysym.sym == SDLK_RIGHT)
@@ -50,7 +50,6 @@ bool	handle_events(t_main *m)
 		m->cam->zcos = cos(m->cam->zang);
 		m->cam->zsin = sin(m->cam->zang);
 	}
-	return (true);
 }
 
 t_cam	*init_cam(t_vec3f *loc, float xang, float yang, float zang)
@@ -111,7 +110,7 @@ int		main(void)
 	while (m->running)
 	{
 		render(m);
-		m->running = handle_events(m);
+		handle_events(m);
 	}
 	exit(0);
 	return (0);

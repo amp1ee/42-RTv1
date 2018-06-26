@@ -27,10 +27,10 @@ bool			triangle_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 {
 	const t_triang	*tri = data;
 
-	t_vec3f *n = 	triangle_normalvec(data, *intersect);
+	t_vec3f			*n = triangle_normalvec(data, *intersect);
 	float			d = vec3f_dotprod(*n, *tri->a);
 	float			nr = vec3f_dotprod(*n, ray);
-	if (nr == 0)
+	if (fabs(nr) <= EPSILON)
 		return (false);
 	float			t = -(vec3f_dotprod(*n, ray_start) + d) / nr;
 	*intersect = (t_vec3f){ ray_start.x + t * ray.x,

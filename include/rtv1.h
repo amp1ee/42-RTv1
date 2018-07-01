@@ -5,6 +5,7 @@
 # include <stdlib.h>
 # include <fcntl.h>
 # include <stdbool.h>
+# include <float.h>
 # include "libft.h"
 
 # ifdef __linux__
@@ -32,6 +33,7 @@
 # define H		480
 # define ASPECT	(H / (float)W)
 # define OBJ	6
+# define LIGHT	1
 
 typedef struct	s_vec3f
 {
@@ -46,6 +48,13 @@ typedef struct	s_vec3i
 	int			y;
 	int			z;
 }				t_vec3i;
+
+typedef struct	s_light
+{
+	t_vec3f		*loc;
+	float		brightness;
+	SDL_Color	*color;
+}				t_light;
 
 typedef struct	s_sphere
 {
@@ -70,7 +79,7 @@ typedef struct	s_obj
 	bool		(*intersects)(void *data, t_vec3f ray_start,
 			t_vec3f ray, t_vec3f *intersect);
 	SDL_Color	*(*get_color)(void *data, t_vec3f intersect);
-	t_vec3f		*(*normal_vec)(void *data, t_vec3f intersect);
+	t_vec3f		(*normal_vec)(void *data, t_vec3f intersect);
 	void		(*cleanup)(void *data);
 }				t_obj;
 
@@ -96,6 +105,7 @@ typedef struct	s_main
 	bool		running;
 	int			bpp;
 	t_cam		*cam;
+	t_light		*lights[LIGHT];
 	t_vec3f		*ray;
 	t_obj		*objects[OBJ];
 }				t_main;
@@ -105,7 +115,7 @@ typedef struct	s_main
 */
 t_obj			*new_sphere(t_vec3f *center, float radius, SDL_Color *color);
 SDL_Color		*sphere_color(void *data, t_vec3f intersect);
-t_vec3f			*sphere_normalvec(void *data, t_vec3f intersect);
+t_vec3f			sphere_normalvec(void *data, t_vec3f intersect);
 void			sphere_cleanup(void *data);
 bool			sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 				t_vec3f *intersect);
@@ -115,7 +125,7 @@ bool			sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 t_obj			*new_triangle(t_vec3f *a, t_vec3f *b, t_vec3f *c,
 			SDL_Color *color);
 SDL_Color		*triangle_color(void *data, t_vec3f intersect);
-t_vec3f			*triangle_normalvec(void *data, t_vec3f intersect);
+t_vec3f			triangle_normalvec(void *data, t_vec3f intersect);
 void			triangle_cleanup(void *data);
 bool			triangle_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 				t_vec3f *intersect);

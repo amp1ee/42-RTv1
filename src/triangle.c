@@ -27,12 +27,12 @@ bool			triangle_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 {
 	const t_triang	*tri = data;
 
-	t_vec3f			*n = triangle_normalvec(data, *intersect);
-	float			d = vec3f_dotprod(*n, *tri->a);
-	float			nr = vec3f_dotprod(*n, ray);
+	t_vec3f			n = triangle_normalvec(data, *intersect);
+	float			d = vec3f_dotprod(n, *tri->a);
+	float			nr = vec3f_dotprod(n, ray);
 	if (fabs(nr) <= EPSILON)
 		return (false);
-	float			t = -(vec3f_dotprod(*n, ray_start) + d) / nr;
+	float			t = -(vec3f_dotprod(n, ray_start) + d) / nr;
 	*intersect = (t_vec3f){ ray_start.x + t * ray.x,
 							ray_start.y + t * ray.y,
 							ray_start.z + t * ray.z };
@@ -42,9 +42,9 @@ bool			triangle_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 	t_vec3f			c0 = get_vec3f(*tri->a, *intersect);
 	t_vec3f			c1 = get_vec3f(*tri->b, *intersect);
 	t_vec3f			c2 = get_vec3f(*tri->c, *intersect);
-	if (t > 0 && vec3f_dotprod(*n, vec3f_cross(edge0, c0)) > 0 &&
-			vec3f_dotprod(*n, vec3f_cross(edge1, c1)) > 0 &&
-			vec3f_dotprod(*n, vec3f_cross(edge2, c2)) > 0)
+	if (t > 0 && vec3f_dotprod(n, vec3f_cross(edge0, c0)) > 0 &&
+			vec3f_dotprod(n, vec3f_cross(edge1, c1)) > 0 &&
+			vec3f_dotprod(n, vec3f_cross(edge2, c2)) > 0)
 		return (true);
 	return (false);
 }
@@ -57,26 +57,19 @@ SDL_Color		*triangle_color(void *data, t_vec3f intersect)
 	return (triang->color);
 }
 
-t_vec3f			*triangle_normalvec(void *data, t_vec3f intersect)
+t_vec3f			triangle_normalvec(void *data, t_vec3f intersect)
 {
 	const t_triang	*tri = data;
 	t_vec3f			v1;
 	t_vec3f			v2;
 	t_vec3f			n;
-	t_vec3f			*v;
 
 	(void)intersect;
 	v1 = get_vec3f(*tri->a, *tri->b);
 	v2 = get_vec3f(*tri->a, *tri->c);
 	n = vec3f_cross(v1, v2);
-
-	if (!(v = malloc(sizeof(t_vec3f))))
-		return (NULL);
-	v->x = n.x;
-	v->y = n.y;
-	v->z = n.z;
-	vec3f_normalize(v);
-	return (v);
+	vec3f_normalize(&n);
+	return (n);
 }
 
 void			triangle_cleanup(void *data)

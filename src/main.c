@@ -103,6 +103,12 @@ int		main(void)
 		&(t_vec3f){7.0, 80.0, 9.0},
 		&(t_vec3f){120.0, 9.0, 7.0},
 		&(SDL_Color){0, 255, 0, 255});
+	
+	m->lights[0] = &(t_light){
+		&(t_vec3f){0, 0, 200},
+		1.0,
+		&(SDL_Color){255,255,255,255}
+	};
 	m->ray = &(t_vec3f){0, 1, 0};
 	m->bpp = m->screen->format->BytesPerPixel;
 	SDL_RaiseWindow(m->window);

@@ -41,14 +41,53 @@ rot_vec_z(const t_vec3f p,
 	return (t_vec3f){x, y, p.z};
 }
 
-/*	float x = ray.x;
-	float y = ray.y;
-	float z = ray.z;
-	r_vec.x = cam->ycos * cam->zcos * x + cam->ycos * cam->zsin * y + cam->ysin * z;
-	r_vec.y = (-cam->xsin * cam->ysin * cam->zcos - cam->xcos * cam->zsin) * x +
-		(cam->xcos * cam->zcos - cam->xsin * cam->ysin * cam->zsin) * y + cam->xsin * cam->ycos * z;
-	r_vec.z = (-cam->ysin * cam->xcos * cam->zcos + cam->xsin * cam->zsin) * x + (-cam->ysin *
-		cam->xcos * cam->zsin - cam->xsin * cam->zcos) * y + cam->xcos * cam->ycos * z;
+static inline t_vec3f
+reflect(const t_vec3f i, const t_vec3f n) 
+{
+	t_vec3f mi = (t_vec3f){
+		-i.x,
+		-i.y,
+		-i.z
+	};
+	float idotn = vec3f_dotprod(mi, n);
+	return ((t_vec3f){
+		mi.x - 2 * idotn * n.x,
+		mi.y - 2 * idotn * n.y,
+		mi.z - 2 * idotn * n.z,
+	});
+}
+
+/*
+default: 
+    { 
+//	We use the Phong illumation model int the default case. The phong model is composed of a diffuse and a specular reflection component. 
+    Vec3f lightAmt = 0, specularColor = 0; 
+    Vec3f shadowPointOrig = (dotProduct(dir, N) < 0) ? 
+        hitPoint + N * options.bias : 
+        hitPoint - N * options.bias; 
+//	Loop over all lights in the scene and sum their contribution up We also apply the lambert cosine law here though we haven't explained yet what this means. 
+        for (uint32_t i = 0; i < lights.size(); ++i) { 
+    	    Vec3f lightDir = lights[i]->position - hitPoint; 
+    	// square of the distance between hitPoint and the light
+            float lightDistance2 = dotProduct(lightDir, lightDir); 
+            lightDir = normalize(lightDir); 
+        	float LdotN = std::max(0.f, dotProduct(lightDir, N)); 
+            Object *shadowHitObject = nullptr; 
+            float tNearShadow = kInfinity; 
+            // is the point in shadow, and is the nearest occluding object 
+            // closer to the object than the light itself?
+            bool inShadow = trace(shadowPointOrig, lightDir, objects,
+            	tNearShadow, index, uv, &shadowHitObject) && 
+                tNearShadow * tNearShadow < lightDistance2; 
+            lightAmt += (1 - inShadow) * lights[i]->intensity * LdotN; 
+            Vec3f reflectionDirection = reflect(-lightDir, N); 
+            specularColor += powf(std::max(0.f, -dotProduct(reflectionDirection,
+            dir)), hitObject->specularExponent) * lights[i]->intensity;
+        } 
+        hitColor = lightAmt * hitObject->evalDiffuseColor(st) * hitObject->Kd +
+        	specularColor * hitObject->Ks; 
+        break; 
+    }
 */
 
 unsigned int		trace(t_main *m, t_vec3f ray)
@@ -71,6 +110,31 @@ unsigned int		trace(t_main *m, t_vec3f ray)
 		o = m->objects[i];
 		if (o->intersects(o->data, *m->cam->loc, r_vec, &intersect))
 		{
+			t_vec3f norm = o->normal_vec(o->data, intersect);
+			t_vec3f lightamt = {0};
+			t_vec3f spec_color = {0};
+			float shadowdir = (vec3f_dotprod(r_vec, norm) < 0) ?
+				EPSILON : -EPSILON;
+			t_vec3f shadowpoint = (t_vec3f){
+				intersect.x + norm.x * shadowdir,
+				intersect.y + norm.y * shadowdir,
+				intersect.z + norm.z * shadowdir
+			};
+			int j = 0;
+			while (j < LIGHT)
+			{
+				t_vec3f light_dir = get_vec3f(intersect, *m->lights[j]->loc);
+				float light_dist2 = vec3f_dotprod(light_dir, light_dir);
+				vec3f_normalize(&light_dir);
+				float ldotn = MAX(0.0f, vec3f_dotprod(light_dir, norm));
+				t_obj *shadowhitobj = NULL;
+				float tnearshadow = FLT_MAX;
+				bool inshadow = o->intersects(o->data, shadowpoint, light_dir,
+					&intersect);
+				lightamt += (1 - inshadow) * m->lights[j]->brightness * ldotn;
+				t_vec3f reflectdir = reflect(light_dir, norm);
+				j++;
+			}
 			color = o->get_color(o->data, intersect);
 		}
 		i++;

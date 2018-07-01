@@ -32,6 +32,7 @@
 # define H		480
 # define ASPECT	(H / (float)W)
 # define OBJ	6
+# define LIGHT	1
 
 typedef struct	s_vec3f
 {
@@ -46,6 +47,12 @@ typedef struct	s_vec3i
 	int			y;
 	int			z;
 }				t_vec3i;
+
+typedef struct	s_light
+{
+	t_vec3f		*loc;
+	SDL_Color	*color;
+}				t_light;
 
 typedef struct	s_sphere
 {
@@ -96,6 +103,7 @@ typedef struct	s_main
 	bool		running;
 	int			bpp;
 	t_cam		*cam;
+	t_light		*lights[LIGHT];
 	t_vec3f		*ray;
 	t_obj		*objects[OBJ];
 }				t_main;

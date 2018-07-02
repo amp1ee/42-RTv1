@@ -107,6 +107,8 @@ int		main(void)
 	m->lights[0] = &(t_light){
 		&(t_vec3f){0, 0, 200},
 		1.0,
+	m->lights[0] = &(t_light){
+		&(t_vec3f){0, 0, 200},
 		&(SDL_Color){255,255,255,255}
 	};
 	m->ray = &(t_vec3f){0, 1, 0};

@@ -50,9 +50,10 @@ bool		sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 SDL_Color	*sphere_color(void *data, t_vec3f intersect)
 {
 	const t_sphere	*sphere = data;
-	const SDL_Color	*scol = sphere->color;
+	(void)intersect;
+/*	const SDL_Color	*scol = sphere->color;
 	SDL_Color		*col;
-	const float		dist = vec3f_length(intersect) / 64.0;
+	const float		dist = MAX(0.15, vec3f_length(intersect) / 64.0);
 
 	if (dist >= 0.0)
 	{
@@ -62,7 +63,7 @@ SDL_Color	*sphere_color(void *data, t_vec3f intersect)
 		col->b = scol->b * dist;
 		col->a = scol->a;
 		return (col);
-	}
+	}*/
 	return (sphere->color);
 }
 

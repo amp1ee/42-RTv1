@@ -1,6 +1,6 @@
 #include "rtv1.h"
 
-t_obj		*new_sphere(t_vec3f *center, float radius, SDL_Color *color)
+t_obj		*new_sphere(t_vec3f *center, float radius, SDL_Color color)
 {
 	t_sphere	*sph;
 	t_obj		*obj;
@@ -47,23 +47,11 @@ bool		sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 	return (t > 0);
 }
 
-SDL_Color	*sphere_color(void *data, t_vec3f intersect)
+SDL_Color	sphere_color(void *data, t_vec3f intersect)
 {
 	const t_sphere	*sphere = data;
-	(void)intersect;
-/*	const SDL_Color	*scol = sphere->color;
-	SDL_Color		*col;
-	const float		dist = MAX(0.15, vec3f_length(intersect) / 64.0);
 
-	if (dist >= 0.0)
-	{
-		col = malloc(sizeof(SDL_Color));
-		col->r = scol->r * dist;
-		col->g = scol->g * dist;
-		col->b = scol->b * dist;
-		col->a = scol->a;
-		return (col);
-	}*/
+	(void)intersect;
 	return (sphere->color);
 }
 

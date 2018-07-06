@@ -93,7 +93,7 @@ default:
 unsigned int		trace(t_main *m, t_vec3f ray)
 {
 	t_vec3f 		r_vec;
-	SDL_Color		*color;
+	SDL_Color		color;
 	t_obj			*o;
 	int				i;
 	t_vec3f			intersect;
@@ -103,17 +103,17 @@ unsigned int		trace(t_main *m, t_vec3f ray)
 	r_vec = rot_vec_x(ray, cam->xsin, cam->xcos);
 	r_vec = rot_vec_z(r_vec, cam->zsin, cam->zcos);
 	r_vec = rot_vec_y(r_vec, cam->ysin, cam->ycos);
-	color = &(SDL_Color){255,192,128,0};
-	i = 0;
-	while (i < OBJ)
+	color = (SDL_Color){255,192,128,255};
+	i = -1;
+	while (++i < OBJ)
 	{
 		o = m->objects[i];
-		if (o->intersects(o->data, *m->cam->loc, r_vec, &intersect))
+		if (o->intersects(o->data, *cam->loc, r_vec, &intersect))
 		{
 			t_vec3f norm = o->normal_vec(o->data, intersect);
 			color = o->get_color(o->data, intersect);
-			int j = 0;
-			while (j < LIGHT)
+			int j = -1;
+			while (++j < LIGHT)
 			{
 				t_vec3f light_dir = get_vec3f(intersect, *m->lights[j]->loc);
 				t_vec3f L = (t_vec3f){
@@ -121,17 +121,17 @@ unsigned int		trace(t_main *m, t_vec3f ray)
 					light_dir.y * -1,
 					light_dir.z * -1
 				};
-				float k = (0.18 / M_PI) * m->lights[j]->brightness *
+				/*0.18 == object's average albedo)*/
+				float k = ((0.18 / 255)*M_PI) * m->lights[j]->brightness *
 					(MAX(0.0f, vec3f_dotprod(norm, L)));
-				color->r *= k;
-				color->g *= k;
-				color->b *= k;
-				j++;
+				//(i == 5) ?printf("%.3f\n", -vec3f_dotprod(norm, L)) :0;
+				color.r *= k;
+				color.g *= k;
+				color.b *= k;
 			}
 		}
-		i++;
 	}
-	return (color->r << 16 | color->g << 8 | color->b);
+	return (color.r << 16 | color.g << 8 | color.b);
 }
 
 void				render(t_main *m)

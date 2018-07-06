@@ -1,7 +1,7 @@
 #include "rtv1.h"
 
 t_obj			*new_triangle(t_vec3f *a, t_vec3f *b, t_vec3f *c,
-				SDL_Color *color)
+				SDL_Color color)
 {
 	t_triang	*tri;
 	t_obj		*obj;
@@ -49,7 +49,7 @@ bool			triangle_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 	return (false);
 }
 
-SDL_Color		*triangle_color(void *data, t_vec3f intersect)
+SDL_Color		triangle_color(void *data, t_vec3f intersect)
 {
 	const t_triang	*triang = data;
 

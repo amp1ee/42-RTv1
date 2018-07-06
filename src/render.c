@@ -40,7 +40,7 @@ rot_vec_z(const t_vec3f p,
 	const float y = p.x * sin_al + p.y * cos_al;
 	return (t_vec3f){x, y, p.z};
 }
-
+/*
 static inline t_vec3f
 reflect(const t_vec3f i, const t_vec3f n) 
 {
@@ -55,7 +55,7 @@ reflect(const t_vec3f i, const t_vec3f n)
 		mi.y - 2 * idotn * n.y,
 		mi.z - 2 * idotn * n.z,
 	});
-}
+}*/
 
 /*
 default: 
@@ -93,7 +93,7 @@ default:
 unsigned int		trace(t_main *m, t_vec3f ray)
 {
 	t_vec3f 		r_vec;
-	SDL_Color		*color;
+	SDL_Color		color;
 	t_obj			*o;
 	int				i;
 	t_vec3f			intersect;
@@ -103,43 +103,35 @@ unsigned int		trace(t_main *m, t_vec3f ray)
 	r_vec = rot_vec_x(ray, cam->xsin, cam->xcos);
 	r_vec = rot_vec_z(r_vec, cam->zsin, cam->zcos);
 	r_vec = rot_vec_y(r_vec, cam->ysin, cam->ycos);
-	color = &(SDL_Color){255,192,128,0};
-	i = 0;
-	while (i < OBJ)
+	color = (SDL_Color){255,192,128,255};
+	i = -1;
+	while (++i < OBJ)
 	{
 		o = m->objects[i];
-		if (o->intersects(o->data, *m->cam->loc, r_vec, &intersect))
+		if (o->intersects(o->data, *cam->loc, r_vec, &intersect))
 		{
 			t_vec3f norm = o->normal_vec(o->data, intersect);
-			t_vec3f lightamt = {0};
-			t_vec3f spec_color = {0};
-			float shadowdir = (vec3f_dotprod(r_vec, norm) < 0) ?
-				EPSILON : -EPSILON;
-			t_vec3f shadowpoint = (t_vec3f){
-				intersect.x + norm.x * shadowdir,
-				intersect.y + norm.y * shadowdir,
-				intersect.z + norm.z * shadowdir
-			};
-			int j = 0;
-			while (j < LIGHT)
+			color = o->get_color(o->data, intersect);
+			int j = -1;
+			while (++j < LIGHT)
 			{
 				t_vec3f light_dir = get_vec3f(intersect, *m->lights[j]->loc);
-				float light_dist2 = vec3f_dotprod(light_dir, light_dir);
-				vec3f_normalize(&light_dir);
-				float ldotn = MAX(0.0f, vec3f_dotprod(light_dir, norm));
-				t_obj *shadowhitobj = NULL;
-				float tnearshadow = FLT_MAX;
-				bool inshadow = o->intersects(o->data, shadowpoint, light_dir,
-					&intersect);
-				lightamt += (1 - inshadow) * m->lights[j]->brightness * ldotn;
-				t_vec3f reflectdir = reflect(light_dir, norm);
-				j++;
+				t_vec3f L = (t_vec3f){
+					light_dir.x * -1,
+					light_dir.y * -1,
+					light_dir.z * -1
+				};
+				/*0.18 == object's average albedo)*/
+				float k = ((0.18 / 255)*M_PI) * m->lights[j]->brightness *
+					(MAX(0.0f, vec3f_dotprod(norm, L)));
+				//(i == 5) ?printf("%.3f\n", -vec3f_dotprod(norm, L)) :0;
+				color.r *= k;
+				color.g *= k;
+				color.b *= k;
 			}
-			color = o->get_color(o->data, intersect);
 		}
-		i++;
 	}
-	return (color->r << 16 | color->g << 8 | color->b);
+	return (color.r << 16 | color.g << 8 | color.b);
 }
 
 void				render(t_main *m)

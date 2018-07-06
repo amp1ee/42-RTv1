@@ -90,24 +90,24 @@ int		main(void)
 		return (1);
 	}
 	m->objects[0] = new_sphere(&(t_vec3f){50.0, 0.0, 0.0}, 50,
-		&(SDL_Color){255, 0, 0, 255});
+		(SDL_Color){255, 0, 0, 255});
 	m->objects[1] = new_sphere(&(t_vec3f){100.0, 3.0, 5.0}, 30,
-		&(SDL_Color){0, 255, 0, 255});
+		(SDL_Color){0, 255, 0, 255});
 	m->objects[2] = new_sphere(&(t_vec3f){50.0, 0.0, 0.0}, 20,
-		&(SDL_Color){255, 255, 0, 255});
+		(SDL_Color){255, 255, 0, 255});
 	m->objects[3] = new_sphere(&(t_vec3f){125.0, 70.0, 50.0}, 10,
-		&(SDL_Color){0, 255, 255, 255});
+		(SDL_Color){0, 255, 255, 255});
 	m->objects[4] = new_sphere(&(t_vec3f){3.0, 30.0, 5.0}, 40,
-		&(SDL_Color){255, 0, 255, 255});
+		(SDL_Color){255, 0, 255, 255});
 	m->objects[5] = new_triangle(&(t_vec3f){3.0, 4.0, 100.0},
 		&(t_vec3f){7.0, 80.0, 9.0},
 		&(t_vec3f){120.0, 9.0, 7.0},
-		&(SDL_Color){0, 255, 0, 255});
+		(SDL_Color){0, 255, 0, 255});
 	
 	m->lights[0] = &(t_light){
-		&(t_vec3f){0, 0, 200},
+		&(t_vec3f){0, 200, -200},
 		1.0,
-		&(SDL_Color){255,255,255,255}
+		(SDL_Color){255,255,255,255}
 	};
 	m->ray = &(t_vec3f){0, 1, 0};
 	m->bpp = m->screen->format->BytesPerPixel;

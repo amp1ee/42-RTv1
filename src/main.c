@@ -89,15 +89,17 @@ int		main(void)
 		printf("Error\n");
 		return (1);
 	}
-	m->objects[0] = new_sphere(&(t_vec3f){50.0, 0.0, 0.0}, 50,
+	t_vec3f	light_pos = (t_vec3f){200.0, 200.0, -50.0};
+
+	m->objects[0] = new_sphere(&light_pos, 3,
 		(SDL_Color){255, 0, 0, 255});
-	m->objects[1] = new_sphere(&(t_vec3f){100.0, 3.0, 5.0}, 30,
+	m->objects[1] = new_sphere(&(t_vec3f){0.0, 300.0, 5.0}, 40,
 		(SDL_Color){0, 255, 0, 255});
-	m->objects[2] = new_sphere(&(t_vec3f){50.0, 0.0, 0.0}, 20,
+	m->objects[2] = new_sphere(&(t_vec3f){0.0, 50.0, 0.0}, 40,
 		(SDL_Color){255, 255, 0, 255});
-	m->objects[3] = new_sphere(&(t_vec3f){125.0, 70.0, 50.0}, 10,
+	m->objects[3] = new_sphere(&(t_vec3f){0.0, 425.0, 0.0}, 40,
 		(SDL_Color){0, 255, 255, 255});
-	m->objects[4] = new_sphere(&(t_vec3f){3.0, 30.0, 5.0}, 40,
+	m->objects[4] = new_sphere(&(t_vec3f){0.0, 800.0, 0.0}, 40,
 		(SDL_Color){255, 0, 255, 255});
 	m->objects[5] = new_triangle(&(t_vec3f){3.0, 4.0, 100.0},
 		&(t_vec3f){7.0, 80.0, 9.0},
@@ -105,7 +107,7 @@ int		main(void)
 		(SDL_Color){0, 255, 0, 255});
 	
 	m->lights[0] = &(t_light){
-		&(t_vec3f){0, 200, -200},
+		&light_pos,
 		1.0,
 		(SDL_Color){255,255,255,255}
 	};

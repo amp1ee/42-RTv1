@@ -37,10 +37,6 @@ bool		sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 	const float		t1 = (-b + sqrtd);
 	const float		t2 = (-b - sqrtd);
 	const float		t = (MIN(t1, t2) >= 0) ? MIN(t1, t2) : MAX(t1, t2);
-	
-	//printf("t=%f\n", t);
-	//if (t < EPSILON)
-	//	return (false);
 	*intersect = (t_vec3f){	ray_start.x + t * ray.x,
 							ray_start.y + t * ray.y,
 							ray_start.z + t * ray.z};

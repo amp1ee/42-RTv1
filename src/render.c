@@ -40,55 +40,6 @@ rot_vec_z(const t_vec3f p,
 	const float y = p.x * sin_al + p.y * cos_al;
 	return (t_vec3f){x, y, p.z};
 }
-/*
-static inline t_vec3f
-reflect(const t_vec3f i, const t_vec3f n) 
-{
-	t_vec3f mi = (t_vec3f){
-		-i.x,
-		-i.y,
-		-i.z
-	};
-	float idotn = vec3f_dotprod(mi, n);
-	return ((t_vec3f){
-		mi.x - 2 * idotn * n.x,
-		mi.y - 2 * idotn * n.y,
-		mi.z - 2 * idotn * n.z,
-	});
-}*/
-
-/*
-default: 
-    { 
-//	We use the Phong illumation model int the default case. The phong model is composed of a diffuse and a specular reflection component. 
-    Vec3f lightAmt = 0, specularColor = 0; 
-    Vec3f shadowPointOrig = (dotProduct(dir, N) < 0) ? 
-        hitPoint + N * options.bias : 
-        hitPoint - N * options.bias; 
-//	Loop over all lights in the scene and sum their contribution up We also apply the lambert cosine law here though we haven't explained yet what this means. 
-        for (uint32_t i = 0; i < lights.size(); ++i) { 
-    	    Vec3f lightDir = lights[i]->position - hitPoint; 
-    	// square of the distance between hitPoint and the light
-            float lightDistance2 = dotProduct(lightDir, lightDir); 
-            lightDir = normalize(lightDir); 
-        	float LdotN = std::max(0.f, dotProduct(lightDir, N)); 
-            Object *shadowHitObject = nullptr; 
-            float tNearShadow = kInfinity; 
-            // is the point in shadow, and is the nearest occluding object 
-            // closer to the object than the light itself?
-            bool inShadow = trace(shadowPointOrig, lightDir, objects,
-            	tNearShadow, index, uv, &shadowHitObject) && 
-                tNearShadow * tNearShadow < lightDistance2; 
-            lightAmt += (1 - inShadow) * lights[i]->intensity * LdotN; 
-            Vec3f reflectionDirection = reflect(-lightDir, N); 
-            specularColor += powf(std::max(0.f, -dotProduct(reflectionDirection,
-            dir)), hitObject->specularExponent) * lights[i]->intensity;
-        } 
-        hitColor = lightAmt * hitObject->evalDiffuseColor(st) * hitObject->Kd +
-        	specularColor * hitObject->Ks; 
-        break; 
-    }
-*/
 
 unsigned int		trace(t_main *m, t_vec3f ray)
 {
@@ -123,8 +74,7 @@ unsigned int		trace(t_main *m, t_vec3f ray)
 				};
 				/*0.18 == object's average albedo)*/
 				float k = ((0.18 / 255)*M_PI) * m->lights[j]->brightness *
-					(MAX(0.0f, vec3f_dotprod(norm, L)));
-				//(i == 5) ?printf("%.3f\n", -vec3f_dotprod(norm, L)) :0;
+					(MAX(0.0f, -vec3f_dotprod(norm, L)));
 				color.r *= k;
 				color.g *= k;
 				color.b *= k;

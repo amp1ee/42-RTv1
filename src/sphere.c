@@ -1,6 +1,6 @@
 #include "rtv1.h"
 
-t_obj		*new_sphere(t_vec3f *center, float radius, SDL_Color color)
+t_obj		*new_sphere(t_vec3f *center, double radius, SDL_Color color)
 {
 	t_sphere	*sph;
 	t_obj		*obj;
@@ -25,18 +25,18 @@ bool		sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 {
 	const t_sphere	*sph = data;
 	const t_vec3f	center = *sph->center;
-	const float		r = sph->radius;
+	const double		r = sph->radius;
 	t_vec3f			k = get_vec3f(center, ray_start);
-	float			b = vec3f_dotprod(k, ray);
-	float			c = vec3f_dotprod(k, k) - SQR(r);
-	float			d = SQR(b) - c;
-	// (d>0)?printf("d=%.3f\n", d):0;
+	double			b = vec3f_dot(k, ray);
+	double			c = vec3f_dot(k, k) - SQR(r);
+	double			d = SQR(b) - c;
+	// (d>0)?//printf("d=%.3f\n", d):0;
 	if (d < 0)
 		return (false);
-	float sqrtd = sqrt(d);
-	const float		t1 = (-b + sqrtd);
-	const float		t2 = (-b - sqrtd);
-	const float		t = (MIN(t1, t2) >= 0) ? MIN(t1, t2) : MAX(t1, t2);
+	double sqrtd = sqrt(d);
+	const double		t1 = (-b + sqrtd);
+	const double		t2 = (-b - sqrtd);
+	const double		t = (MIN(t1, t2) >= 0) ? MIN(t1, t2) : MAX(t1, t2);
 	*intersect = (t_vec3f){	ray_start.x + t * ray.x,
 							ray_start.y + t * ray.y,
 							ray_start.z + t * ray.z};

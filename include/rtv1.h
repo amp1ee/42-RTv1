@@ -5,7 +5,6 @@
 # include <stdlib.h>
 # include <fcntl.h>
 # include <stdbool.h>
-# include <float.h>
 # include <complex.h> 
 # include "libft.h"
 
@@ -20,8 +19,9 @@
 # define QRT(n)			(pow(n, 4))
 # define MIN(t1, t2)	(t1 < t2) ? (t1) : (t2)
 # define MAX(t1, t2)	(t1 > t2) ? (t1) : (t2)
-# define EPSILON		0.00001
-
+# define EPSILON		(1e-4)
+# define INF			(2147483647)
+# define ALBEDO			(0.26f)
 /*
 **	typedef double	t_vec4f __attribute__((vector_size(sizeof(double) * 4)));
 **	typedef int		t_vec4i __attribute__((vector_size(sizeof(int) * 4)));
@@ -34,8 +34,8 @@
 # define FOCUS	320
 # define W		640
 # define H		480
-# define ASPECT	(H / (float)W)
-# define OBJ	6
+# define ASPECT	(H / (double)W)
+# define OBJ	2
 # define LIGHT	1
 
 typedef struct	s_vec3f
@@ -55,14 +55,14 @@ typedef struct	s_vec3i
 typedef struct	s_light
 {
 	t_vec3f		*loc;
-	float		brightness;
+	double		brightness;
 	SDL_Color	color;
 }				t_light;
 
 typedef struct	s_sphere
 {
 	t_vec3f		*center;
-	float		radius;
+	double		radius;
 	SDL_Color	color;
 }				t_sphere;
 
@@ -79,8 +79,8 @@ typedef struct	s_triang
 typedef struct	s_torus
 {
 	t_vec3f		*center;
-	float		radius;
-	float		tube_radius;
+	double		radius;
+	double		tube_radius;
 	SDL_Color	color;
 }				t_torus;
 
@@ -98,16 +98,16 @@ typedef struct	s_obj
 typedef struct	s_cam
 {
 	t_vec3f		*loc;
-	float		xang;
-	float		xcos;
-	float		xsin;
-	float		yang;
-	float		ycos;
-	float		ysin;
-	float		zang;
-	float		zcos;
-	float		zsin;
-	float		focus;
+	double		xang;
+	double		xcos;
+	double		xsin;
+	double		yang;
+	double		ycos;
+	double		ysin;
+	double		zang;
+	double		zcos;
+	double		zsin;
+	double		focus;
 }				t_cam;
 
 typedef struct	s_main
@@ -125,7 +125,7 @@ typedef struct	s_main
 /*
 **	sphere.c
 */
-t_obj			*new_sphere(t_vec3f *center, float radius, SDL_Color color);
+t_obj			*new_sphere(t_vec3f *center, double radius, SDL_Color color);
 SDL_Color		sphere_color(void *data, t_vec3f intersect);
 t_vec3f			sphere_normalvec(void *data, t_vec3f intersect);
 void			sphere_cleanup(void *data);
@@ -141,13 +141,23 @@ t_vec3f			triangle_normalvec(void *data, t_vec3f intersect);
 void			triangle_cleanup(void *data);
 bool			triangle_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 				t_vec3f *intersect);
+
+t_obj			*new_torus(t_vec3f *center, double tor_rad, double tube_rad,
+						SDL_Color color);
+bool			torus_intersect(void *data, t_vec3f o, t_vec3f dir,
+				t_vec3f *intersect);
+SDL_Color		torus_color(void *data, t_vec3f intersect);
+t_vec3f			torus_normalvec(void *data, t_vec3f intersect);
+void			torus_cleanup(void *data);
+
+
 /*
 **	vec4f.c
 */
 t_vec3f			get_vec3f(t_vec3f p0, t_vec3f p1);
 void			vec3f_normalize(t_vec3f *vec);
-float			vec3f_length(t_vec3f vec);
-float			vec3f_dotprod(t_vec3f a, t_vec3f b);
+double			vec3f_length(t_vec3f vec);
+double			vec3f_dot(t_vec3f a, t_vec3f b);
 t_vec3f			vec3f_cross(t_vec3f a, t_vec3f b);
 /*
 **	render.c

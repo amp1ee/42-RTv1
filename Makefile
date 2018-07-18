@@ -1,6 +1,7 @@
 NAME	=rtv1
 CC		=gcc
-CFLAGS	=-Wall -Wextra -Werror -g -O3
+CFLAGS	=-Wall -Wextra -Werror -g
+#CFLAGS	+=-O3
 
 SRCDIR	=./src/
 OBJDIR	=./obj/
@@ -16,6 +17,7 @@ SRC		=$(addprefix $(SRCDIR),	\
 			plane.c				\
 			cylinder.c			\
 			cone.c				\
+			torus.c				\
 			vec3f.c)
 OBJ		=$(SRC:$(SRCDIR)%.c=$(OBJDIR)%.o)
 INCLUDE	=-I$(INCLDIR) -I$(LIBFTDIR)

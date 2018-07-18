@@ -11,48 +11,44 @@ void	game_quit(t_main *m)
 	SDL_Quit();
 }
 
-void	handle_events(t_main *m)
+void	handle_events(t_main *m, SDL_Event e)
 {
-	SDL_Event	e;
+	char		c = 0;
 
-	while (SDL_PollEvent(&e))
-	{
-		if (e.type == SDL_QUIT || e.key.keysym.sym == SDLK_ESCAPE)
-			game_quit(m);
-		else if (e.key.keysym.sym == SDLK_LEFT)
-			m->cam->xang += 2 * M_PI / 180.0;
-		else if (e.key.keysym.sym == SDLK_RIGHT)
-			m->cam->xang -= 2 * M_PI / 180.0;
-		else if (e.key.keysym.sym == SDLK_UP)
-			m->cam->yang += 2 * M_PI / 180.0;
-		else if (e.key.keysym.sym == SDLK_DOWN)
-			m->cam->yang -= 2 * M_PI / 180.0;
-		else if (e.key.keysym.sym == SDLK_w)
-			m->cam->zang += 2 * M_PI / 180.0;
-		else if (e.key.keysym.sym == SDLK_s)
+	if (e.key.keysym.sym == SDLK_DOWN && ++c)
+		m->cam->xang += 2 * M_PI / 180.0;
+	else if (e.key.keysym.sym == SDLK_UP && ++c)
+		m->cam->xang -= 2 * M_PI / 180.0;
+	else if (e.key.keysym.sym == SDLK_RIGHT && ++c)
+		m->cam->yang += 2 * M_PI / 180.0;
+	else if (e.key.keysym.sym == SDLK_LEFT && ++c)
+		m->cam->yang -= 2 * M_PI / 180.0;
+	else if (e.key.keysym.sym == SDLK_x && ++c)
+		m->cam->zang += 2 * M_PI / 180.0;
+	else if (e.key.keysym.sym == SDLK_z && ++c)
 			m->cam->zang -= 2 * M_PI / 180.0;
-		else if (e.key.keysym.sym == SDLK_KP_4)
-			m->cam->loc->x += 10;
-		else if (e.key.keysym.sym == SDLK_KP_6)
-			m->cam->loc->x -= 10;
-		else if (e.key.keysym.sym == SDLK_KP_2)
-			m->cam->loc->y += 10;
-		else if (e.key.keysym.sym == SDLK_KP_8)
-			m->cam->loc->y -= 10;
-		else if (e.key.keysym.sym == SDLK_z)
-			m->cam->loc->z += 10;
-		else if (e.key.keysym.sym == SDLK_x)
-			m->cam->loc->z -= 10;
-		m->cam->xcos = cos(m->cam->xang);
-		m->cam->xsin = sin(m->cam->xang);
-		m->cam->ycos = cos(m->cam->yang);
-		m->cam->ysin = sin(m->cam->yang);
-		m->cam->zcos = cos(m->cam->zang);
-		m->cam->zsin = sin(m->cam->zang);
-	}
+	else if (e.key.keysym.sym == SDLK_KP_4 && ++c)
+		m->cam->loc->x -= 10;
+	else if (e.key.keysym.sym == SDLK_KP_6 && ++c)
+		m->cam->loc->x += 10;
+	else if (e.key.keysym.sym == SDLK_KP_2 && ++c)
+		m->cam->loc->y -= 10;
+	else if (e.key.keysym.sym == SDLK_KP_8 && ++c)
+		m->cam->loc->y += 10;
+	else if (e.key.keysym.sym == SDLK_s && ++c)
+		m->cam->loc->z += 10;
+	else if (e.key.keysym.sym == SDLK_w && ++c)
+		m->cam->loc->z -= 10;
+	m->cam->xcos = cos(m->cam->xang);
+	m->cam->xsin = sin(m->cam->xang);
+	m->cam->ycos = cos(m->cam->yang);
+	m->cam->ysin = sin(m->cam->yang);
+	m->cam->zcos = cos(m->cam->zang);
+	m->cam->zsin = sin(m->cam->zang);
+	(c) ? render(m) : 0;
 }
 
-t_cam	*init_cam(t_vec3f *loc, float xang, float yang, float zang)
+t_cam	*init_cam(t_vec3f *loc, double xang, double yang, double zang)
 {
 	t_cam	*cam;
 
@@ -75,6 +71,8 @@ t_cam	*init_cam(t_vec3f *loc, float xang, float yang, float zang)
 int		main(void)
 {
 	t_main		*m;
+	SDL_Event	e;
+//	test_te();
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0
 		|| !(m = malloc(sizeof(t_main)))
@@ -82,30 +80,20 @@ int		main(void)
 			SDL_WINDOWPOS_CENTERED, W, H, 0))
 		|| !(m->screen = SDL_GetWindowSurface(m->window))
 		|| !(m->cam = init_cam(&(t_vec3f){0, 0, 0},
-					-M_PI / 2.0,
+					M_PI,
 					0,
-					-M_PI / 2.0)))
+					M_PI)))
 	{
-		printf("Error\n");
+		//printf("Error\n");
 		return (1);
 	}
-	t_vec3f	light_pos = (t_vec3f){200.0, 200.0, -50.0};
+	t_vec3f	light_pos = (t_vec3f){0.0, 0.0, -5.0};
 
-	m->objects[0] = new_sphere(&light_pos, 3,
-		(SDL_Color){255, 0, 0, 255});
-	m->objects[1] = new_sphere(&(t_vec3f){0.0, 300.0, 5.0}, 40,
-		(SDL_Color){0, 255, 0, 255});
-	m->objects[2] = new_sphere(&(t_vec3f){0.0, 50.0, 0.0}, 40,
-		(SDL_Color){255, 255, 0, 255});
-	m->objects[3] = new_sphere(&(t_vec3f){0.0, 425.0, 0.0}, 40,
+	m->objects[0] = new_torus(&(t_vec3f){0.0, 0.0, -100.0}, 10.0, 2.0,
 		(SDL_Color){0, 255, 255, 255});
-	m->objects[4] = new_sphere(&(t_vec3f){0.0, 800.0, 0.0}, 40,
-		(SDL_Color){255, 0, 255, 255});
-	m->objects[5] = new_triangle(&(t_vec3f){3.0, 4.0, 100.0},
-		&(t_vec3f){7.0, 80.0, 9.0},
-		&(t_vec3f){120.0, 9.0, 7.0},
-		(SDL_Color){0, 255, 0, 255});
-	
+	printf(m->objects[0] ? "Torus ready\n": "Failed with a torus\n");
+	m->objects[1] = new_sphere(&(t_vec3f){0.0, 100.0, -170}, 10,
+		(SDL_Color){255, 0, 0, 255});
 	m->lights[0] = &(t_light){
 		&light_pos,
 		1.0,
@@ -115,10 +103,18 @@ int		main(void)
 	m->bpp = m->screen->format->BytesPerPixel;
 	SDL_RaiseWindow(m->window);
 	m->running = true;
+	render(m);
 	while (m->running)
 	{
-		render(m);
-		handle_events(m);
+		while (SDL_PollEvent(&e))
+		{	
+			if (e.key.keysym.sym == SDLK_ESCAPE ||
+				(e.type == SDL_WINDOWEVENT &&
+				e.window.event == SDL_WINDOWEVENT_CLOSE))
+				game_quit(m);
+			else if (e.type == SDL_KEYDOWN)
+				handle_events(m, e);
+		}
 	}
 	exit(0);
 	return (0);

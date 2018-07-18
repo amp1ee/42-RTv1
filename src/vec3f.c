@@ -1,8 +1,8 @@
 #include "rtv1.h"
 
-float		vec3f_length(t_vec3f vec)
+double		vec3f_length(t_vec3f vec)
 {
-	float	res;
+	double	res;
 
 	res = sqrt(SQR(vec.x) + SQR(vec.y) + SQR(vec.z));
 	return (res);
@@ -18,9 +18,9 @@ t_vec3f		vec3f_cross(t_vec3f a, t_vec3f b)
 	return (xprod);
 }
 
-float		vec3f_dotprod(t_vec3f a, t_vec3f b)
+double		vec3f_dot(t_vec3f a, t_vec3f b)
 {
-	float	dprod;
+	double	dprod;
 
 	dprod = a.x * b.x +
 			a.y * b.y +
@@ -42,7 +42,7 @@ t_vec3f		get_vec3f(t_vec3f p0, t_vec3f p1)
 
 void		vec3f_normalize(t_vec3f *vec)
 {
-	const float	vlen = vec3f_length(*vec);
+	const double	vlen = vec3f_length(*vec);
 	
 	vec->x /= vlen;
 	vec->y /= vlen;

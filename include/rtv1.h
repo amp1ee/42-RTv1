@@ -6,6 +6,7 @@
 # include <fcntl.h>
 # include <stdbool.h>
 # include <float.h>
+# include <complex.h> 
 # include "libft.h"
 
 # ifdef __linux__
@@ -15,6 +16,8 @@
 # endif
 
 # define SQR(n)			(pow(n, 2))
+# define CUB(n)			(pow(n, 3))
+# define QRT(n)			(pow(n, 4))
 # define MIN(t1, t2)	(t1 < t2) ? (t1) : (t2)
 # define MAX(t1, t2)	(t1 > t2) ? (t1) : (t2)
 # define EPSILON		0.00001
@@ -72,6 +75,15 @@ typedef struct	s_triang
 	SDL_Color	color;
 	double		dist;
 }				t_triang;
+
+typedef struct	s_torus
+{
+	t_vec3f		*center;
+	float		radius;
+	float		tube_radius;
+	SDL_Color	color;
+}				t_torus;
+
 
 typedef struct	s_obj
 {

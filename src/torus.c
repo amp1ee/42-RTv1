@@ -1,8 +1,8 @@
 #include "rtv1.h"
 #include <fcntl.h>
 
-t_obj			*new_torus(t_vec3f *center, double tor_rad, double tube_rad,
-						SDL_Color color)
+t_obj			*new_torus(t_vec3f *center, t_vec3f dir,
+						double tor_rad, double tube_rad, SDL_Color color)
 {
 	t_torus		*tor;
 	t_obj		*obj;
@@ -12,6 +12,8 @@ t_obj			*new_torus(t_vec3f *center, double tor_rad, double tube_rad,
 	tor->radius = tor_rad;
 	tor->tube_radius = tube_rad;
 	tor->center = center;
+	tor->dir = dir;
+	vec3f_normalize(&(tor->dir));
 	tor->color = color;
 	if (!(obj = (t_obj *)malloc(sizeof(t_obj))))
 		return (NULL);
@@ -24,77 +26,54 @@ t_obj			*new_torus(t_vec3f *center, double tor_rad, double tube_rad,
 }
 
 
-static void		solve_quartic(double a, double b, double c,
-							double d, double e, double roots[4])
+static void		solve_quartic(complex double a, complex double b, complex double c,
+							complex double d, complex double e, complex double roots[4])
 {
-		(void)a;	
-	double complex b2 = b * b;
-	double complex b3 = b * b2;
-	double complex b4 = b2 * b2;
+	complex double a2 = a*a;
+	complex double a3 = a*a2;
+	complex double b2 = b*b;
+	complex double b3 = b*b2;
+	complex double b4 = b*b3;
+	complex double c2 = c*c;
+	complex double c3 = c*c2;
+	complex double c4 = c*c3;
+	complex double d2 = d*d;
+	complex double d3 = d*d2;
+	complex double d4 = d*d3;
+	complex double e2 = e*e;
+	complex double e3 = e*e2;
+	complex double dsc, dsc0, dsc1;
+	complex double S, Q, p, q;
+	// complex double D, P, R;
 
-	double complex alpha = (-3.0/8.0)*b2 + c;
-	double complex beta  = b3/8.0 - b*c/2.0 + d;
-	double complex gamma = (-3.0/256.0)*b4 + b2*c/16.0 - b*d/4.0 + e;
+	//P = 8*a*c - 3*b2;
+	//R = b3 + 8*d*a2 - 4*a*b*c;
+	//D = 64*a3*e - 16*a2*c2 + 16*a*b2*c - 16*a2*b*d - 3*b4;
 
-	double complex alpha2 = alpha * alpha;
-	double complex t = -b / 4.0;
+	dsc = 256*a3*e3 - 192*a2*b*d*e2 - 128*a2*c2*e2 + 144*a2*c*d2*e - 27*a2*d4 +
+	144*a*b2*c*e2 - 6*a*b2*d2*e - 80*a*b*c2*d*e + 18*a*b*c*d3 + 16*a*c4*e -
+	4*a*c3*d2 - 27*b4*e2 + 18*b3*c*d*e - 4*b3*d3 - 4*b2*c3*e + b2*c2*d2;
 
-	if (cabs(beta) <= EPSILON)
-	{
-		double complex rad = csqrt(alpha2 - 4.0*gamma);
-		double complex r1 = csqrt((-alpha + rad) / 2.0);
-		double complex r2 = csqrt((-alpha - rad) / 2.0);
+	dsc0 = c2 - 3*b*d + 12*a*e;
+	dsc1 = 2*c3 - 9*b*c*d + 27*b2*e + 27*a*d2 - 72*a*c*e;
 
-		roots[0] = t + r1;
-		roots[1] = t - r1;
-		roots[2] = t + r2;
-		roots[3] = t - r2;
-	}
-	else
-	{
-		double complex alpha3 = alpha * alpha2;
-		double complex P = -(alpha2/12.0 + gamma);
-		double complex Q = -alpha3/108.0 + alpha*gamma/3.0 - beta*beta/8.0;
-		double complex R = -Q/2.0 + csqrt(Q*Q/4.0 + P*P*P/27.0);
-		double complex U = pow(R, (1.0/3.0));
-		double complex y = (-5.0/6.0)*alpha + U;
-		if (cabs(U) <= EPSILON)
-		{
-			y -= pow(Q, (1.0/3.0));
-		}
-		else
-		{
-			y -= P/(3.0 * U);
-		}
-		double complex w = csqrt(alpha + 2.0*y);
-		double complex r1 = csqrt(-(3.0*alpha + 2.0*y + 2.0*beta/w));
-		double complex r2 = csqrt(-(3.0*alpha + 2.0*y - 2.0*beta/w));
+	p = (8*a*c - 3*b2)/(8.0*a2);
+	q = (b3 - 4*a*b*c + 8*a2*d)/(8.0*a3);
+	Q = cbrt((dsc1 + csqrt(-27*dsc))/2.0);
+	S = csqrt((-2*p)/3.0 + (Q + dsc0/Q)/(3*a))/2.0;
 
-		roots[0] = t + ( w - r1)/2.0;
-		roots[1] = t + ( w + r1)/2.0;
-		roots[2] = t + (-w - r2)/2.0;
-		roots[3] = t + (-w + r2)/2.0;
-	}
+	roots[0] = -b/(4*a) - S + csqrt(-4*S*S - 2*p + q/S)/2.0;
+	roots[1] = -b/(4*a) + S + csqrt(-4*S*S - 2*p - q/S)/2.0;
+	roots[2] = -b/(4*a) - S - csqrt(-4*S*S - 2*p + q/S)/2.0;
+	roots[3] = -b/(4*a) + S - csqrt(-4*S*S - 2*p - q/S)/2.0;
 }
-/* 
-	A = tor->radius
-	B = tor->tube_radius
-	D = o
-	E = dir
-*/
-// /double	epsi = gamm - R2 - r2;
-//	double	alph = vec3f_dot(dir, dir) = 1;
-//	a = SQR(alph) = 1;
-//	c = 2 * alph * delt - 4 * R2 * (SQR(dir.x) + SQR(dir.y)) + 4 * SQR(beta);
-//	d = 8 * R2 * o.z * dir.z + 4 * beta * epsi;
-/*	e = SQR(alph) + (SQR(R2 - r2)) + 2 * (SQR(dir.x) * SQR(dir.y) + SQR(dir.z) *
-		(R2 - r2) + (SQR(dir.x) + SQR(dir.y)) * (SQR(dir.z) - R2 - r2));*/
+
 bool			torus_intersect(void *data, t_vec3f o, t_vec3f dir,
 				t_vec3f *intersect)
 {
 	t_torus			*tor = data;
 	double			a4, a3, a2, a1, a0;
-	double			t[4];
+	complex double	t[4];
 	double			R = tor->radius;
 	double			r = tor->tube_radius;
 	double			R2 = SQR(R);
@@ -105,7 +84,8 @@ bool			torus_intersect(void *data, t_vec3f o, t_vec3f dir,
 	double	beta = vec3f_dot(dir, oc);
 	double	gamm = vec3f_dot(oc, oc);
 	double	delt = gamm + R2 - r2;
-	//double	epsi = gamm - R2 - r2;
+/*	double	v0 = vec3f_dot(dir, tor->dir);
+	double	v1 = vec3f_dot(oc, tor->dir);*/
 
 	a4 = 1.0;
 	a3 = 4 * alph * beta;

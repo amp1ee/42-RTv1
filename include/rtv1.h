@@ -79,6 +79,7 @@ typedef struct	s_triang
 typedef struct	s_torus
 {
 	t_vec3f		*center;
+	t_vec3f		dir;
 	double		radius;
 	double		tube_radius;
 	SDL_Color	color;
@@ -142,8 +143,8 @@ void			triangle_cleanup(void *data);
 bool			triangle_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 				t_vec3f *intersect);
 
-t_obj			*new_torus(t_vec3f *center, double tor_rad, double tube_rad,
-						SDL_Color color);
+t_obj			*new_torus(t_vec3f *center, t_vec3f dir, double tor_rad,
+							double tube_rad, SDL_Color color);
 bool			torus_intersect(void *data, t_vec3f o, t_vec3f dir,
 				t_vec3f *intersect);
 SDL_Color		torus_color(void *data, t_vec3f intersect);

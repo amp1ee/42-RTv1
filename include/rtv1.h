@@ -14,29 +14,29 @@
 #  include "SDL2/SDL.h"
 # endif
 
-# define SQR(n)			(pow(n, 2))
-# define CUB(n)			(pow(n, 3))
-# define QRT(n)			(pow(n, 4))
+# define SQ(n)			(pow(n, 2))
+# define CB(n)			(pow(n, 3))
+# define QR(n)			(pow(n, 4))
 # define MIN(t1, t2)	(t1 < t2) ? (t1) : (t2)
 # define MAX(t1, t2)	(t1 > t2) ? (t1) : (t2)
-# define EPSILON		(1e-4)
+# define EPSILON		(1e-12)
 # define INF			(2147483647)
 # define ALBEDO			(0.26f)
-/*
-**	typedef double	t_vec4f __attribute__((vector_size(sizeof(double) * 4)));
-**	typedef int		t_vec4i __attribute__((vector_size(sizeof(int) * 4)));
-**	
-**	typedef double	t_vec2f __attribute__((vector_size(sizeof(double) * 2)));
-**	typedef int		t_vec2i __attribute__((vector_size(sizeof(int) * 2)));
-*/
 
-# define TITLE	"rtv1"
+# define BGCOLOR	((SDL_Color){ 12, 12, 12, 255 })
 # define FOCUS	320
+# define TITLE	"rtv1"
 # define W		640
 # define H		480
 # define ASPECT	(H / (double)W)
 # define OBJ	2
 # define LIGHT	1
+
+typedef enum	e_figures
+{
+	TRIANGLE = 0,
+	SPHERE, TORUS
+}				t_figures;
 
 typedef struct	s_vec3f
 {
@@ -88,6 +88,7 @@ typedef struct	s_torus
 
 typedef struct	s_obj
 {
+	int			type;
 	void		*data;
 	bool		(*intersects)(void *data, t_vec3f ray_start,
 			t_vec3f ray, t_vec3f *intersect);

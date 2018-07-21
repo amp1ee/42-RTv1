@@ -12,6 +12,7 @@ t_obj		*new_sphere(t_vec3f *center, double radius, SDL_Color color)
 	sph->color = color;
 	if (!(obj = (t_obj *)malloc(sizeof(t_obj))))
 		return (NULL);
+	obj->type = SPHERE;
 	obj->data = sph;
 	obj->intersects = sphere_intersect;
 	obj->get_color = sphere_color;
@@ -28,8 +29,8 @@ bool		sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 	const double		r = sph->radius;
 	t_vec3f			k = get_vec3f(center, ray_start);
 	double			b = vec3f_dot(k, ray);
-	double			c = vec3f_dot(k, k) - SQR(r);
-	double			d = SQR(b) - c;
+	double			c = vec3f_dot(k, k) - SQ(r);
+	double			d = SQ(b) - c;
 	// (d>0)?//printf("d=%.3f\n", d):0;
 	if (d < 0)
 		return (false);

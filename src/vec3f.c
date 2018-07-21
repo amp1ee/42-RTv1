@@ -4,7 +4,7 @@ double		vec3f_length(t_vec3f vec)
 {
 	double	res;
 
-	res = sqrt(SQR(vec.x) + SQR(vec.y) + SQR(vec.z));
+	res = sqrt(SQ(vec.x) + SQ(vec.y) + SQ(vec.z));
 	return (res);
 }
 

@@ -14,6 +14,7 @@ t_obj			*new_triangle(t_vec3f *a, t_vec3f *b, t_vec3f *c,
 	tri->color = color;
 	if (!(obj = (t_obj *)malloc(sizeof(t_obj))))
 		return (NULL);
+	obj->type = TRIANGLE;
 	obj->data = tri;
 	obj->get_color = triangle_color;
 	obj->normal_vec = triangle_normalvec;

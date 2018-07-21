@@ -87,14 +87,15 @@ int		main(void)
 		//printf("Error\n");
 		return (1);
 	}
-	t_vec3f	light_pos = (t_vec3f){0.0, 0.0, -5.0};
+	t_vec3f	light_pos = (t_vec3f){30.0, 30.0, -5.0};
 
-	m->objects[0] = new_torus(&(t_vec3f){0.0, 0.0, -100.0}, 
-		(t_vec3f){0.52, -1.0, 0.70}, 10.0, 2.0,
+	m->objects[0] = new_torus(&(t_vec3f){0.0, 0.0, -50.0},
+		(t_vec3f){0.0, 0.0, 1.0}, 20.0, 12.0,
 		(SDL_Color){0, 255, 255, 255});
 	printf(m->objects[0] ? "Torus ready\n": "Failed with a torus\n");
 	m->objects[1] = new_sphere(&(t_vec3f){0.0, 100.0, -170}, 10,
 		(SDL_Color){255, 0, 0, 255});
+	
 	m->lights[0] = &(t_light){
 		&light_pos,
 		1.0,

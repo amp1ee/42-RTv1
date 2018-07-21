@@ -41,34 +41,32 @@ rot_vec_z(const t_vec3f p,
 	return (t_vec3f){x, y, p.z};
 }
 
-unsigned int		trace(t_main *m, t_vec3f ray)
+unsigned int		trace(t_main *m, t_vec3f rdir)
 {
-	t_vec3f 		r_vec;
 	SDL_Color		color;
 	t_obj			*o;
 	int				i;
-	t_vec3f			intersect;
+	t_vec3f			P;
+	t_vec3f			N;
 	const t_cam		*cam = m->cam;
 
-	vec3f_normalize(&ray);
-	r_vec = rot_vec_x(ray, cam->xsin, cam->xcos);
-	r_vec = rot_vec_z(r_vec, cam->zsin, cam->zcos);
-	r_vec = rot_vec_y(r_vec, cam->ysin, cam->ycos);
-	color = (SDL_Color){25,19,12,255};
+	vec3f_normalize(&rdir);
+	rdir = rot_vec_y(rot_vec_z(rot_vec_x(rdir, cam->xsin, cam->xcos), cam->zsin,
+										cam->zcos), cam->ysin, cam->ycos);
+	color = /*(SDL_Color){255,255,255,255};//*/BGCOLOR;
 	i = -1;
 	while (++i < OBJ)
 	{
+		double k = 0.0f;
 		o = m->objects[i];
-		if (o->intersects(o->data, *cam->loc, r_vec, &intersect))
+		if (o->intersects(o->data, *cam->loc, rdir, &P))
 		{
-			
-			color = o->get_color(o->data, intersect);
-			
-			t_vec3f norm = o->normal_vec(o->data, intersect);
+			color = o->get_color(o->data, P);
+			N = o->normal_vec(o->data, P);
 			int j = -1;
 			while (++j < LIGHT)
 			{
-				t_vec3f light_dir = get_vec3f(intersect, *m->lights[j]->loc);
+				t_vec3f light_dir = get_vec3f(P, *m->lights[j]->loc);
 				
 				t_vec3f L = (t_vec3f){
 					light_dir.x * -1,
@@ -76,13 +74,12 @@ unsigned int		trace(t_main *m, t_vec3f ray)
 					light_dir.z * -1
 				};
 
-				double k = ((ALBEDO / 255)*M_PI) * m->lights[j]->brightness *
-					(MAX(0.0f, -vec3f_dot(norm, L)));
-				
-				color.r *= k;
-				color.g *= k;
-				color.b *= k;
+				k += ((ALBEDO / 255)*M_PI) * m->lights[j]->brightness *
+					(MAX(0.0f, -vec3f_dot(N, L)));
 			}
+			color.r *= k;
+			color.g *= k;
+			color.b *= k;
 		}
 	}
 	
@@ -104,15 +101,16 @@ void				render(t_main *m)
 		j = 0;
 		while (j < H)
 		{
-			x = (i - (W + m->cam->loc->x) / 2.0);
-			y = (j - (H + m->cam->loc->y) / 2.0);
-			t_vec3f ray = (t_vec3f){x, y, 320};
-			rgb = trace(m, ray);
+			x = (i - W / 2.0);
+			y = (j - H / 2.0);
+			t_vec3f rdir = (t_vec3f){x, y, 320};
+			rgb = trace(m, rdir);
 			set_pixel(m, i, j, rgb);
 			j++;
 		}
 		i++;
 	}
-	printf("%u\n", ++frames);
+	printf(" Frame #%u\tCamera @ (%.2f, %.2f, %.2f)\n", ++frames, m->cam->loc->x,
+		   m->cam->loc->y, m->cam->loc->z);
 	SDL_UpdateWindowSurface(m->window);
 }

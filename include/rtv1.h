@@ -26,10 +26,9 @@
 # define BGCOLOR	((SDL_Color){ 12, 12, 12, 255 })
 # define FOCUS	320
 # define TITLE	"rtv1"
-# define W		640
-# define H		480
+# define W		1280
+# define H		720
 # define ASPECT	(H / (double)W)
-# define OBJ	2
 # define LIGHT	1
 
 typedef enum	e_figures
@@ -121,13 +120,21 @@ typedef struct	s_main
 	t_cam		*cam;
 	t_light		*lights[LIGHT];
 	t_vec3f		*ray;
-	t_obj		*objects[OBJ];
+	t_obj		**objects;
+	int			obj_num;
 }				t_main;
 
+t_obj			**parse_scene(t_main *m, char *path);
+
+t_obj			*new_plane(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
+t_obj			*new_sphere(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
+t_obj			*new_cylinder(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
+t_obj			*new_cone(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
+t_obj			*new_light(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
 /*
 **	sphere.c
 */
-t_obj			*new_sphere(t_vec3f *center, double radius, SDL_Color color);
+t_obj			*new_sphere(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
 SDL_Color		sphere_color(void *data, t_vec3f intersect);
 t_vec3f			sphere_normalvec(void *data, t_vec3f intersect);
 void			sphere_cleanup(void *data);

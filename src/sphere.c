@@ -1,23 +1,27 @@
 #include "rtv1.h"
 
-t_obj		*new_sphere(t_vec3f *center, double radius, SDL_Color color)
+t_obj		*new_sphere(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
 {
 	t_sphere	*sph;
 	t_obj		*obj;
 
+	(void)dir;
 	if (!(sph = (t_sphere *)malloc(sizeof(t_sphere))))
 		return (NULL);
 	sph->center = center;
+	printf("p.x: %f, p.y: %f, p.z: %f\n", center->x, center->y, center->z);
 	sph->radius = radius;
+	printf("%f\n", sph->radius);
 	sph->color = color;
+	printf("c.r: %u, c.g: %u, c.b: %u, c.a: %u\n", color.r, color.g, color.b, color.a);
 	if (!(obj = (t_obj *)malloc(sizeof(t_obj))))
 		return (NULL);
 	obj->type = SPHERE;
 	obj->data = sph;
-	obj->intersects = sphere_intersect;
-	obj->get_color = sphere_color;
-	obj->normal_vec = sphere_normalvec;
-	obj->cleanup = sphere_cleanup;
+	obj->intersects = &sphere_intersect;
+	obj->get_color = &sphere_color;
+	obj->normal_vec = &sphere_normalvec;
+	obj->cleanup = &sphere_cleanup;
 	return (obj);
 }
 

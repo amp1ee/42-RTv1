@@ -1,10 +1,11 @@
 #include "rtv1.h"
 
-t_obj		*new_sphere(t_vec3f *center, double radius, SDL_Color color)
+t_obj		*new_sphere(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
 {
 	t_sphere	*sph;
 	t_obj		*obj;
 
+	(void)dir;
 	if (!(sph = (t_sphere *)malloc(sizeof(t_sphere))))
 		return (NULL);
 	sph->center = center;

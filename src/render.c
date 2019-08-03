@@ -55,7 +55,7 @@ unsigned int		trace(t_main *m, t_vec3f rdir)
 										cam->zcos), cam->ysin, cam->ycos);
 	color = /*(SDL_Color){255,255,255,255};//*/BGCOLOR;
 	i = -1;
-	while (++i < OBJ)
+	while (++i < m->obj_num)
 	{
 		double k = 0.0f;
 		o = m->objects[i];

@@ -12,6 +12,7 @@ SDLDIR	=./sdl2/
 SRC		=$(addprefix $(SRCDIR),	\
 			main.c				\
 			render.c			\
+			parser.c			\
 			sphere.c			\
 			triangle.c			\
 			plane.c				\

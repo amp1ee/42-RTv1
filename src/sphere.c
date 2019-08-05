@@ -55,7 +55,7 @@ t_obj		*new_sphere(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
 	t_obj		*obj;
 
 	(void)dir;
-	if (!(sph = (t_sphere *)malloc(sizeof(t_sphere))))
+	if (!(sph = malloc(sizeof(t_sphere))))
 		return (NULL);
 	sph->center = center;
 	printf("p.x: %f, p.y: %f, p.z: %f\n", center->x, center->y, center->z);
@@ -63,12 +63,11 @@ t_obj		*new_sphere(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
 	printf("%f\n", sph->radius);
 	sph->color = color;
 	printf("c.r: %u, c.g: %u, c.b: %u, c.a: %u\n", color.r, color.g, color.b, color.a);
-	if (!(obj = (t_obj *)malloc(sizeof(t_obj))))
+	if (!(obj = malloc(sizeof(t_obj))))
 		return (NULL);
 	obj->type = SPHERE;
 	obj->data = sph;
 	obj->intersects = &sphere_intersect;
-	printf("sphere_intersect: %p, obj->intersects = %p\n", &sphere_intersect, obj->intersects);
 	obj->get_color = &sphere_color;
 	obj->normal_vec = &sphere_normalvec;
 	obj->cleanup = &sphere_cleanup;

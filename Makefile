@@ -13,6 +13,7 @@ SRC		=$(addprefix $(SRCDIR),	\
 			main.c				\
 			render.c			\
 			parser.c			\
+			lights.c			\
 			sphere.c			\
 			triangle.c			\
 			plane.c				\

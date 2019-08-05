@@ -59,23 +59,25 @@ unsigned int		trace(t_main *m, t_vec3f rdir)
 	{
 		double k = 0.0f;
 		o = m->objects[i];
-		if (o->intersects(o->data, *(cam->loc), rdir, &P))
+		if (o->type != LIGHT_SOURCE && o->intersects(o->data, *(cam->loc), rdir, &P))
 		{
 			color = o->get_color(o->data, P);
 			N = o->normal_vec(o->data, P);
 			int j = -1;
-			while (++j < LIGHT)
+			while (++j < m->obj_num)
 			{
-				t_vec3f light_dir = get_vec3f(P, *m->lights[j]->loc);
-				
-				t_vec3f L = (t_vec3f){
-					light_dir.x * -1,
-					light_dir.y * -1,
-					light_dir.z * -1
-				};
-
-				k += ((ALBEDO / 255)*M_PI) * m->lights[j]->brightness *
-					(MAX(0.0f, -vec3f_dot(N, L)));
+				if ((m->objects[j])->type == LIGHT_SOURCE)
+				{
+					t_light *light = (t_light *)m->objects[j]->data;
+					t_vec3f light_dir = get_vec3f(P, *(light->loc));
+					t_vec3f L = (t_vec3f){
+						light_dir.x * -1,
+						light_dir.y * -1,
+						light_dir.z * -1
+					};
+					k += ((ALBEDO / 255) * M_PI) * light->brightness *
+						(MAX(0.0f, -vec3f_dot(N, L)));
+				}
 			}
 			color.r *= k;
 			color.g *= k;

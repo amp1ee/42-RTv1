@@ -72,7 +72,6 @@ int		main(int argc, char *argv[])
 {
 	t_main		*m;
 	SDL_Event	e;
-//	test_te();
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0
 		|| !(m = malloc(sizeof(t_main)))
@@ -87,8 +86,6 @@ int		main(int argc, char *argv[])
 		//printf("Error\n");
 		return (1);
 	}
-	t_vec3f	light_pos = (t_vec3f){0, 14.0, 92.0};
-
 /*	m->objects[0] = new_torus(&(t_vec3f){0.0, 0.0, -50.0},
 		(t_vec3f){0.0, 0.0, 1.0}, 20.0, 12.0,
 		(SDL_Color){255, 0, 255, 255});
@@ -96,12 +93,6 @@ int		main(int argc, char *argv[])
 	if (argc < 2)
 		return (10);
 	m->objects = parse_scene(m, argv[1]);
-	
-	m->lights[0] = &(t_light){
-		&light_pos,
-		1.0,
-		(SDL_Color){255,255,255,255}
-	};
 	m->ray = &(t_vec3f){0, 1, 0};
 	m->bpp = m->screen->format->BytesPerPixel;
 	SDL_RaiseWindow(m->window);

@@ -34,7 +34,12 @@
 typedef enum	e_figures
 {
 	TRIANGLE = 0,
-	SPHERE, TORUS
+	PLANE,
+	SPHERE,
+	CYLINDER,
+	CONE,
+	LIGHT_SOURCE,
+	TORUS
 }				t_figures;
 
 typedef struct	s_vec3f
@@ -132,7 +137,10 @@ t_obj			*new_plane(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
 t_obj			*new_sphere(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
 t_obj			*new_cylinder(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
 t_obj			*new_cone(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
-t_obj			*new_light(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
+
+SDL_Color		lights_color(void *data, t_vec3f intersect);
+void			lights_cleanup(void *data);
+t_obj			*new_light(t_vec3f *location, t_vec3f dir, double brightness, SDL_Color color);
 /*
 **	sphere.c
 */

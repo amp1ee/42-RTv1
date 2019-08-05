@@ -22,13 +22,6 @@ t_obj			*new_cone(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
 	(void)radius;
 	(void)color;
 	return NULL; }
-t_obj			*new_light(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
-{
-	(void)center;
-	(void)dir;
-	(void)radius;
-	(void)color;
-	return NULL; }
 
 void			ft_lstpush(t_list **dest, t_list *src)
 {

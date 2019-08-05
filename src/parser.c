@@ -40,6 +40,8 @@ void			ft_lstpush(t_list **dest, t_list *src)
 	}
 }
 
+// TODO:
+// double			ft_atof()
 
 t_obj			**lst_to_arr(t_list *obj_list)
 {
@@ -123,7 +125,6 @@ t_obj			*ft_new_object(t_of obj_creator, char *line)
 		line++;
 	}
 	obj = obj_creator(pos, dir, radius, color);
-	printf("ret obj->intersects: %p\n", obj->intersects);
 	return (obj);
 }
 

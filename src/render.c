@@ -41,6 +41,34 @@ rot_vec_z(const t_vec3f p,
 	return (t_vec3f){x, y, p.z};
 }
 
+double				shed_lights(t_main *m, t_vec3f P, t_vec3f N)
+{
+	int				j;
+	t_light			*light;
+	t_vec3f			light_dir;
+	t_vec3f			L;
+	double			k;
+
+	k = 0.0;
+	j = -1;
+	while (++j < m->obj_num)
+	{
+		if ((m->objects[j])->type == LIGHT_SOURCE)
+		{
+			light = (t_light *)m->objects[j]->data;
+			light_dir = get_vec3f(P, *(light->loc));
+			L = (t_vec3f){
+				light_dir.x * -1,
+				light_dir.y * -1,
+				light_dir.z * -1
+			};
+			k += ((ALBEDO / 255) * M_PI) * light->brightness *
+				(MAX(0.0f, -vec3f_dot(N, L)));
+		}
+	}
+	return (k);
+}
+
 unsigned int		trace(t_main *m, t_vec3f rdir)
 {
 	SDL_Color		color;
@@ -63,28 +91,12 @@ unsigned int		trace(t_main *m, t_vec3f rdir)
 		{
 			color = o->get_color(o->data, P);
 			N = o->normal_vec(o->data, P);
-			int j = -1;
-			while (++j < m->obj_num)
-			{
-				if ((m->objects[j])->type == LIGHT_SOURCE)
-				{
-					t_light *light = (t_light *)m->objects[j]->data;
-					t_vec3f light_dir = get_vec3f(P, *(light->loc));
-					t_vec3f L = (t_vec3f){
-						light_dir.x * -1,
-						light_dir.y * -1,
-						light_dir.z * -1
-					};
-					k += ((ALBEDO / 255) * M_PI) * light->brightness *
-						(MAX(0.0f, -vec3f_dot(N, L)));
-				}
-			}
+			k = shed_lights(m, P, N);
 			color.r *= k;
 			color.g *= k;
 			color.b *= k;
 		}
 	}
-	
 	return (color.r << 16 | color.g << 8 | color.b);
 }
 

@@ -79,7 +79,7 @@ int		main(int argc, char *argv[])
 		|| !(m->window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED, W, H, 0))
 		|| !(m->screen = SDL_GetWindowSurface(m->window))
-		|| !(m->cam = init_cam(&(t_vec3f){0, 14, 88},
+		|| !(m->cam = init_cam(&(t_vec3f){0, 14, 42},
 					M_PI,
 					0,
 					M_PI)))
@@ -87,7 +87,7 @@ int		main(int argc, char *argv[])
 		//printf("Error\n");
 		return (1);
 	}
-	t_vec3f	light_pos = (t_vec3f){0, 14.0, 88.0};
+	t_vec3f	light_pos = (t_vec3f){0, 14.0, 92.0};
 
 /*	m->objects[0] = new_torus(&(t_vec3f){0.0, 0.0, -50.0},
 		(t_vec3f){0.0, 0.0, 1.0}, 20.0, 12.0,

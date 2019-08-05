@@ -79,11 +79,13 @@ t_vec3f			parse_vec3f(char *line)
 	vec.x = atof(line);
 	printf("vec.x: %f\n", vec.x);
 	pos = ft_strpos(line, '_');
-	vec.y = atof((char *)(line + pos + 1));
-	printf("pos: %zu, vec.y: %f\n", pos, vec.y);
-	pos = ft_strpos((char *)(line + pos), '_');
-	vec.z = atof((char *)(line + pos + 1));
-	printf("pos: %zu, vec.z: %f\n", pos, vec.z);
+	line += (pos + 1);
+	vec.y = atof(line);
+	printf("vec.y: %f\n", vec.y);
+	pos = ft_strpos(line, '_');
+	line += (pos + 1);
+	vec.z = atof(line);
+	printf("vec.z: %f\n", vec.z);
 	return (vec);
 }
 
@@ -100,7 +102,7 @@ SDL_Color		parse_color(char *line)
 /*
 **	S P:10.0_10.0_10.0 D:0_0_0 R:12.0 C:128_12_2
 */
-t_obj			*ft_new_object(t_of of, char *line)
+t_obj			*ft_new_object(t_of obj_creator, char *line)
 {
 	t_obj		*obj;
 	t_vec3f		*pos;
@@ -108,7 +110,7 @@ t_obj			*ft_new_object(t_of of, char *line)
 	double		radius;
 	SDL_Color	color;
 
-	while (line && *line != ';')
+	while (*line)
 	{
 		if (*line == 'P')
 		{
@@ -127,7 +129,7 @@ t_obj			*ft_new_object(t_of of, char *line)
 			color = parse_color(&line[2]);
 		line++;
 	}
-	obj = of(pos, dir, radius, color);
+	obj = obj_creator(pos, dir, radius, color);
 	printf("ret obj->intersects: %p\n", obj->intersects);
 	return (obj);
 }

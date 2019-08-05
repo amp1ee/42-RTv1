@@ -71,16 +71,16 @@ t_vec3f			parse_vec3f(char *line)
 	t_vec3f		vec;
 	size_t		pos;
 
-	vec.x = atof(line);
-	printf("vec.x: %f\n", vec.x);
+	vec[0] = atof(line);
+	printf("vec.x: %f\n", vec[0]);
 	pos = ft_strpos(line, '_');
 	line += (pos + 1);
-	vec.y = atof(line);
-	printf("vec.y: %f\n", vec.y);
+	vec[1] = atof(line);
+	printf("vec.y: %f\n", vec[1]);
 	pos = ft_strpos(line, '_');
 	line += (pos + 1);
-	vec.z = atof(line);
-	printf("vec.z: %f\n", vec.z);
+	vec[2] = atof(line);
+	printf("vec.z: %f\n", vec[2]);
 	return (vec);
 }
 
@@ -90,7 +90,7 @@ SDL_Color		parse_color(char *line)
 	t_vec3f		tmp;
 
 	tmp = parse_vec3f(line);
-	color = (SDL_Color){ tmp.x, tmp.y, tmp.z, 255 };
+	color = (SDL_Color){ tmp[0], tmp[1], tmp[2], 255 };
 	return (color);
 }
 

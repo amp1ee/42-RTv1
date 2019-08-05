@@ -42,19 +42,14 @@ typedef enum	e_figures
 	TORUS
 }				t_figures;
 
-typedef struct	s_vec3f
-{
-	double		x;
-	double		y;
-	double		z;
-}				t_vec3f;
-
 typedef struct	s_vec3i
 {
 	int			x;
 	int			y;
 	int			z;
 }				t_vec3i;
+
+typedef double	t_vec3f __attribute__((vector_size(sizeof(double)*3)));
 
 typedef struct	s_light
 {
@@ -69,6 +64,14 @@ typedef struct	s_sphere
 	double		radius;
 	SDL_Color	color;
 }				t_sphere;
+
+typedef struct	s_cylind
+{
+	t_vec3f		*center;
+	t_vec3f		dir;
+	double		radius;
+	SDL_Color	color;
+}				t_cylind;
 
 typedef struct	s_triang
 {

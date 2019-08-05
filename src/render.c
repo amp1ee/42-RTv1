@@ -18,27 +18,27 @@ static inline t_vec3f
 rot_vec_x(const t_vec3f p,
 				const double sin_al,
 				const double cos_al) {
-	const double y = p.y * cos_al - p.z * sin_al;
-	const double z = p.y * sin_al + p.z * cos_al;
-	return (t_vec3f){p.x, y, z};
+	const double y = p[1] * cos_al - p[2] * sin_al;
+	const double z = p[1] * sin_al + p[2] * cos_al;
+	return (t_vec3f){p[0], y, z};
 }
 
 static inline t_vec3f
 rot_vec_y(const t_vec3f p,
 				const double sin_al,
 				const double cos_al) {
-	const double x = p.x * cos_al - p.z * sin_al;
-	const double z = p.x * sin_al + p.z * cos_al;
-	return (t_vec3f){x, p.y, z};
+	const double x = p[0] * cos_al - p[2] * sin_al;
+	const double z = p[0] * sin_al + p[2] * cos_al;
+	return (t_vec3f){x, p[1], z};
 }
 
 static inline t_vec3f
 rot_vec_z(const t_vec3f p,
 				const double sin_al,
 				const double cos_al) {
-	const double x = p.x * cos_al - p.y * sin_al;
-	const double y = p.x * sin_al + p.y * cos_al;
-	return (t_vec3f){x, y, p.z};
+	const double x = p[0] * cos_al - p[1] * sin_al;
+	const double y = p[0] * sin_al + p[1] * cos_al;
+	return (t_vec3f){x, y, p[2]};
 }
 
 double				shed_lights(t_main *m, t_vec3f P, t_vec3f N)
@@ -58,9 +58,9 @@ double				shed_lights(t_main *m, t_vec3f P, t_vec3f N)
 			light = (t_light *)m->objects[j]->data;
 			light_dir = get_vec3f(P, *(light->loc));
 			L = (t_vec3f){
-				light_dir.x * -1,
-				light_dir.y * -1,
-				light_dir.z * -1
+				light_dir[0] * -1,
+				light_dir[1] * -1,
+				light_dir[2] * -1
 			};
 			k += ((ALBEDO / 255) * M_PI) * light->brightness *
 				(MAX(0.0f, -vec3f_dot(N, L)));
@@ -117,14 +117,14 @@ void				render(t_main *m)
 		{
 			x = (i - W / 2.0);
 			y = (j - H / 2.0);
-			t_vec3f rdir = (t_vec3f){x, y, 320};
+			t_vec3f rdir = (t_vec3f){x, y, 256};
 			rgb = trace(m, rdir);
 			set_pixel(m, i, j, rgb);
 			j++;
 		}
 		i++;
 	}
-	printf(" Frame #%u\tCamera @ (%.2f, %.2f, %.2f)\n", ++frames, m->cam->loc->x,
-		   m->cam->loc->y, m->cam->loc->z);
+	printf(" Frame #%u\tCamera @ (%.2f, %.2f, %.2f)\n", ++frames, (*m->cam->loc)[0],
+		   (*m->cam->loc)[1], (*m->cam->loc)[2]);
 	SDL_UpdateWindowSurface(m->window);
 }

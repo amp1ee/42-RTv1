@@ -6,7 +6,7 @@ bool		sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 	const t_sphere	*sph = data;
 	const t_vec3f	center = *sph->center;
 	const double		r = sph->radius;
-	t_vec3f			k = get_vec3f(center, ray_start);
+	t_vec3f			k = ray_start - center;
 	double			b = vec3f_dot(k, ray);
 	double			c = vec3f_dot(k, k) - SQ(r);
 	double			d = SQ(b) - c;
@@ -17,9 +17,10 @@ bool		sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 	const double		t1 = (-b + sqrtd);
 	const double		t2 = (-b - sqrtd);
 	const double		t = (MIN(t1, t2) >= 0) ? MIN(t1, t2) : MAX(t1, t2);
-	*intersect = (t_vec3f){	ray_start.x + t * ray.x,
-							ray_start.y + t * ray.y,
-							ray_start.z + t * ray.z};
+	*intersect = (t_vec3f){	ray_start[0] + t * ray[0],
+							ray_start[1] + t * ray[1],
+							ray_start[2] + t * ray[2]
+						};
 	return (t > 0);
 }
 
@@ -58,7 +59,7 @@ t_obj		*new_sphere(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
 	if (!(sph = malloc(sizeof(t_sphere))))
 		return (NULL);
 	sph->center = center;
-	printf("p.x: %f, p.y: %f, p.z: %f\n", center->x, center->y, center->z);
+	printf("p.x: %f, p.y: %f, p.z: %f\n", (*center)[0], (*center)[1], (*center)[2]);
 	sph->radius = radius;
 	printf("%f\n", sph->radius);
 	sph->color = color;

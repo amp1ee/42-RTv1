@@ -28,17 +28,17 @@ void	handle_events(t_main *m, SDL_Event e)
 	else if (e.key.keysym.sym == SDLK_z && ++c)
 			m->cam->zang -= 2 * M_PI / 180.0;
 	else if (e.key.keysym.sym == SDLK_KP_4 && ++c)
-		m->cam->loc->x -= 10;
+		(*m->cam->loc)[0] -= 10;
 	else if (e.key.keysym.sym == SDLK_KP_6 && ++c)
-		m->cam->loc->x += 10;
+		(*m->cam->loc)[0] += 10;
 	else if (e.key.keysym.sym == SDLK_KP_2 && ++c)
-		m->cam->loc->y -= 10;
+		(*m->cam->loc)[1] -= 10;
 	else if (e.key.keysym.sym == SDLK_KP_8 && ++c)
-		m->cam->loc->y += 10;
+		(*m->cam->loc)[1] += 10;
 	else if (e.key.keysym.sym == SDLK_s && ++c)
-		m->cam->loc->z += 10;
+		(*m->cam->loc)[2] += 10;
 	else if (e.key.keysym.sym == SDLK_w && ++c)
-		m->cam->loc->z -= 10;
+		(*m->cam->loc)[2] -= 10;
 	m->cam->xcos = cos(m->cam->xang);
 	m->cam->xsin = sin(m->cam->xang);
 	m->cam->ycos = cos(m->cam->yang);

@@ -15,11 +15,8 @@ SRC		=$(addprefix $(SRCDIR),	\
 			parser.c			\
 			lights.c			\
 			sphere.c			\
-			triangle.c			\
 			plane.c				\
-			cylinder.c			\
 			cone.c				\
-			torus.c				\
 			vec3f.c)
 OBJ		=$(SRC:$(SRCDIR)%.c=$(OBJDIR)%.o)
 INCLUDE	=-I$(INCLDIR) -I$(LIBFTDIR)

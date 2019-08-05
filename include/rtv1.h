@@ -124,6 +124,8 @@ typedef struct	s_main
 	int			obj_num;
 }				t_main;
 
+typedef t_obj	*(*t_of)(t_vec3f *, t_vec3f, double, SDL_Color);
+
 t_obj			**parse_scene(t_main *m, char *path);
 
 t_obj			*new_plane(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);

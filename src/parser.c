@@ -65,8 +65,7 @@ t_obj			**lst_to_arr(t_list *obj_list)
 	elem = obj_list;
 	while (elem)
 	{
-		num--;
-		objs[num] = (t_obj *)elem->content;
+		objs[--num] = (t_obj *)(elem->content);
 		elem = elem->next;
 	}
 	return (objs);
@@ -101,7 +100,7 @@ SDL_Color		parse_color(char *line)
 /*
 **	S P:10.0_10.0_10.0 D:0_0_0 R:12.0 C:128_12_2
 */
-t_obj			*ft_new_object(t_obj *(*obj_func)(t_vec3f *, t_vec3f, double, SDL_Color), char *line)
+t_obj			*ft_new_object(t_of of, char *line)
 {
 	t_obj		*obj;
 	t_vec3f		*pos;
@@ -128,7 +127,8 @@ t_obj			*ft_new_object(t_obj *(*obj_func)(t_vec3f *, t_vec3f, double, SDL_Color)
 			color = parse_color(&line[2]);
 		line++;
 	}
-	obj = (*obj_func)(pos, dir, radius, color);
+	obj = of(pos, dir, radius, color);
+	printf("ret obj->intersects: %p\n", obj->intersects);
 	return (obj);
 }
 
@@ -142,7 +142,7 @@ t_obj			*ft_new_object(t_obj *(*obj_func)(t_vec3f *, t_vec3f, double, SDL_Color)
 t_obj			**parse_scene(t_main *m, char *path)
 {
 	const char	*objs_str = "PSCcL";
-	const void	(*obj_func[]) = {
+	const t_of	obj_func[] = {
 		&new_plane,
 		&new_sphere,
 		&new_cylinder,
@@ -170,7 +170,7 @@ t_obj			**parse_scene(t_main *m, char *path)
 			{
 				printf("line[0]: %c\n", line[0]);
 				obj = ft_new_object((obj_func[i]), &line[2]);
-				ft_lstpush(&obj_list, ft_lstnew(obj, sizeof(obj)));
+				ft_lstpush(&obj_list, ft_lstnew(obj, sizeof(*obj)));
 				m->obj_num++;
 			}
 			i++;

@@ -8,13 +8,6 @@ t_obj			*new_plane(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
 	(void)color;
 	return NULL; }
 
-t_obj			*new_cylinder(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
-{
-	(void)center;
-	(void)dir;
-	(void)radius;
-	(void)color;
-	return NULL; }
 t_obj			*new_cone(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
 {
 	(void)center;
@@ -72,15 +65,15 @@ t_vec3f			parse_vec3f(char *line)
 	size_t		pos;
 
 	vec[0] = atof(line);
-	printf("vec.x: %f\n", vec[0]);
+	//printf("vec.x: %f\n", vec[0]);
 	pos = ft_strpos(line, '_');
 	line += (pos + 1);
 	vec[1] = atof(line);
-	printf("vec.y: %f\n", vec[1]);
+	//printf("vec.y: %f\n", vec[1]);
 	pos = ft_strpos(line, '_');
 	line += (pos + 1);
 	vec[2] = atof(line);
-	printf("vec.z: %f\n", vec[2]);
+	//printf("vec.z: %f\n", vec[2]);
 	return (vec);
 }
 
@@ -114,7 +107,10 @@ t_obj			*ft_new_object(t_of obj_creator, char *line)
 			*pos = parse_vec3f(&line[2]);
 		}
 		else if (*line == 'D')
+		{
 			dir = parse_vec3f(&line[2]);
+			printf("dir: %f %f %f\n", dir[0], dir[1], dir[2]);
+		}
 		else if (*line == 'R')
 		{
 			radius = atof(&line[2]);

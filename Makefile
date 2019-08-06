@@ -16,6 +16,7 @@ SRC		=$(addprefix $(SRCDIR),	\
 			parser.c			\
 			lights.c			\
 			sphere.c			\
+			cylinder.c			\
 			plane.c				\
 			cone.c				\
 			vec3f.c)

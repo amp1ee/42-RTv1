@@ -14,19 +14,22 @@ void	game_quit(t_main *m)
 void	handle_events(t_main *m, SDL_Event e)
 {
 	char		c = 0;
+	t_vec3f		angle;
 
+	angle = m->cam->angle;
+	double angdelta = 8 * M_PI / 180.0;
 	if (e.key.keysym.sym == SDLK_DOWN && ++c)
-		m->cam->xang += 2 * M_PI / 180.0;
+		m->cam->angle = (t_vec3f){ angle[0] + angdelta, angle[1], angle[2]};
 	else if (e.key.keysym.sym == SDLK_UP && ++c)
-		m->cam->xang -= 2 * M_PI / 180.0;
+		m->cam->angle = (t_vec3f){ angle[0] - angdelta, angle[1], angle[2]};
 	else if (e.key.keysym.sym == SDLK_RIGHT && ++c)
-		m->cam->yang += 2 * M_PI / 180.0;
+		m->cam->angle = (t_vec3f){ angle[0], (angle[1] + angdelta), angle[2]};
 	else if (e.key.keysym.sym == SDLK_LEFT && ++c)
-		m->cam->yang -= 2 * M_PI / 180.0;
+		m->cam->angle = (t_vec3f){ angle[0], (angle[1] - angdelta), angle[2]};
 	else if (e.key.keysym.sym == SDLK_x && ++c)
-		m->cam->zang += 2 * M_PI / 180.0;
+		m->cam->angle = (t_vec3f){ angle[0], angle[1], angle[2] + angdelta};
 	else if (e.key.keysym.sym == SDLK_z && ++c)
-		m->cam->zang -= 2 * M_PI / 180.0;
+		m->cam->angle = (t_vec3f){ angle[0], angle[1], angle[2] - angdelta};
 	else if (e.key.keysym.sym == SDLK_w && ++c)
 		(*m->cam->loc)[2] -= 10;
 	else if (e.key.keysym.sym == SDLK_s && ++c)
@@ -39,31 +42,19 @@ void	handle_events(t_main *m, SDL_Event e)
 		(*m->cam->loc)[1] -= 10;
 	else if (e.key.keysym.sym == SDLK_e && ++c)
 		(*m->cam->loc)[1] += 10;
-	m->cam->xcos = cos(m->cam->xang);
-	m->cam->xsin = sin(m->cam->xang);
-	m->cam->ycos = cos(m->cam->yang);
-	m->cam->ysin = sin(m->cam->yang);
-	m->cam->zcos = cos(m->cam->zang);
-	m->cam->zsin = sin(m->cam->zang);
 	(c) ? render(m) : 0;
 }
 
-t_cam	*init_cam(t_vec3f *loc, double xang, double yang, double zang)
+t_cam	*init_cam(t_vec3f *loc, t_vec3f angle)
 {
 	t_cam	*cam;
 
 	if (!(cam = malloc(sizeof(t_cam))))
 		return (NULL);
 	cam->loc = loc;
-	cam->xang = xang;
-	cam->xcos = cos(xang);
-	cam->xsin = sin(xang);
-	cam->yang = yang;
-	cam->ycos = cos(yang);
-	cam->ysin = sin(yang);
-	cam->zang = zang;
-	cam->zcos = cos(zang);
-	cam->zsin = sin(zang);
+	cam->angle = angle;
+	cam->rot_mtx = init_matrix(angle);
+	matrix_apply(cam->loc, cam->rot_mtx);
 	cam->focus = FOCUS;
 	return (cam);
 }
@@ -78,10 +69,7 @@ int		main(int argc, char *argv[])
 		|| !(m->window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED, W, H, 0))
 		|| !(m->screen = SDL_GetWindowSurface(m->window))
-		|| !(m->cam = init_cam(&(t_vec3f){0, 14, 42},
-					M_PI,
-					0,
-					M_PI)))
+		|| !(m->cam = init_cam(&(t_vec3f){0, 0, -60}, (t_vec3f){0, 0, 0})))
 	{
 		//printf("Error\n");
 		return (1);
@@ -89,7 +77,8 @@ int		main(int argc, char *argv[])
 	if (argc < 2)
 		return (10);
 	m->objects = parse_scene(m, argv[1]);
-	m->ray = &(t_vec3f){0, 1, 0};
+	//m->ray = &(t_vec3f){0, 1, 0};
+
 	m->bpp = m->screen->format->BytesPerPixel;
 	SDL_RaiseWindow(m->window);
 	m->running = true;

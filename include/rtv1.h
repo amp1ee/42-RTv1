@@ -19,7 +19,7 @@
 # define QR(n)			(pow(n, 4))
 # define MIN(t1, t2)	(t1 < t2) ? (t1) : (t2)
 # define MAX(t1, t2)	(t1 > t2) ? (t1) : (t2)
-# define EPSILON		(1e-12)
+# define EPSILON		(1e-6)
 # define INF			(2147483647)
 # define ALBEDO			(0.26f)
 
@@ -41,14 +41,22 @@ typedef enum	e_figures
 	TORUS
 }				t_figures;
 
-typedef struct	s_vec3i
-{
-	int			x;
-	int			y;
-	int			z;
-}				t_vec3i;
-
 typedef double	t_vec3f __attribute__((vector_size(sizeof(double)*3)));
+
+typedef struct	s_matrix
+{
+	t_vec3f		m[3];
+	double		cx;
+	double		cy;
+	double		cz;
+	double		sx;
+	double		sy;
+	double		sz;
+	double		sxsz;
+	double		cxsz;
+	double		cxcz;
+	double		sxcz;
+}				t_matrix;
 
 typedef struct	s_light
 {
@@ -106,15 +114,8 @@ typedef struct	s_obj
 typedef struct	s_cam
 {
 	t_vec3f		*loc;
-	double		xang;
-	double		xcos;
-	double		xsin;
-	double		yang;
-	double		ycos;
-	double		ysin;
-	double		zang;
-	double		zcos;
-	double		zsin;
+	t_vec3f		angle;
+	t_matrix	rot_mtx;
 	double		focus;
 }				t_cam;
 
@@ -125,7 +126,6 @@ typedef struct	s_main
 	bool		running;
 	int			bpp;
 	t_cam		*cam;
-	t_vec3f		*ray;
 	t_obj		**objects;
 	int			obj_num;
 }				t_main;
@@ -172,16 +172,19 @@ void			torus_cleanup(void *data);
 
 
 /*
-**	vec4f.c
+**	vec3f.c
 */
-t_vec3f			get_vec3f(t_vec3f p0, t_vec3f p1);
-void			vec3f_normalize(t_vec3f *vec);
-double			vec3f_length(t_vec3f vec);
-double			vec3f_dot(t_vec3f a, t_vec3f b);
-t_vec3f			vec3f_cross(t_vec3f a, t_vec3f b);
+double		vec3f_dot(t_vec3f a, t_vec3f b);
+double		vec3f_squared(t_vec3f v);
+double		vec3f_length(t_vec3f vec);
+t_vec3f		vec3f_cross(t_vec3f a, t_vec3f b);
+t_vec3f		vec3f_multsc(t_vec3f v, double scalar);
+void		vec3f_normalize(t_vec3f *vec);
 /*
 **	render.c
 */
+void				matrix_apply(t_vec3f *vec, t_matrix m);
+t_matrix			init_matrix(t_vec3f angle);
 void			render(t_main *m);
 void			set_pixel(t_main *m, int x, int y, unsigned int p);
 

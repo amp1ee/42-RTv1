@@ -14,31 +14,35 @@ void				set_pixel(t_main *m, int x, int y, unsigned int p)
 	}
 }
 
-static inline t_vec3f
-rot_vec_x(const t_vec3f p,
-				const double sin_al,
-				const double cos_al) {
-	const double y = p[1] * cos_al - p[2] * sin_al;
-	const double z = p[1] * sin_al + p[2] * cos_al;
-	return (t_vec3f){p[0], y, z};
+t_matrix			init_matrix(t_vec3f angle)
+{
+	t_matrix		m;
+
+	m.cx = cos(angle[0]);
+	m.cy = cos(angle[1]);
+	m.cz = cos(angle[2]);
+	m.sx = sin(angle[0]);
+	m.sy = sin(angle[1]);
+	m.sz = sin(angle[2]);
+	m.sxsz = m.sx * m.sz;
+	m.cxsz = m.cx * m.sz;
+	m.cxcz = m.cx * m.cz;
+	m.sxcz = m.sx * m.cz;
+	//Matrix result = {{ {{ Cy*Cz, Cy*Sz, -Sy }},
+	//			    {{ sxcz*Sy - cxsz, sxsz*Sy + cxcz, Sx*Cy }},
+	//			    {{ cxcz*Sy + sxsz, cxsz*Sy - sxcz, Cx*Cy }} }};
+	m.m[0] = (t_vec3f){m.cy * m.cz, m.cy * m.sz, -m.sy };
+	m.m[1] = (t_vec3f){m.sxcz * m.sy - m.cxsz, m.sxsz * m.sy + m.cxcz, m.sx * m.cy};
+	m.m[2] = (t_vec3f){m.cxcz * m.sy + m.sxsz, m.cxsz * m.sy - m.sxcz, m.cx * m.cy};
+	return (m);
 }
 
-static inline t_vec3f
-rot_vec_y(const t_vec3f p,
-				const double sin_al,
-				const double cos_al) {
-	const double x = p[0] * cos_al - p[2] * sin_al;
-	const double z = p[0] * sin_al + p[2] * cos_al;
-	return (t_vec3f){x, p[1], z};
-}
+void				matrix_apply(t_vec3f *vec, t_matrix m)
+{
+	t_vec3f			t;
 
-static inline t_vec3f
-rot_vec_z(const t_vec3f p,
-				const double sin_al,
-				const double cos_al) {
-	const double x = p[0] * cos_al - p[1] * sin_al;
-	const double y = p[0] * sin_al + p[1] * cos_al;
-	return (t_vec3f){x, y, p[2]};
+	t = *vec;
+	*vec = (t_vec3f){ vec3f_dot(m.m[0], t), vec3f_dot(m.m[1], t), vec3f_dot(m.m[2], t) };
 }
 
 double				shed_lights(t_main *m, t_vec3f P, t_vec3f N)
@@ -56,7 +60,7 @@ double				shed_lights(t_main *m, t_vec3f P, t_vec3f N)
 		if ((m->objects[j])->type == LIGHT_SOURCE)
 		{
 			light = (t_light *)m->objects[j]->data;
-			light_dir = get_vec3f(P, *(light->loc));
+			light_dir = *(light->loc) - P;
 			L = (t_vec3f){
 				light_dir[0] * -1,
 				light_dir[1] * -1,
@@ -78,10 +82,7 @@ unsigned int		trace(t_main *m, t_vec3f rdir)
 	t_vec3f			N;
 	const t_cam		*cam = m->cam;
 
-	vec3f_normalize(&rdir);
-	rdir = rot_vec_y(rot_vec_z(rot_vec_x(rdir, cam->xsin, cam->xcos), cam->zsin,
-										cam->zcos), cam->ysin, cam->ycos);
-	color = /*(SDL_Color){255,255,255,255};//*/BGCOLOR;
+	color = BGCOLOR;
 	i = -1;
 	while (++i < m->obj_num)
 	{
@@ -109,20 +110,23 @@ void				render(t_main *m)
 	//SDL_Color		*color;
 
 	SDL_FillRect(m->screen, NULL, 0x000000);
-	i = 0;
-	while (i < W)
+	m->cam->rot_mtx = init_matrix(m->cam->angle);
+	j = 0;
+	while (j < H)
 	{
-		j = 0;
-		while (j < H)
+		i = 0;
+		while (i < W)
 		{
 			x = i / (double)W - 0.5;
 			y = j / (double)H - 0.5;
 			t_vec3f rdir = (t_vec3f){x * ASPECT, y, m->cam->focus};
+			vec3f_normalize(&rdir);
+			matrix_apply(&rdir, m->cam->rot_mtx);
 			rgb = trace(m, rdir);
 			set_pixel(m, i, j, rgb);
-			j++;
+			i++;
 		}
-		i++;
+		j++;
 	}
 	printf(" Frame #%u\tCamera @ (%.2f, %.2f, %.2f)\n", ++frames, (*m->cam->loc)[0],
 		   (*m->cam->loc)[1], (*m->cam->loc)[2]);

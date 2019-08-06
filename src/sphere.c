@@ -37,7 +37,7 @@ t_vec3f		sphere_normalvec(void *data, t_vec3f intersect)
 	const t_sphere	*sphere = data;
 	t_vec3f			n;
 
-	n = get_vec3f(*sphere->center, intersect);
+	n = intersect - *(sphere->center);
 	vec3f_normalize(&n);
 	return (n);
 }

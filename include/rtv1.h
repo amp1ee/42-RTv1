@@ -24,12 +24,11 @@
 # define ALBEDO			(0.26f)
 
 # define BGCOLOR	((SDL_Color){ 12, 12, 12, 255 })
-# define FOCUS	320
+# define FOCUS	(0.7)
 # define TITLE	"rtv1"
 # define W		1280
 # define H		720
-# define ASPECT	(H / (double)W)
-# define LIGHT	1
+# define ASPECT	(W / (double)H)
 
 typedef enum	e_figures
 {
@@ -126,7 +125,6 @@ typedef struct	s_main
 	bool		running;
 	int			bpp;
 	t_cam		*cam;
-	t_light		*lights[LIGHT];
 	t_vec3f		*ray;
 	t_obj		**objects;
 	int			obj_num;

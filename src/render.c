@@ -115,9 +115,9 @@ void				render(t_main *m)
 		j = 0;
 		while (j < H)
 		{
-			x = (i - W / 2.0);
-			y = (j - H / 2.0);
-			t_vec3f rdir = (t_vec3f){x, y, 256};
+			x = i / (double)W - 0.5;
+			y = j / (double)H - 0.5;
+			t_vec3f rdir = (t_vec3f){x * ASPECT, y, m->cam->focus};
 			rgb = trace(m, rdir);
 			set_pixel(m, i, j, rgb);
 			j++;

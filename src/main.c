@@ -26,19 +26,19 @@ void	handle_events(t_main *m, SDL_Event e)
 	else if (e.key.keysym.sym == SDLK_x && ++c)
 		m->cam->zang += 2 * M_PI / 180.0;
 	else if (e.key.keysym.sym == SDLK_z && ++c)
-			m->cam->zang -= 2 * M_PI / 180.0;
-	else if (e.key.keysym.sym == SDLK_KP_4 && ++c)
-		(*m->cam->loc)[0] -= 10;
-	else if (e.key.keysym.sym == SDLK_KP_6 && ++c)
-		(*m->cam->loc)[0] += 10;
-	else if (e.key.keysym.sym == SDLK_KP_2 && ++c)
-		(*m->cam->loc)[1] -= 10;
-	else if (e.key.keysym.sym == SDLK_KP_8 && ++c)
-		(*m->cam->loc)[1] += 10;
-	else if (e.key.keysym.sym == SDLK_s && ++c)
-		(*m->cam->loc)[2] += 10;
+		m->cam->zang -= 2 * M_PI / 180.0;
 	else if (e.key.keysym.sym == SDLK_w && ++c)
 		(*m->cam->loc)[2] -= 10;
+	else if (e.key.keysym.sym == SDLK_s && ++c)
+		(*m->cam->loc)[2] += 10;
+	else if (e.key.keysym.sym == SDLK_a && ++c)
+		(*m->cam->loc)[0] -= 10;
+	else if (e.key.keysym.sym == SDLK_d && ++c)
+		(*m->cam->loc)[0] += 10;
+	else if (e.key.keysym.sym == SDLK_q && ++c)
+		(*m->cam->loc)[1] -= 10;
+	else if (e.key.keysym.sym == SDLK_e && ++c)
+		(*m->cam->loc)[1] += 10;
 	m->cam->xcos = cos(m->cam->xang);
 	m->cam->xsin = sin(m->cam->xang);
 	m->cam->ycos = cos(m->cam->yang);
@@ -86,10 +86,6 @@ int		main(int argc, char *argv[])
 		//printf("Error\n");
 		return (1);
 	}
-/*	m->objects[0] = new_torus(&(t_vec3f){0.0, 0.0, -50.0},
-		(t_vec3f){0.0, 0.0, 1.0}, 20.0, 12.0,
-		(SDL_Color){255, 0, 255, 255});
-	printf(m->objects[0] ? "Torus ready\n": "Failed with a torus\n");*/
 	if (argc < 2)
 		return (10);
 	m->objects = parse_scene(m, argv[1]);

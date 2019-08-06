@@ -1,7 +1,8 @@
 NAME	=rtv1
 CC		=gcc
-CFLAGS	=-Wall -Wextra -Werror -g
-#CFLAGS	+=-O3
+CFLAGS	=-Wall -Wextra -Werror
+CFLAGS	+=-g
+CFLAGS	+=-Ofast
 
 SRCDIR	=./src/
 OBJDIR	=./obj/

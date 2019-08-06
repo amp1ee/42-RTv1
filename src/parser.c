@@ -1,12 +1,5 @@
 #include "rtv1.h"
 
-t_obj			*new_plane(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
-{
-	(void)center;
-	(void)dir;
-	(void)radius;
-	(void)color;
-	return NULL; }
 
 t_obj			*new_cone(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
 {

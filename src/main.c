@@ -31,9 +31,9 @@ void	handle_events(t_main *m, SDL_Event e)
 	else if (e.key.keysym.sym == SDLK_z && ++c)
 		m->cam->angle = (t_vec3f){ angle[0], angle[1], angle[2] - angdelta};
 	else if (e.key.keysym.sym == SDLK_w && ++c)
-		(*m->cam->loc)[2] -= 10;
-	else if (e.key.keysym.sym == SDLK_s && ++c)
 		(*m->cam->loc)[2] += 10;
+	else if (e.key.keysym.sym == SDLK_s && ++c)
+		(*m->cam->loc)[2] -= 10;
 	else if (e.key.keysym.sym == SDLK_a && ++c)
 		(*m->cam->loc)[0] -= 10;
 	else if (e.key.keysym.sym == SDLK_d && ++c)

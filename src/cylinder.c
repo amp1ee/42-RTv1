@@ -1,20 +1,5 @@
 #include "rtv1.h"
 
-/*
-	float3	Va = (obj->dir - obj->pos) / fast_length(obj->dir - obj->pos);
-
-	D_Va = D - dot(D, Va) * Va;
-	OC_Va = (O - obj->dir) - dot((O - obj->dir), Va) * Va;
-	k1 = dot(D_Va, D_Va);
-	k2 = 2.0F * dot(D_Va, OC_Va);
-	k3 = dot(OC_Va, OC_Va) - obj->rad * obj->rad;
-
-	descr = k2 * k2 - 4.0F * k1 * k3;
-	if (descr < 0)
-		return ((float2){INFINITY, INFINITY});
-	T = (float2){
-*/
-
 bool		cylinder_intersect(void *data, t_vec3f eye, t_vec3f rdir,
 				t_vec3f *intersect)
 {
@@ -23,19 +8,17 @@ bool		cylinder_intersect(void *data, t_vec3f eye, t_vec3f rdir,
 	const double	r = cyl->radius;
 	const t_vec3f	dir = cyl->dir;
 
-	t_vec3f		Va = (dir - pos);
+	t_vec3f		Va = dir - pos;
 	vec3f_normalize(&Va);
-	double		d_rdirVa = vec3f_dot(rdir, Va);
-	t_vec3f		m_Va = vec3f_multsc(Va, d_rdirVa);
-	t_vec3f		D_Va = rdir - m_Va;
-	t_vec3f		DO = (eye - dir);
-	double		d_DO_Va = vec3f_dot(DO, Va);
-	t_vec3f		OC_Va = DO - vec3f_multsc(Va, d_DO_Va);
+	t_vec3f		D_Va = rdir - (vec3f_multsc(Va, vec3f_dot(rdir, Va)));
+
+	t_vec3f		DO = (eye - pos);
+	t_vec3f		OC_Va = DO - vec3f_multsc(Va, vec3f_dot(Va, DO));
 
 	double A = vec3f_squared(D_Va);
 	double B = 2.0 * vec3f_dot(D_Va, OC_Va);
 	double C = vec3f_squared(OC_Va) - SQ(r);
-	double d = SQ(B) - 4 * A * C;
+	double d = SQ(B) - 4.0 * A * C;
 	if (d < 0)
 		return (false);
 	double sqrtd = sqrt(d);
@@ -87,6 +70,7 @@ t_obj		*new_cylinder(t_vec3f *center, t_vec3f dir, double radius, SDL_Color colo
 	if (!(cyl = malloc(sizeof(t_cylind))))
 		return (NULL);
 	cyl->center = center;
+	vec3f_normalize(&dir);
 	cyl->dir = dir;
 	cyl->radius = radius;
 	cyl->color = color;

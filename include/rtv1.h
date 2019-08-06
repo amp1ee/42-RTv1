@@ -65,6 +65,13 @@ typedef struct	s_light
 	SDL_Color	color;
 }				t_light;
 
+typedef struct	s_plane
+{
+	t_vec3f		*pos;
+	t_vec3f		normal;
+	SDL_Color	color;
+}				t_plane;
+
 typedef struct	s_sphere
 {
 	t_vec3f		*center;
@@ -134,14 +141,21 @@ typedef t_obj	*(*t_of)(t_vec3f *, t_vec3f, double, SDL_Color);
 
 t_obj			**parse_scene(t_main *m, char *path);
 
-t_obj			*new_plane(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
-t_obj			*new_sphere(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
 t_obj			*new_cylinder(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
 t_obj			*new_cone(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
 
 SDL_Color		lights_color(void *data, t_vec3f intersect);
 void			lights_cleanup(void *data);
 t_obj			*new_light(t_vec3f *location, t_vec3f dir, double brightness, SDL_Color color);
+
+t_obj				*new_plane(t_vec3f *center, t_vec3f dir, double radius,
+							SDL_Color color);
+bool				plane_intersect(void *data, t_vec3f eye, t_vec3f rdir,
+										t_vec3f *intersect);
+t_vec3f				plane_normalvec(void *data, t_vec3f intersect);
+SDL_Color			plane_color(void *data, t_vec3f intersect);
+void				plane_cleanup(void *data);
+
 /*
 **	sphere.c
 */

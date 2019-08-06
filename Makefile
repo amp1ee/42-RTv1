@@ -15,9 +15,9 @@ SRC		=$(addprefix $(SRCDIR),	\
 			render.c			\
 			parser.c			\
 			lights.c			\
+			plane.c				\
 			sphere.c			\
 			cylinder.c			\
-			plane.c				\
 			cone.c				\
 			vec3f.c)
 OBJ		=$(SRC:$(SRCDIR)%.c=$(OBJDIR)%.o)

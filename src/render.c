@@ -114,6 +114,9 @@ void				render(t_main *m)
 
 	SDL_FillRect(m->screen, NULL, 0x000000);
 	m->cam->rot_mtx = init_matrix(m->cam->angle);
+	// Apply rotation to move in eye direction
+	m->cam->ray = (t_vec3f){ 0, 0, m->cam->focus };
+	matrix_apply(&(m->cam->ray), m->cam->rot_mtx);
 	j = 0;
 	while (j < H)
 	{

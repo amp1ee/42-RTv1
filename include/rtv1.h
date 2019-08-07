@@ -21,7 +21,7 @@
 # define MAX(t1, t2)	(t1 > t2) ? (t1) : (t2)
 # define EPSILON		(1e-6)
 # define INF			(2147483647)
-# define ALBEDO			(0.26f)
+# define ALBEDO			(0.26s)
 
 # define BGCOLOR	((SDL_Color){ 12, 12, 12, 255 })
 # define FOCUS	(0.7)
@@ -121,6 +121,7 @@ typedef struct	s_obj
 typedef struct	s_cam
 {
 	t_vec3f		*loc;
+	t_vec3f		ray;
 	t_vec3f		angle;
 	t_matrix	rot_mtx;
 	double		focus;
@@ -194,6 +195,7 @@ double		vec3f_length(t_vec3f vec);
 t_vec3f		vec3f_cross(t_vec3f a, t_vec3f b);
 t_vec3f		vec3f_multsc(t_vec3f v, double scalar);
 void		vec3f_normalize(t_vec3f *vec);
+t_vec3f		vec3f_copy(t_vec3f orig);
 /*
 **	render.c
 */

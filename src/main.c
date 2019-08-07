@@ -11,37 +11,53 @@ void	game_quit(t_main *m)
 	SDL_Quit();
 }
 
+#define STEP	(50)
+#define DOT(a, b) vec3f_dot((a), (b))
+#define INV(a, b) sqrt(1 - SQ(DOT((a), (b))))
+#define uI ((t_vec3f){1, 0, 0})
+#define uJ ((t_vec3f){0, -1, 0})
+#define uK ((t_vec3f){0, 0, 1})
+/*
+**	presses w... angle (0.25, -0.5, 0)
+**	loc.x += 10 * dot(angle, (t_vec3f){1, 0, 0})
+*/
 void	handle_events(t_main *m, SDL_Event e)
 {
 	char		c = 0;
 	t_vec3f		angle;
+	t_cam		*cam;
 
-	angle = m->cam->angle;
+	cam = m->cam;
+	angle = cam->angle;
+	t_vec3f ray = cam->ray;
+	t_vec3f perpray = vec3f_copy(ray);
+	matrix_apply(&perpray, init_matrix(angle+(t_vec3f){M_PI/2, -M_PI/2, M_PI/2}));
+
 	double angdelta = 8 * M_PI / 180.0;
 	if (e.key.keysym.sym == SDLK_DOWN && ++c)
-		m->cam->angle = (t_vec3f){ angle[0] + angdelta, angle[1], angle[2]};
+		cam->angle = (t_vec3f){ angle[0] + angdelta, angle[1], angle[2]};
 	else if (e.key.keysym.sym == SDLK_UP && ++c)
-		m->cam->angle = (t_vec3f){ angle[0] - angdelta, angle[1], angle[2]};
+		cam->angle = (t_vec3f){ angle[0] - angdelta, angle[1], angle[2]};
 	else if (e.key.keysym.sym == SDLK_RIGHT && ++c)
-		m->cam->angle = (t_vec3f){ angle[0], (angle[1] + angdelta), angle[2]};
+		cam->angle = (t_vec3f){ angle[0], (angle[1] - angdelta), angle[2]};
 	else if (e.key.keysym.sym == SDLK_LEFT && ++c)
-		m->cam->angle = (t_vec3f){ angle[0], (angle[1] - angdelta), angle[2]};
+		cam->angle = (t_vec3f){ angle[0], (angle[1] + angdelta), angle[2]};
 	else if (e.key.keysym.sym == SDLK_x && ++c)
-		m->cam->angle = (t_vec3f){ angle[0], angle[1], angle[2] + angdelta};
+		cam->angle = (t_vec3f){ angle[0], angle[1], angle[2] + angdelta};
 	else if (e.key.keysym.sym == SDLK_z && ++c)
-		m->cam->angle = (t_vec3f){ angle[0], angle[1], angle[2] - angdelta};
+		cam->angle = (t_vec3f){ angle[0], angle[1], angle[2] - angdelta};
 	else if (e.key.keysym.sym == SDLK_w && ++c)
-		(*m->cam->loc)[2] += 10;
+		(*cam->loc) += vec3f_multsc((t_vec3f){ DOT(ray, uI), -DOT(ray, uJ), DOT(ray, uK) }, STEP);
 	else if (e.key.keysym.sym == SDLK_s && ++c)
-		(*m->cam->loc)[2] -= 10;
+		(*cam->loc) -= vec3f_multsc((t_vec3f){ DOT(ray, uI), -DOT(ray, uJ), DOT(ray, uK) }, STEP);
 	else if (e.key.keysym.sym == SDLK_a && ++c)
-		(*m->cam->loc)[0] -= 10;
+		(*cam->loc) -= vec3f_multsc((t_vec3f){ DOT(perpray, uI), 0, DOT(perpray, uK) }, STEP);
 	else if (e.key.keysym.sym == SDLK_d && ++c)
-		(*m->cam->loc)[0] += 10;
+		(*cam->loc) += vec3f_multsc((t_vec3f){ DOT(perpray, uI), 0, DOT(perpray, uK) }, STEP);
 	else if (e.key.keysym.sym == SDLK_q && ++c)
-		(*m->cam->loc)[1] -= 10;
+		(*cam->loc)[1] -= 10;
 	else if (e.key.keysym.sym == SDLK_e && ++c)
-		(*m->cam->loc)[1] += 10;
+		(*cam->loc)[1] += 10;
 	(c) ? render(m) : 0;
 }
 

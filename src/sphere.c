@@ -4,18 +4,17 @@ bool		sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 				t_vec3f *intersect)
 {
 	const t_sphere	*sph = data;
-	const t_vec3f	center = *sph->center;
-	const double		r = sph->radius;
-	t_vec3f			k = ray_start - center;
-	double			b = vec3f_dot(k, ray);
-	double			c = vec3f_dot(k, k) - SQ(r);
-	double			d = SQ(b) - c;
-	// (d>0)?//printf("d=%.3f\n", d):0;
+	t_vec3f			k = ray_start - *sph->center;
+
+	double b,c;
+	b = vec3f_dot(ray, k);
+	c = vec3f_squared(k) - SQ(sph->radius);
+	double d = SQ(b) - c;
 	if (d < 0)
 		return (false);
 	double sqrtd = sqrt(d);
-	const double		t1 = (-b + sqrtd);
-	const double		t2 = (-b - sqrtd);
+	const double		t1 = (-b - sqrtd);
+	const double		t2 = (-b + sqrtd);
 	const double		t = (MIN(t1, t2) >= 0) ? MIN(t1, t2) : MAX(t1, t2);
 	*intersect = (t_vec3f){	ray_start[0] + t * ray[0],
 							ray_start[1] + t * ray[1],
@@ -32,12 +31,12 @@ SDL_Color	sphere_color(void *data, t_vec3f intersect)
 	return (sphere->color);
 }
 
-t_vec3f		sphere_normalvec(void *data, t_vec3f intersect)
+t_vec3f		sphere_normalvec(void *data, t_vec3f hit)
 {
 	const t_sphere	*sphere = data;
 	t_vec3f			n;
 
-	n = intersect - *(sphere->center);
+	n = hit - *(sphere->center);
 	vec3f_normalize(&n);
 	return (n);
 }

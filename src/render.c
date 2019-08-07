@@ -61,11 +61,7 @@ double				shed_lights(t_main *m, t_vec3f P, t_vec3f N)
 		{
 			light = (t_light *)m->objects[j]->data;
 			light_dir = *(light->loc) - P;
-			L = (t_vec3f){
-				light_dir[0] * -1,
-				light_dir[1] * -1,
-				light_dir[2] * -1
-			};
+			L = vec3f_multsc(light_dir, -1);
 			k += ((ALBEDO / 255) * M_PI) * light->brightness *
 				(MAX(0.0f, -vec3f_dot(N, L)));
 		}
@@ -80,6 +76,7 @@ unsigned int		trace(t_main *m, t_vec3f rdir)
 	int				i;
 	t_vec3f			P;
 	t_vec3f			N;
+	double			t = INFINITY;
 	const t_cam		*cam = m->cam;
 
 	color = BGCOLOR;
@@ -90,12 +87,16 @@ unsigned int		trace(t_main *m, t_vec3f rdir)
 		o = m->objects[i];
 		if (o->type != LIGHT_SOURCE && o->intersects(o->data, *(cam->loc), rdir, &P))
 		{
-			color = o->get_color(o->data, P);
-			N = o->normal_vec(o->data, P);
-			k = shed_lights(m, P, N);
-			color.r *= k;
-			color.g *= k;
-			color.b *= k;
+			if (vec3f_length(P - *(cam->loc)) < t)
+			{
+				N = o->normal_vec(o->data, P);
+				color = o->get_color(o->data, P);
+				k = shed_lights(m, P, N);
+				color.r *= k;
+				color.g *= k;
+				color.b *= k;
+				t = vec3f_length(P - *(cam->loc));
+			}
 		}
 	}
 	return (color.r << 16 | color.g << 8 | color.b);

@@ -28,9 +28,6 @@ t_matrix			init_matrix(t_vec3f angle)
 	m.cxsz = m.cx * m.sz;
 	m.cxcz = m.cx * m.cz;
 	m.sxcz = m.sx * m.cz;
-	//Matrix result = {{ {{ Cy*Cz, Cy*Sz, -Sy }},
-	//			    {{ sxcz*Sy - cxsz, sxsz*Sy + cxcz, Sx*Cy }},
-	//			    {{ cxcz*Sy + sxsz, cxsz*Sy - sxcz, Cx*Cy }} }};
 	m.m[0] = (t_vec3f){m.cy * m.cz, m.cy * m.sz, -m.sy };
 	m.m[1] = (t_vec3f){m.sxcz * m.sy - m.cxsz, m.sxsz * m.sy + m.cxcz, m.sx * m.cy};
 	m.m[2] = (t_vec3f){m.cxcz * m.sy + m.sxsz, m.cxsz * m.sy - m.sxcz, m.cx * m.cy};
@@ -50,10 +47,11 @@ double				shed_lights(t_main *m, t_vec3f P, t_vec3f N)
 	int				j;
 	t_light			*light;
 	t_vec3f			light_dir;
-	t_vec3f			L;
-	double			k;
+	double			diffuse_k;
+	double			atten;
+	double			dist;
 
-	k = 0.0;
+	diffuse_k = 0.0;
 	j = -1;
 	while (++j < m->obj_num)
 	{
@@ -61,12 +59,17 @@ double				shed_lights(t_main *m, t_vec3f P, t_vec3f N)
 		{
 			light = (t_light *)m->objects[j]->data;
 			light_dir = *(light->loc) - P;
-			L = vec3f_multsc(light_dir, -1);
-			k += ((ALBEDO / 255) * M_PI) * light->brightness *
-				(MAX(0.0f, -vec3f_dot(N, L)));
+			dist = vec3f_length(light_dir);
+			vec3f_normalize(&light_dir);
+			atten = 1 + SQ(dist / 34.0);
+			diffuse_k += MAX(0.0, vec3f_dot(N, light_dir)) / atten;
+/*			if (diffuse_k > 1e-3)
+			{
+				diffuse_light += light->color * diffuse_k;
+			}*/
 		}
 	}
-	return (k);
+	return (diffuse_k);
 }
 
 unsigned int		trace(t_main *m, t_vec3f rdir)
@@ -108,7 +111,6 @@ void				render(t_main *m)
 	double			x, y;
 	unsigned int	rgb;
 	static unsigned int frames;
-	//SDL_Color		*color;
 
 	SDL_FillRect(m->screen, NULL, 0x000000);
 	m->cam->rot_mtx = init_matrix(m->cam->angle);

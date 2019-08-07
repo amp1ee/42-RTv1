@@ -69,7 +69,7 @@ int		main(int argc, char *argv[])
 		|| !(m->window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED, W, H, 0))
 		|| !(m->screen = SDL_GetWindowSurface(m->window))
-		|| !(m->cam = init_cam(&(t_vec3f){0, 0, -60}, (t_vec3f){0, 0, 0})))
+		|| !(m->cam = init_cam(&(t_vec3f){0, 0, -160}, (t_vec3f){0, 0, 0})))
 	{
 		//printf("Error\n");
 		return (1);
@@ -77,7 +77,6 @@ int		main(int argc, char *argv[])
 	if (argc < 2)
 		return (10);
 	m->objects = parse_scene(m, argv[1]);
-	//m->ray = &(t_vec3f){0, 1, 0};
 
 	m->bpp = m->screen->format->BytesPerPixel;
 	SDL_RaiseWindow(m->window);

@@ -91,7 +91,7 @@ t_obj			*ft_new_object(t_of obj_creator, char *line)
 	double		radius;
 	SDL_Color	color;
 
-	while (*line)
+	while (*line && *line != '#')
 	{
 		if (*line == 'P')
 		{

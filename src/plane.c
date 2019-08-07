@@ -43,9 +43,9 @@ bool				plane_intersect(void *data, t_vec3f eye, t_vec3f rdir,
 	t_vec3f			oc = pos - eye;
 	double			a = vec3f_dot(rdir, dir);
 	double			b = vec3f_dot(oc, dir);
-	t = (b / a);
 	if (fabs(a) <= EPSILON)
 		return (false);
+	t = (b / a);
 	*intersect = (t_vec3f){
 		eye[0] + t * rdir[0],
 		eye[1] + t * rdir[1],

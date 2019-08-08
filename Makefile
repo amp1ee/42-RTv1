@@ -1,5 +1,5 @@
 NAME	=RTv1
-CC		=gcc
+CC		=clang
 CFLAGS	=-Wall -Wextra -Werror
 CFLAGS	+=-g
 CFLAGS	+=-Ofast

@@ -9,46 +9,26 @@ t_obj			*new_cone(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
 	(void)color;
 	return NULL; }
 
-void			ft_lstpush(t_list **dest, t_list *src)
-{
-	t_list		*cur;
-
-	if (!dest || !src)
-		return ;
-	if (*dest == NULL)
-		*dest = src;
-	else
-	{
-		cur = *dest;
-		while (cur->next)
-			cur = cur->next;
-		cur->next = src;
-	}
-}
-
 // TODO:
 // double			ft_atof()
 
-t_obj			**lst_to_arr(t_list *obj_list)
+t_obj			**lst_to_arr(t_list **obj_list, int num)
 {
-	int			num;
 	t_list		*elem;
 	t_obj		**objs;
 
-	num = 0;
-	elem = obj_list;
+	ft_lstreverse(obj_list);
+	if (!(objs = malloc(num * sizeof(*objs))))
+		return (NULL);
+	elem = *obj_list;
 	while (elem)
 	{
-		num++;
+		if (!(objs[--num] = malloc(sizeof(t_obj))))
+			return (NULL);
+		ft_memcpy(objs[num], (t_obj *)(elem->content), sizeof(t_obj));
 		elem = elem->next;
 	}
-	objs = malloc(num * sizeof(*objs));
-	elem = obj_list;
-	while (elem)
-	{
-		objs[--num] = (t_obj *)(elem->content);
-		elem = elem->next;
-	}
+	ft_lstdel(obj_list, ft_bzero);
 	return (objs);
 }
 
@@ -102,12 +82,12 @@ t_obj			*ft_new_object(t_of obj_creator, char *line)
 		else if (*line == 'D')
 		{
 			dir = parse_vec3f(&line[2]);
-			printf("dir: %f %f %f\n", dir[0], dir[1], dir[2]);
+			//printf("dir: %f %f %f\n", dir[0], dir[1], dir[2]);
 		}
 		else if (*line == 'R')
 		{
 			radius = atof(&line[2]);
-			printf("R: %f\n", radius);
+			//printf("R: %f\n", radius);
 		}
 		else if (*line == 'C')
 			color = parse_color(&line[2]);
@@ -137,7 +117,6 @@ t_obj			**parse_scene(t_main *m, char *path)
 	char		*line;
 	t_list		*obj_list;
 	t_obj		*obj;
-	//t_obj		**objs;
 	int			fd;
 	int			i;
 
@@ -153,14 +132,16 @@ t_obj			**parse_scene(t_main *m, char *path)
 		{
 			if (line[0] == objs_str[i])
 			{
-				printf("line[0]: %c\n", line[0]);
+				//printf("line[0]: %c\n", line[0]);
 				obj = ft_new_object((obj_func[i]), &line[2]);
-				ft_lstpush(&obj_list, ft_lstnew(obj, sizeof(*obj)));
+				ft_lstadd(&obj_list, ft_lstnew(obj, sizeof(*obj)));
+				ft_memdel((void **)&obj);
 				m->obj_num++;
 			}
 			i++;
 		}
+		ft_strdel(&line);
 	}
 	close(fd);
-	return (lst_to_arr(obj_list));
+	return (lst_to_arr(&obj_list, m->obj_num));
 }

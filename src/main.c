@@ -1,17 +1,34 @@
 #include "rtv1.h"
 
+void	free_mem(t_main *m)
+{
+	int		obj_num;
+
+	obj_num = m->obj_num;
+	while (obj_num--)
+	{
+		(m->objects[obj_num])->cleanup((m->objects[obj_num])->data);
+		ft_memdel((void **)&(m->objects[obj_num]));
+	}
+	ft_memdel((void **)&(m->objects));
+	ft_memdel((void **)&(m->cam));
+}
+
 void	game_quit(t_main *m)
 {
 	m->running = false;
+	free_mem(m);
 	SDL_PixelFormat* pixelFormat = m->screen->format;
 	Uint32 pixelFormatEnum = pixelFormat->format;
 	const char* surfacePixelFormatName = SDL_GetPixelFormatName(pixelFormatEnum);
 	SDL_Log("The surface's pixelformat is %s", surfacePixelFormatName);
+	SDL_FreeSurface(m->screen);
 	SDL_DestroyWindow(m->window);
 	SDL_Quit();
 }
 
 #define STEP	(50)
+#define ANG		(8 * (M_PI) / 180.0)
 #define DOT(a, b) vec3f_dot((a), (b))
 #define XPROD(a, b) vec3f_cross((a), (b))
 #define INV(a, b) sqrt(1 - SQ(DOT((a), (b))))
@@ -34,19 +51,18 @@ void	handle_events(t_main *m, SDL_Event e)
 	t_vec3f perpray;
 	perpray = XPROD(ray, uJ);
 
-	double angdelta = 8 * M_PI / 180.0;
 	if (e.key.keysym.sym == SDLK_DOWN && ++c)
-		cam->angle = (t_vec3f){ angle[0] + angdelta, angle[1], angle[2]};
+		cam->angle = (t_vec3f){ angle[0] + ANG, angle[1], angle[2]};
 	else if (e.key.keysym.sym == SDLK_UP && ++c)
-		cam->angle = (t_vec3f){ angle[0] - angdelta, angle[1], angle[2]};
+		cam->angle = (t_vec3f){ angle[0] - ANG, angle[1], angle[2]};
 	else if (e.key.keysym.sym == SDLK_RIGHT && ++c)
-		cam->angle = (t_vec3f){ angle[0], (angle[1] - angdelta), angle[2]};
+		cam->angle = (t_vec3f){ angle[0], (angle[1] - ANG), angle[2]};
 	else if (e.key.keysym.sym == SDLK_LEFT && ++c)
-		cam->angle = (t_vec3f){ angle[0], (angle[1] + angdelta), angle[2]};
+		cam->angle = (t_vec3f){ angle[0], (angle[1] + ANG), angle[2]};
 	else if (e.key.keysym.sym == SDLK_x && ++c)
-		cam->angle = (t_vec3f){ angle[0], angle[1], angle[2] + angdelta};
+		cam->angle = (t_vec3f){ angle[0], angle[1], angle[2] + ANG};
 	else if (e.key.keysym.sym == SDLK_z && ++c)
-		cam->angle = (t_vec3f){ angle[0], angle[1], angle[2] - angdelta};
+		cam->angle = (t_vec3f){ angle[0], angle[1], angle[2] - ANG};
 	else if (e.key.keysym.sym == SDLK_w && ++c)
 		(*cam->loc) += vec3f_multsc((t_vec3f){ DOT(ray, uI), -DOT(ray, uJ), DOT(ray, uK) }, STEP);
 	else if (e.key.keysym.sym == SDLK_s && ++c)
@@ -56,9 +72,9 @@ void	handle_events(t_main *m, SDL_Event e)
 	else if (e.key.keysym.sym == SDLK_d && ++c)
 		(*cam->loc) += vec3f_multsc((t_vec3f){ DOT(perpray, uI), 0, DOT(perpray, uK) }, STEP);
 	else if (e.key.keysym.sym == SDLK_q && ++c)
-		(*cam->loc)[1] -= 10;
+		(*cam->loc)[1] -= STEP;
 	else if (e.key.keysym.sym == SDLK_e && ++c)
-		(*cam->loc)[1] += 10;
+		(*cam->loc)[1] += STEP;
 	(c) ? render(m) : 0;
 }
 
@@ -94,7 +110,6 @@ int		main(int argc, char *argv[])
 	if (argc < 2)
 		return (10);
 	m->objects = parse_scene(m, argv[1]);
-
 	m->bpp = m->screen->format->BytesPerPixel;
 	SDL_RaiseWindow(m->window);
 	m->running = true;
@@ -111,6 +126,8 @@ int		main(int argc, char *argv[])
 				handle_events(m, e);
 		}
 	}
+	ft_memdel((void **)&m);
+	system("leaks rtv1");
 	exit(0);
 	return (0);
 }

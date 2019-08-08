@@ -46,7 +46,8 @@ void		sphere_cleanup(void *data)
 	t_sphere *sphere;
 
 	sphere = data;
-	free(sphere);
+	ft_memdel((void **)&(sphere->center));
+	ft_memdel((void **)&sphere);
 }
 
 t_obj		*new_sphere(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
@@ -58,11 +59,11 @@ t_obj		*new_sphere(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
 	if (!(sph = malloc(sizeof(t_sphere))))
 		return (NULL);
 	sph->center = center;
-	printf("p.x: %f, p.y: %f, p.z: %f\n", (*center)[0], (*center)[1], (*center)[2]);
+	//printf("p.x: %f, p.y: %f, p.z: %f\n", (*center)[0], (*center)[1], (*center)[2]);
 	sph->radius = radius;
-	printf("%f\n", sph->radius);
+	//printf("%f\n", sph->radius);
 	sph->color = color;
-	printf("c.r: %u, c.g: %u, c.b: %u, c.a: %u\n", color.r, color.g, color.b, color.a);
+	//printf("c.r: %u, c.g: %u, c.b: %u, c.a: %u\n", color.r, color.g, color.b, color.a);
 	if (!(obj = malloc(sizeof(t_obj))))
 		return (NULL);
 	obj->type = SPHERE;

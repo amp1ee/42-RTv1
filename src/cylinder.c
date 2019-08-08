@@ -59,7 +59,8 @@ void		cylinder_cleanup(void *data)
 	t_cylind *cylinder;
 
 	cylinder = data;
-	free(cylinder);
+	ft_memdel((void **)&(cylinder->center));
+	ft_memdel((void **)&cylinder);
 }
 
 t_obj		*new_cylinder(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)

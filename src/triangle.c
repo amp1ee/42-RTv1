@@ -78,5 +78,8 @@ void			triangle_cleanup(void *data)
 	t_triang	*triang;
 
 	triang = data;
-	free(triang);
+	ft_memdel((void **)&(triang->a));
+	ft_memdel((void **)&(triang->b));
+	ft_memdel((void **)&(triang->c));
+	ft_memdel((void **)&triang);
 }

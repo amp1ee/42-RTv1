@@ -13,7 +13,8 @@ void				lights_cleanup(void *data)
 	t_light		*lights;
 
 	lights = data;
-	free(lights);
+	ft_memdel((void **)&(lights->loc));
+	ft_memdel((void **)&lights);
 }
 
 t_obj				*new_light(t_vec3f *location, t_vec3f dir, double brightness, SDL_Color color)

@@ -194,6 +194,6 @@ void			torus_cleanup(void *data)
 	t_torus	*torus;
 
 	torus = data;
-
-	free(torus);
+	ft_memdel((void **)&(torus->center));
+	ft_memdel((void **)&torus);
 }

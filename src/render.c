@@ -110,7 +110,7 @@ void				render(t_main *m)
 	int				i, j;
 	double			x, y;
 	unsigned int	rgb;
-	static unsigned int frames;
+	//static unsigned int frames;
 
 	SDL_FillRect(m->screen, NULL, 0x000000);
 	m->cam->rot_mtx = init_matrix(m->cam->angle);
@@ -134,7 +134,7 @@ void				render(t_main *m)
 		}
 		j++;
 	}
-	printf(" Frame #%u\tCamera @ (%.2f, %.2f, %.2f)\n", ++frames, (*m->cam->loc)[0],
-		   (*m->cam->loc)[1], (*m->cam->loc)[2]);
+	//printf(" Frame #%u\tCamera @ (%.2f, %.2f, %.2f)\n", ++frames, (*m->cam->loc)[0],
+	//	   (*m->cam->loc)[1], (*m->cam->loc)[2]);
 	SDL_UpdateWindowSurface(m->window);
 }

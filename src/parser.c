@@ -132,7 +132,6 @@ t_obj			**parse_scene(t_main *m, char *path)
 		{
 			if (line[0] == objs_str[i])
 			{
-				//printf("line[0]: %c\n", line[0]);
 				obj = ft_new_object((obj_func[i]), &line[2]);
 				ft_lstadd(&obj_list, ft_lstnew(obj, sizeof(*obj)));
 				ft_memdel((void **)&obj);

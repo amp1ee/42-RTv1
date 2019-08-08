@@ -1,14 +1,5 @@
 #include "rtv1.h"
 
-
-t_obj			*new_cone(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
-{
-	(void)center;
-	(void)dir;
-	(void)radius;
-	(void)color;
-	return NULL; }
-
 // TODO:
 // double			ft_atof()
 
@@ -82,7 +73,7 @@ t_obj			*ft_new_object(t_of obj_creator, char *line)
 		else if (*line == 'D')
 		{
 			dir = parse_vec3f(&line[2]);
-			//printf("dir: %f %f %f\n", dir[0], dir[1], dir[2]);
+			printf("dir: %f %f %f\n", dir[0], dir[1], dir[2]);
 		}
 		else if (*line == 'R')
 		{

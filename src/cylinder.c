@@ -22,8 +22,8 @@ bool		cylinder_intersect(void *data, t_vec3f eye, t_vec3f rdir,
 	if (d < 0)
 		return (false);
 	double sqrtd = sqrt(d);
-	const double		t1 = (-B + sqrtd) / (2.0 * A);
-	const double		t2 = (-B - sqrtd) / (2.0 * A);
+	const double		t1 = (-B - sqrtd) / (2.0 * A);
+	const double		t2 = (-B + sqrtd) / (2.0 * A);
 	const double		t = (MIN(t1, t2) >= 0) ? MIN(t1, t2) : MAX(t1, t2);
 	*intersect = (t_vec3f){	eye[0] + t * rdir[0],
 							eye[1] + t * rdir[1],
@@ -71,7 +71,6 @@ t_obj		*new_cylinder(t_vec3f *pos, t_vec3f dir, double radius, SDL_Color color)
 	if (!(cyl = malloc(sizeof(t_cylind))))
 		return (NULL);
 	cyl->pos = pos;
-	vec3f_normalize(&dir);
 	cyl->dir = dir;
 	cyl->radius = radius;
 	cyl->color = color;

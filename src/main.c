@@ -127,7 +127,7 @@ int		main(int argc, char *argv[])
 		}
 	}
 	ft_memdel((void **)&m);
-	system("leaks RTv1");
+	//system("leaks RTv1");
 	exit(0);
 	return (0);
 }

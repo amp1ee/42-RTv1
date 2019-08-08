@@ -87,6 +87,14 @@ typedef struct	s_cylind
 	SDL_Color	color;
 }				t_cylind;
 
+typedef struct	s_cone
+{
+	t_vec3f		*pos;
+	t_vec3f		dir;
+	double		angle;
+	SDL_Color	color;
+}				t_cone;
+
 typedef struct	s_triang
 {
 	t_vec3f		*a;

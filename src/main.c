@@ -13,6 +13,7 @@ void	game_quit(t_main *m)
 
 #define STEP	(50)
 #define DOT(a, b) vec3f_dot((a), (b))
+#define XPROD(a, b) vec3f_cross((a), (b))
 #define INV(a, b) sqrt(1 - SQ(DOT((a), (b))))
 #define uI ((t_vec3f){1, 0, 0})
 #define uJ ((t_vec3f){0, -1, 0})
@@ -30,8 +31,8 @@ void	handle_events(t_main *m, SDL_Event e)
 	cam = m->cam;
 	angle = cam->angle;
 	t_vec3f ray = cam->ray;
-	t_vec3f perpray = vec3f_copy(ray);
-	matrix_apply(&perpray, init_matrix(angle+(t_vec3f){M_PI/2, -M_PI/2, M_PI/2}));
+	t_vec3f perpray;
+	perpray = XPROD(ray, uJ);
 
 	double angdelta = 8 * M_PI / 180.0;
 	if (e.key.keysym.sym == SDLK_DOWN && ++c)

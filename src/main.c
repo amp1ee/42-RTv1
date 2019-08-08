@@ -64,30 +64,30 @@ void	handle_events(t_main *m, SDL_Event e)
 	else if (e.key.keysym.sym == SDLK_z && ++c)
 		cam->angle = (t_vec3f){ angle[0], angle[1], angle[2] - ANG};
 	else if (e.key.keysym.sym == SDLK_w && ++c)
-		(*cam->loc) += vec3f_multsc((t_vec3f){ DOT(ray, uI), -DOT(ray, uJ), DOT(ray, uK) }, STEP);
+		(*cam->pos) += vec3f_multsc((t_vec3f){ DOT(ray, uI), -DOT(ray, uJ), DOT(ray, uK) }, STEP);
 	else if (e.key.keysym.sym == SDLK_s && ++c)
-		(*cam->loc) -= vec3f_multsc((t_vec3f){ DOT(ray, uI), -DOT(ray, uJ), DOT(ray, uK) }, STEP);
+		(*cam->pos) -= vec3f_multsc((t_vec3f){ DOT(ray, uI), -DOT(ray, uJ), DOT(ray, uK) }, STEP);
 	else if (e.key.keysym.sym == SDLK_a && ++c)
-		(*cam->loc) -= vec3f_multsc((t_vec3f){ DOT(perpray, uI), 0, DOT(perpray, uK) }, STEP);
+		(*cam->pos) -= vec3f_multsc((t_vec3f){ DOT(perpray, uI), 0, DOT(perpray, uK) }, STEP);
 	else if (e.key.keysym.sym == SDLK_d && ++c)
-		(*cam->loc) += vec3f_multsc((t_vec3f){ DOT(perpray, uI), 0, DOT(perpray, uK) }, STEP);
+		(*cam->pos) += vec3f_multsc((t_vec3f){ DOT(perpray, uI), 0, DOT(perpray, uK) }, STEP);
 	else if (e.key.keysym.sym == SDLK_q && ++c)
-		(*cam->loc)[1] -= STEP;
+		(*cam->pos)[1] -= STEP;
 	else if (e.key.keysym.sym == SDLK_e && ++c)
-		(*cam->loc)[1] += STEP;
+		(*cam->pos)[1] += STEP;
 	(c) ? render(m) : 0;
 }
 
-t_cam	*init_cam(t_vec3f *loc, t_vec3f angle)
+t_cam	*init_cam(t_vec3f *pos, t_vec3f angle)
 {
 	t_cam	*cam;
 
 	if (!(cam = malloc(sizeof(t_cam))))
 		return (NULL);
-	cam->loc = loc;
+	cam->pos = pos;
 	cam->angle = angle;
 	cam->rot_mtx = init_matrix(angle);
-	matrix_apply(cam->loc, cam->rot_mtx);
+	matrix_apply(cam->pos, cam->rot_mtx);
 	cam->focus = FOCUS;
 	return (cam);
 }
@@ -127,7 +127,7 @@ int		main(int argc, char *argv[])
 		}
 	}
 	ft_memdel((void **)&m);
-	system("leaks rtv1");
+	system("leaks RTv1");
 	exit(0);
 	return (0);
 }

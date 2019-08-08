@@ -29,8 +29,10 @@ t_matrix			init_matrix(t_vec3f angle)
 	m.cxcz = m.cx * m.cz;
 	m.sxcz = m.sx * m.cz;
 	m.m[0] = (t_vec3f){m.cy * m.cz, m.cy * m.sz, -m.sy };
-	m.m[1] = (t_vec3f){m.sxcz * m.sy - m.cxsz, m.sxsz * m.sy + m.cxcz, m.sx * m.cy};
-	m.m[2] = (t_vec3f){m.cxcz * m.sy + m.sxsz, m.cxsz * m.sy - m.sxcz, m.cx * m.cy};
+	m.m[1] = (t_vec3f){m.sxcz * m.sy - m.cxsz,
+		m.sxsz * m.sy + m.cxcz, m.sx * m.cy};
+	m.m[2] = (t_vec3f){m.cxcz * m.sy + m.sxsz,
+		m.cxsz * m.sy - m.sxcz, m.cx * m.cy};
 	return (m);
 }
 
@@ -39,7 +41,11 @@ void				matrix_apply(t_vec3f *vec, t_matrix m)
 	t_vec3f			t;
 
 	t = *vec;
-	*vec = (t_vec3f){ vec3f_dot(m.m[0], t), vec3f_dot(m.m[1], t), vec3f_dot(m.m[2], t) };
+	*vec = (t_vec3f){
+		vec3f_dot(m.m[0], t),
+		vec3f_dot(m.m[1], t),
+		vec3f_dot(m.m[2], t)
+	};
 }
 
 double				shed_lights(t_main *m, t_vec3f P, t_vec3f N)
@@ -58,7 +64,7 @@ double				shed_lights(t_main *m, t_vec3f P, t_vec3f N)
 		if ((m->objects[j])->type == LIGHT_SOURCE)
 		{
 			light = (t_light *)m->objects[j]->data;
-			light_dir = *(light->loc) - P;
+			light_dir = *(light->pos) - P;
 			dist = vec3f_length(light_dir);
 			vec3f_normalize(&light_dir);
 			atten = 1 + SQ(dist / 34.0);
@@ -86,19 +92,19 @@ unsigned int		trace(t_main *m, t_vec3f rdir)
 	i = -1;
 	while (++i < m->obj_num)
 	{
-		double k = 0.0f;
 		o = m->objects[i];
-		if (o->type != LIGHT_SOURCE && o->intersects(o->data, *(cam->loc), rdir, &P))
+		if (o->type != LIGHT_SOURCE &&
+			o->intersects(o->data, *(cam->pos), rdir, &P))
 		{
-			if (vec3f_length(P - *(cam->loc)) < t)
+			if (vec3f_length(P - *(cam->pos)) < t)
 			{
 				N = o->normal_vec(o->data, P);
 				color = o->get_color(o->data, P);
-				k = shed_lights(m, P, N);
+				double k = shed_lights(m, P, N);
 				color.r *= k;
 				color.g *= k;
 				color.b *= k;
-				t = vec3f_length(P - *(cam->loc));
+				t = vec3f_length(P - *(cam->pos));
 			}
 		}
 	}
@@ -134,7 +140,7 @@ void				render(t_main *m)
 		}
 		j++;
 	}
-	//printf(" Frame #%u\tCamera @ (%.2f, %.2f, %.2f)\n", ++frames, (*m->cam->loc)[0],
-	//	   (*m->cam->loc)[1], (*m->cam->loc)[2]);
+	//printf(" Frame #%u\tCamera @ (%.2f, %.2f, %.2f)\n", ++frames, (*m->cam->pos)[0],
+	//	   (*m->cam->pos)[1], (*m->cam->pos)[2]);
 	SDL_UpdateWindowSurface(m->window);
 }

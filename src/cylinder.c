@@ -4,7 +4,7 @@ bool		cylinder_intersect(void *data, t_vec3f eye, t_vec3f rdir,
 				t_vec3f *intersect)
 {
 	const t_cylind	*cyl = data;
-	const t_vec3f	pos = *cyl->center;
+	const t_vec3f	pos = *cyl->pos;
 	const double	r = cyl->radius;
 	const t_vec3f	dir = cyl->dir;
 
@@ -46,8 +46,8 @@ t_vec3f		cylinder_normalvec(void *data, t_vec3f intersect)
 	t_vec3f			dir;
 
 	dir = cyl->dir;
-	n = intersect - *(cyl->center);
-	t = dir - *(cyl->center);
+	n = intersect - *(cyl->pos);
+	t = dir - *(cyl->pos);
 	vec3f_normalize(&t);
 	n = n - vec3f_multsc(t, vec3f_dot(n, t));
 	vec3f_normalize(&n);
@@ -59,18 +59,18 @@ void		cylinder_cleanup(void *data)
 	t_cylind *cylinder;
 
 	cylinder = data;
-	ft_memdel((void **)&(cylinder->center));
+	ft_memdel((void **)&(cylinder->pos));
 	ft_memdel((void **)&cylinder);
 }
 
-t_obj		*new_cylinder(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
+t_obj		*new_cylinder(t_vec3f *pos, t_vec3f dir, double radius, SDL_Color color)
 {
 	t_cylind	*cyl;
 	t_obj		*obj;
 
 	if (!(cyl = malloc(sizeof(t_cylind))))
 		return (NULL);
-	cyl->center = center;
+	cyl->pos = pos;
 	vec3f_normalize(&dir);
 	cyl->dir = dir;
 	cyl->radius = radius;

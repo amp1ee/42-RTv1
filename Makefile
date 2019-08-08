@@ -1,4 +1,4 @@
-NAME	=rtv1
+NAME	=RTv1
 CC		=gcc
 CFLAGS	=-Wall -Wextra -Werror
 CFLAGS	+=-g
@@ -59,5 +59,3 @@ fclean: clean
 	make -sC $(LIBFTDIR) fclean
 
 re: fclean all
-#
-#

@@ -1,7 +1,7 @@
 #include "rtv1.h"
 #include <fcntl.h>
 
-t_obj			*new_torus(t_vec3f *center, t_vec3f dir,
+t_obj			*new_torus(t_vec3f *pos, t_vec3f dir,
 						double tor_rad, double tube_rad, SDL_Color color)
 {
 	t_torus		*tor;
@@ -11,7 +11,7 @@ t_obj			*new_torus(t_vec3f *center, t_vec3f dir,
 		return (NULL);
 	tor->radius = tor_rad;
 	tor->tube_radius = tube_rad;
-	tor->center = center;
+	tor->pos = pos;
 	tor->dir = dir;
 	vec3f_normalize(&(tor->dir));
 	tor->color = color;
@@ -114,7 +114,7 @@ bool			torus_intersect(void *data, t_vec3f o, t_vec3f dir,
 	double			R2 = SQ(R);
 	double			r2 = SQ(r);
 
-	t_vec3f			oc = get_vec3f(*tor->center, o);
+	t_vec3f			oc = get_vec3f(*tor->pos, o);
 	double	alph = 1.0;
 	double	beta = vec3f_dot(dir, oc);
 	double	gamm = vec3f_dot(oc, oc);
@@ -165,7 +165,7 @@ t_vec3f			torus_normalvec(void *data, t_vec3f P)
 	t_vec3f			N;
 	double	R = tor->radius;
 	double	r = tor->tube_radius;
-	t_vec3f C = *(tor->center);
+	t_vec3f C = *(tor->pos);
 	t_vec3f	V = tor->dir;
 	t_vec3f	CP = get_vec3f(C, P);
 	double	k = vec3f_dot(CP, V);
@@ -194,6 +194,6 @@ void			torus_cleanup(void *data)
 	t_torus	*torus;
 
 	torus = data;
-	ft_memdel((void **)&(torus->center));
+	ft_memdel((void **)&(torus->pos));
 	ft_memdel((void **)&torus);
 }

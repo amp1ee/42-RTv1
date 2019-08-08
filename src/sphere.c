@@ -4,7 +4,7 @@ bool		sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
 				t_vec3f *intersect)
 {
 	const t_sphere	*sph = data;
-	t_vec3f			k = ray_start - *sph->center;
+	t_vec3f			k = ray_start - *sph->pos;
 
 	double b,c;
 	b = vec3f_dot(ray, k);
@@ -36,7 +36,7 @@ t_vec3f		sphere_normalvec(void *data, t_vec3f hit)
 	const t_sphere	*sphere = data;
 	t_vec3f			n;
 
-	n = hit - *(sphere->center);
+	n = hit - *(sphere->pos);
 	vec3f_normalize(&n);
 	return (n);
 }
@@ -46,11 +46,11 @@ void		sphere_cleanup(void *data)
 	t_sphere *sphere;
 
 	sphere = data;
-	ft_memdel((void **)&(sphere->center));
+	ft_memdel((void **)&(sphere->pos));
 	ft_memdel((void **)&sphere);
 }
 
-t_obj		*new_sphere(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
+t_obj		*new_sphere(t_vec3f *pos, t_vec3f dir, double radius, SDL_Color color)
 {
 	t_sphere	*sph;
 	t_obj		*obj;
@@ -58,8 +58,8 @@ t_obj		*new_sphere(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color)
 	(void)dir;
 	if (!(sph = malloc(sizeof(t_sphere))))
 		return (NULL);
-	sph->center = center;
-	//printf("p.x: %f, p.y: %f, p.z: %f\n", (*center)[0], (*center)[1], (*center)[2]);
+	sph->pos = pos;
+	//printf("p.x: %f, p.y: %f, p.z: %f\n", (*pos)[0], (*pos)[1], (*pos)[2]);
 	sph->radius = radius;
 	//printf("%f\n", sph->radius);
 	sph->color = color;

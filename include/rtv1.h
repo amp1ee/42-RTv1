@@ -60,7 +60,7 @@ typedef struct	s_matrix
 
 typedef struct	s_light
 {
-	t_vec3f		*loc;
+	t_vec3f		*pos;
 	double		brightness;
 	SDL_Color	color;
 }				t_light;
@@ -74,14 +74,14 @@ typedef struct	s_plane
 
 typedef struct	s_sphere
 {
-	t_vec3f		*center;
+	t_vec3f		*pos;
 	double		radius;
 	SDL_Color	color;
 }				t_sphere;
 
 typedef struct	s_cylind
 {
-	t_vec3f		*center;
+	t_vec3f		*pos;
 	t_vec3f		dir;
 	double		radius;
 	SDL_Color	color;
@@ -99,7 +99,7 @@ typedef struct	s_triang
 
 typedef struct	s_torus
 {
-	t_vec3f		*center;
+	t_vec3f		*pos;
 	t_vec3f		dir;
 	double		radius;
 	double		tube_radius;
@@ -120,7 +120,7 @@ typedef struct	s_obj
 
 typedef struct	s_cam
 {
-	t_vec3f		*loc;
+	t_vec3f		*pos;
 	t_vec3f		ray;
 	t_vec3f		angle;
 	t_matrix	rot_mtx;

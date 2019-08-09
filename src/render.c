@@ -1,10 +1,12 @@
 #include "rtv1.h"
 
-void				set_pixel(t_main *m, int x, int y, unsigned int p)
+void				set_pixel(t_main *m, int x, int y, t_vec3f color)
 {
 	unsigned char	*pix;
 	unsigned char	b;
+	unsigned int	p;
 
+	p = (255 << 24 | (int)color[0] << 16 | (int)color[1] << 8 | (int)color[2]);
 	if (x < W && x >= 0 && y < H && y >= 0)
 	{
 		pix = (unsigned char *)m->screen->pixels;
@@ -62,9 +64,9 @@ t_obj				*get_obstacle(t_main *m, t_vec3f rdir, t_vec3f *P, double t)
 	{
 		o = m->objects[i];
 		if (o->type != LIGHT_SOURCE &&
-			o->intersects(o->data, *(m->cam->pos), rdir, &lP))
+			o->intersects(o->data, m->refl_point, rdir, &lP))
 		{
-			dist = vec3f_length(lP - *(m->cam->pos));
+			dist = vec3f_length(lP - m->refl_point);
 			if (dist < t)
 			{
 				*P = lP;
@@ -136,9 +138,9 @@ double				shed_lights(t_main *m, t_vec3f P, t_vec3f N)
 			}
 		}
 */
-unsigned int		trace(t_main *m, t_vec3f rdir)
+t_vec3f 			trace(t_main *m, t_vec3f rdir, int depth)
 {
-	SDL_Color		color;
+	t_vec3f			color;
 	t_obj			*o;
 	t_vec3f			P;
 	t_vec3f			N;
@@ -150,20 +152,25 @@ unsigned int		trace(t_main *m, t_vec3f rdir)
 	if (o != NULL)
 	{
 		N = o->normal_vec(o->data, P);
-		color = o->get_color(o->data, P);
+		SDL_Color c = o->get_color(o->data, P);
+		color = vec3f_get(c.r, c.g, c.b);
 		double k = shed_lights(m, P, N);
-		color.r *= k;
-		color.g *= k;
-		color.b *= k;
+		if (depth > 1)
+		{
+			t_vec3f refl = vec3f_reflected(-rdir, N);
+			m->refl_point = P + vec3f_multsc(refl, 1e-4);
+			color += trace(m, refl, depth - 1);
+		}
+		color *= vec3f_get(k, k, k);
 	}
-	return (color.r << 16 | color.g << 8 | color.b);
+	return (color);
 }
 
 void				render(t_main *m)
 {
 	int				i, j;
 	double			x, y;
-	unsigned int	rgb;
+	t_vec3f			rgb;
 	//static unsigned int frames;
 
 	SDL_FillRect(m->screen, NULL, 0x000000);
@@ -182,7 +189,8 @@ void				render(t_main *m)
 			t_vec3f rdir = (t_vec3f){x * ASPECT, y, m->cam->focus};
 			vec3f_normalize(&rdir);
 			matrix_apply(&rdir, m->cam->rot_mtx);
-			rgb = trace(m, rdir);
+			m->refl_point = *(m->cam->pos);
+			rgb = trace(m, rdir, m->recur_depth);
 			set_pixel(m, i, j, rgb);
 			i++;
 		}

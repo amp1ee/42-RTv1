@@ -23,7 +23,7 @@
 # define INF			(2147483647)
 # define ALBEDO			(0.26s)
 
-# define BGCOLOR	((SDL_Color){ 12, 12, 12, 255 })
+# define BGCOLOR	((t_vec3f){ 12, 12, 12 })
 # define FOCUS	(0.7)
 # define TITLE	"rtv1"
 # define W		1280
@@ -139,12 +139,14 @@ typedef struct	s_main
 {
 	SDL_Window	*window;
 	SDL_Surface	*screen;
-	bool		running;
-	int			bpp;
-	t_vec3f		p;
 	t_cam		*cam;
 	t_obj		**objects;
+	t_vec3f		p;
+	t_vec3f		refl_point;
+	bool		running;
+	int			bpp;
 	int			obj_num;
+	int			recur_depth;
 }				t_main;
 
 typedef t_obj	*(*t_of)(t_vec3f *, t_vec3f, double, SDL_Color);
@@ -205,15 +207,16 @@ t_vec3f		vec3f_cross(t_vec3f a, t_vec3f b);
 t_vec3f		vec3f_multsc(t_vec3f v, double scalar);
 void		vec3f_normalize(t_vec3f *vec);
 t_vec3f		vec3f_get(double a, double b, double c);
+t_vec3f		vec3f_reflected(t_vec3f vec, t_vec3f n);
 /*
 **	render.c
 */
 void				matrix_apply(t_vec3f *vec, t_matrix m);
 t_matrix			init_matrix(t_vec3f angle);
 void			render(t_main *m);
-void			set_pixel(t_main *m, int x, int y, unsigned int p);
+void			set_pixel(t_main *m, int x, int y, t_vec3f color);
 
-unsigned int	trace(t_main *m, t_vec3f ray);
+t_vec3f			trace(t_main *m, t_vec3f ray, int depth);
 
 
 #endif

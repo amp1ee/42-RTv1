@@ -61,3 +61,24 @@ void		vec3f_normalize(t_vec3f *vec)
 	v[2] /= vlen;
 	*vec = v;
 }
+
+/*
+	void MirrorAround(const XYZ& axis)
+	{
+		XYZ N = axis; N.Normalize();
+		double v = Dot(N);
+		*this = N * (v+v) - *this;
+	}
+*/
+t_vec3f		vec3f_reflected(t_vec3f vec, t_vec3f n)
+{
+	t_vec3f	refl;
+	t_vec3f	norm;
+	double	v;
+
+	norm = n;
+	vec3f_normalize(&norm);
+	v = vec3f_dot(vec, norm);
+	refl = vec3f_multsc(norm, v + v) - vec;
+	return (refl);
+}

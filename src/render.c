@@ -48,16 +48,48 @@ void				matrix_apply(t_vec3f *vec, t_matrix m)
 	};
 }
 
+t_obj				*get_obstacle(t_main *m, t_vec3f rdir, t_vec3f *P, double t)
+{
+	t_obj			*o;
+	t_obj			*closest;
+	t_vec3f			lP;
+	double			dist;
+	int				i;
+
+	closest = NULL;
+	i = -1;
+	while (++i < m->obj_num)
+	{
+		o = m->objects[i];
+		if (o->type != LIGHT_SOURCE &&
+			o->intersects(o->data, *(m->cam->pos), rdir, &lP))
+		{
+			dist = vec3f_length(lP - *(m->cam->pos));
+			if (dist < t)
+			{
+				*P = lP;
+				t = dist;
+				closest = o;
+			}
+		}
+	}
+	return (closest);
+}
+
 double				shed_lights(t_main *m, t_vec3f P, t_vec3f N)
 {
 	int				j;
 	t_light			*light;
 	t_vec3f			light_dir;
+	t_vec3f			diffuse_light;
+	t_vec3f			specular_light;
 	double			diffuse_k;
 	double			atten;
 	double			dist;
 
 	diffuse_k = 0.0;
+	diffuse_light = (t_vec3f){0, 0, 0};
+	specular_light = (t_vec3f){0, 0, 0};
 	j = -1;
 	while (++j < m->obj_num)
 	{
@@ -69,44 +101,60 @@ double				shed_lights(t_main *m, t_vec3f P, t_vec3f N)
 			vec3f_normalize(&light_dir);
 			atten = 1 + SQ(dist / 34.0);
 			diffuse_k += MAX(0.0, vec3f_dot(N, light_dir)) / atten;
-/*			if (diffuse_k > 1e-3)
+			if (diffuse_k > 1e-3)
 			{
-				diffuse_light += light->color * diffuse_k;
-			}*/
+				double shadow_dist = dist - 1e-4;
+				t_vec3f lp = P + vec3f_multsc(light_dir, 1e-4);
+				if ((get_obstacle(m, light_dir, &lp, shadow_dist)) == NULL)
+					diffuse_light += vec3f_multsc(vec3f_get(light->color.r,
+						light->color.g, light->color.b), diffuse_k);
+			}
 		}
 	}
 	return (diffuse_k);
 }
 
+/*
+*	for (each x)
+		for (each y)
+		{
+			find rdir ->
+			min_dist = INF;
+			color = BG;
+			for (each object)
+			{
+				if (intersecting with ray)
+				{
+					find dist to obj;
+					if (dist < min_dist)
+					{
+						calculate diff_k;
+						color *= diff_k;
+						min_dist = dist;
+					}
+				}
+			}
+		}
+*/
 unsigned int		trace(t_main *m, t_vec3f rdir)
 {
 	SDL_Color		color;
 	t_obj			*o;
-	int				i;
 	t_vec3f			P;
 	t_vec3f			N;
-	double			t = INFINITY;
-	const t_cam		*cam = m->cam;
+	double			t;
 
 	color = BGCOLOR;
-	i = -1;
-	while (++i < m->obj_num)
+	t = INFINITY;
+	o = get_obstacle(m, rdir, &P, t);
+	if (o != NULL)
 	{
-		o = m->objects[i];
-		if (o->type != LIGHT_SOURCE &&
-			o->intersects(o->data, *(cam->pos), rdir, &P))
-		{
-			if (vec3f_length(P - *(cam->pos)) < t)
-			{
-				N = o->normal_vec(o->data, P);
-				color = o->get_color(o->data, P);
-				double k = shed_lights(m, P, N);
-				color.r *= k;
-				color.g *= k;
-				color.b *= k;
-				t = vec3f_length(P - *(cam->pos));
-			}
-		}
+		N = o->normal_vec(o->data, P);
+		color = o->get_color(o->data, P);
+		double k = shed_lights(m, P, N);
+		color.r *= k;
+		color.g *= k;
+		color.b *= k;
 	}
 	return (color.r << 16 | color.g << 8 | color.b);
 }

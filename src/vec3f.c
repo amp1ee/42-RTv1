@@ -1,11 +1,8 @@
 #include "rtv1.h"
 
-t_vec3f		vec3f_copy(t_vec3f orig)
+t_vec3f		vec3f_get(double a, double b, double c)
 {
-	t_vec3f	copy;
-
-	copy = (t_vec3f){ orig[0], orig[1], orig[2] };
-	return (copy);
+	return ((t_vec3f){ a, b, c });
 }
 
 double		vec3f_dot(t_vec3f a, t_vec3f b)

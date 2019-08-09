@@ -141,6 +141,7 @@ typedef struct	s_main
 	SDL_Surface	*screen;
 	bool		running;
 	int			bpp;
+	t_vec3f		p;
 	t_cam		*cam;
 	t_obj		**objects;
 	int			obj_num;
@@ -203,7 +204,7 @@ double		vec3f_length(t_vec3f vec);
 t_vec3f		vec3f_cross(t_vec3f a, t_vec3f b);
 t_vec3f		vec3f_multsc(t_vec3f v, double scalar);
 void		vec3f_normalize(t_vec3f *vec);
-t_vec3f		vec3f_copy(t_vec3f orig);
+t_vec3f		vec3f_get(double a, double b, double c);
 /*
 **	render.c
 */

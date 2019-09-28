@@ -1,11 +1,11 @@
 #include "rtv1.h"
 
-t_vec3f		vec3f_get(double a, double b, double c)
+t_v3		v3_get(double a, double b, double c)
 {
-	return ((t_vec3f){ a, b, c });
+	return ((t_v3){ a, b, c });
 }
 
-double		vec3f_dot(t_vec3f a, t_vec3f b)
+double		v3_dot(t_v3 a, t_v3 b)
 {
 	double	dprod;
 
@@ -15,25 +15,25 @@ double		vec3f_dot(t_vec3f a, t_vec3f b)
 	return (dprod);
 }
 
-double		vec3f_squared(t_vec3f v)
+double		v3_squared(t_v3 v)
 {
 	double	res;
 
-	res = vec3f_dot(v, v);
+	res = v3_dot(v, v);
 	return (res);
 }
 
-double		vec3f_length(t_vec3f vec)
+double		v3_length(t_v3 vec)
 {
 	double	res;
 
-	res = sqrt(vec3f_squared(vec));
+	res = sqrt(v3_squared(vec));
 	return (res);
 }
 
-t_vec3f		vec3f_cross(t_vec3f a, t_vec3f b)
+t_v3		v3_cross(t_v3 a, t_v3 b)
 {
-	t_vec3f	xprod;
+	t_v3	xprod;
 
 	xprod[0] = a[1] * b[2] - a[2] * b[1];
 	xprod[1] = a[2] * b[0] - a[0] * b[2];
@@ -41,18 +41,18 @@ t_vec3f		vec3f_cross(t_vec3f a, t_vec3f b)
 	return (xprod);
 }
 
-t_vec3f		vec3f_multsc(t_vec3f v, double scalar)
+t_v3		v3_multsc(t_v3 v, double scalar)
 {
-	t_vec3f	res;
+	t_v3	res;
 
-	res = (t_vec3f){ v[0] * scalar, v[1] * scalar, v[2] * scalar };
+	res = (t_v3){ v[0] * scalar, v[1] * scalar, v[2] * scalar };
 	return (res);
 }
 
-void		vec3f_normalize(t_vec3f *vec)
+void		v3_normalize(t_v3 *vec)
 {
-	const double	vlen = vec3f_length(*vec);
-	t_vec3f v = *vec;
+	const double	vlen = v3_length(*vec);
+	t_v3 v = *vec;
 
 	if (vlen <= EPSILON)
 		return ;
@@ -62,23 +62,15 @@ void		vec3f_normalize(t_vec3f *vec)
 	*vec = v;
 }
 
-/*
-	void MirrorAround(const XYZ& axis)
-	{
-		XYZ N = axis; N.Normalize();
-		double v = Dot(N);
-		*this = N * (v+v) - *this;
-	}
-*/
-t_vec3f		vec3f_reflected(t_vec3f vec, t_vec3f n)
+t_v3		v3_reflected(t_v3 vec, t_v3 n)
 {
-	t_vec3f	refl;
-	t_vec3f	norm;
+	t_v3	refl;
+	t_v3	norm;
 	double	v;
 
 	norm = n;
-	vec3f_normalize(&norm);
-	v = vec3f_dot(vec, norm);
-	refl = vec3f_multsc(norm, v + v) - vec;
+	v3_normalize(&norm);
+	v = v3_dot(vec, norm);
+	refl = v3_multsc(norm, v + v) - vec;
 	return (refl);
 }

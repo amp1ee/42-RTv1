@@ -23,7 +23,7 @@
 # define INF			(2147483647)
 # define ALBEDO			(0.26s)
 
-# define BGCOLOR	((t_vec3f){ 12, 12, 12 })
+# define BGCOLOR	((t_v3){ 12, 12, 12 })
 # define FOCUS	(0.7)
 # define TITLE	"rtv1"
 # define W		1280
@@ -41,11 +41,11 @@ typedef enum	e_figures
 	TORUS
 }				t_figures;
 
-typedef double	t_vec3f __attribute__((vector_size(sizeof(double)*3)));
+typedef double	t_v3 __attribute__((vector_size(sizeof(double)*3)));
 
 typedef struct	s_matrix
 {
-	t_vec3f		m[3];
+	t_v3		m[3];
 	double		cx;
 	double		cy;
 	double		cz;
@@ -60,55 +60,55 @@ typedef struct	s_matrix
 
 typedef struct	s_light
 {
-	t_vec3f		*pos;
+	t_v3		*pos;
 	double		brightness;
 	SDL_Color	color;
 }				t_light;
 
 typedef struct	s_plane
 {
-	t_vec3f		*pos;
-	t_vec3f		normal;
+	t_v3		*pos;
+	t_v3		normal;
 	SDL_Color	color;
 }				t_plane;
 
 typedef struct	s_sphere
 {
-	t_vec3f		*pos;
+	t_v3		*pos;
 	double		radius;
 	SDL_Color	color;
 }				t_sphere;
 
 typedef struct	s_cylind
 {
-	t_vec3f		*pos;
-	t_vec3f		dir;
+	t_v3		*pos;
+	t_v3		dir;
 	double		radius;
 	SDL_Color	color;
 }				t_cylind;
 
 typedef struct	s_cone
 {
-	t_vec3f		*pos;
-	t_vec3f		dir;
+	t_v3		*pos;
+	t_v3		dir;
 	double		angle;
 	SDL_Color	color;
 }				t_cone;
 
 typedef struct	s_triang
 {
-	t_vec3f		*a;
-	t_vec3f		*b;
-	t_vec3f		*c;
-	t_vec3f		*normal;
+	t_v3		*a;
+	t_v3		*b;
+	t_v3		*c;
+	t_v3		*normal;
 	SDL_Color	color;
 	double		dist;
 }				t_triang;
 
 typedef struct	s_torus
 {
-	t_vec3f		*pos;
-	t_vec3f		dir;
+	t_v3		*pos;
+	t_v3		dir;
 	double		radius;
 	double		tube_radius;
 	SDL_Color	color;
@@ -119,18 +119,18 @@ typedef struct	s_obj
 {
 	int			type;
 	void		*data;
-	bool		(*intersects)(void *data, t_vec3f ray_start,
-			t_vec3f ray, t_vec3f *intersect);
-	SDL_Color	(*get_color)(void *data, t_vec3f intersect);
-	t_vec3f		(*normal_vec)(void *data, t_vec3f intersect);
+	bool		(*intersects)(void *data, t_v3 ray_start,
+			t_v3 ray, t_v3 *intersect);
+	SDL_Color	(*get_color)(void *data, t_v3 intersect);
+	t_v3		(*normal_vec)(void *data, t_v3 intersect);
 	void		(*cleanup)(void *data);
 }				t_obj;
 
 typedef struct	s_cam
 {
-	t_vec3f		*pos;
-	t_vec3f		ray;
-	t_vec3f		angle;
+	t_v3		*pos;
+	t_v3		ray;
+	t_v3		angle;
 	t_matrix	rot_mtx;
 	double		focus;
 }				t_cam;
@@ -141,82 +141,108 @@ typedef struct	s_main
 	SDL_Surface	*screen;
 	t_cam		*cam;
 	t_obj		**objects;
-	t_vec3f		p;
-	t_vec3f		refl_point;
+	t_v3		rdir;
+	t_v3		p;
+	t_v3		refl_point;
 	bool		running;
 	int			bpp;
 	int			obj_num;
 	int			recur_depth;
 }				t_main;
 
-typedef t_obj	*(*t_of)(t_vec3f *, t_vec3f, double, SDL_Color);
+typedef struct	s_shedlight
+{
+	t_light		*light;
+	t_v3		light_dir;
+	t_v3		spot;
+	t_v3		diffuse_light;
+	t_v3		specular_light;
+	double		diffuse_k;
+	double		atten;
+	double		dist;
+	int			j;
+}				t_shedlight;
+
+typedef struct	s_trace
+{
+	t_v3		color;
+	SDL_Color	c;
+	t_obj		*o;
+	t_v3		p;
+	t_v3		n;
+	t_v3		refl;
+	double		t;
+	double		k;
+}				t_trace;
+
+typedef t_obj	*(*t_of)(t_v3 *, t_v3, double, SDL_Color);
 
 t_obj			**parse_scene(t_main *m, char *path);
 
-t_obj			*new_cylinder(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
-t_obj			*new_cone(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
+t_obj			*new_cylinder(t_v3 *center, t_v3 dir, double radius, SDL_Color color);
+t_obj			*new_cone(t_v3 *center, t_v3 dir, double radius, SDL_Color color);
 
-SDL_Color		lights_color(void *data, t_vec3f intersect);
+SDL_Color		lights_color(void *data, t_v3 intersect);
 void			lights_cleanup(void *data);
-t_obj			*new_light(t_vec3f *location, t_vec3f dir, double brightness, SDL_Color color);
+t_obj			*new_light(t_v3 *location, t_v3 dir, double brightness, SDL_Color color);
 
-t_obj				*new_plane(t_vec3f *center, t_vec3f dir, double radius,
+t_obj				*new_plane(t_v3 *center, t_v3 dir, double radius,
 							SDL_Color color);
-bool				plane_intersect(void *data, t_vec3f eye, t_vec3f rdir,
-										t_vec3f *intersect);
-t_vec3f				plane_normalvec(void *data, t_vec3f intersect);
-SDL_Color			plane_color(void *data, t_vec3f intersect);
+bool				plane_intersect(void *data, t_v3 eye, t_v3 rdir,
+										t_v3 *intersect);
+t_v3				plane_normalvec(void *data, t_v3 intersect);
+SDL_Color			plane_color(void *data, t_v3 intersect);
 void				plane_cleanup(void *data);
 
 /*
 **	sphere.c
 */
-t_obj			*new_sphere(t_vec3f *center, t_vec3f dir, double radius, SDL_Color color);
-SDL_Color		sphere_color(void *data, t_vec3f intersect);
-t_vec3f			sphere_normalvec(void *data, t_vec3f intersect);
+t_obj			*new_sphere(t_v3 *center, t_v3 dir, double radius, SDL_Color color);
+SDL_Color		sphere_color(void *data, t_v3 intersect);
+t_v3			sphere_normalvec(void *data, t_v3 intersect);
 void			sphere_cleanup(void *data);
-bool			sphere_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
-				t_vec3f *intersect);
+bool			sphere_intersect(void *data, t_v3 ray_start, t_v3 ray,
+				t_v3 *intersect);
 /*
 **	triangle.c
 */
-t_obj			*new_triangle(t_vec3f *a, t_vec3f *b, t_vec3f *c,
+t_obj			*new_triangle(t_v3 *a, t_v3 *b, t_v3 *c,
 			SDL_Color color);
-SDL_Color		triangle_color(void *data, t_vec3f intersect);
-t_vec3f			triangle_normalvec(void *data, t_vec3f intersect);
+SDL_Color		triangle_color(void *data, t_v3 intersect);
+t_v3			triangle_normalvec(void *data, t_v3 intersect);
 void			triangle_cleanup(void *data);
-bool			triangle_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
-				t_vec3f *intersect);
+bool			triangle_intersect(void *data, t_v3 ray_start, t_v3 ray,
+				t_v3 *intersect);
 
-t_obj			*new_torus(t_vec3f *center, t_vec3f dir, double tor_rad,
+t_obj			*new_torus(t_v3 *center, t_v3 dir, double tor_rad,
 							double tube_rad, SDL_Color color);
-bool			torus_intersect(void *data, t_vec3f o, t_vec3f dir,
-				t_vec3f *intersect);
-SDL_Color		torus_color(void *data, t_vec3f intersect);
-t_vec3f			torus_normalvec(void *data, t_vec3f intersect);
+bool			torus_intersect(void *data, t_v3 o, t_v3 dir,
+				t_v3 *intersect);
+SDL_Color		torus_color(void *data, t_v3 intersect);
+t_v3			torus_normalvec(void *data, t_v3 intersect);
 void			torus_cleanup(void *data);
 
 
 /*
-**	vec3f.c
+**	v3.c
 */
-double		vec3f_dot(t_vec3f a, t_vec3f b);
-double		vec3f_squared(t_vec3f v);
-double		vec3f_length(t_vec3f vec);
-t_vec3f		vec3f_cross(t_vec3f a, t_vec3f b);
-t_vec3f		vec3f_multsc(t_vec3f v, double scalar);
-void		vec3f_normalize(t_vec3f *vec);
-t_vec3f		vec3f_get(double a, double b, double c);
-t_vec3f		vec3f_reflected(t_vec3f vec, t_vec3f n);
+double		v3_dot(t_v3 a, t_v3 b);
+double		v3_squared(t_v3 v);
+double		v3_length(t_v3 vec);
+t_v3		v3_cross(t_v3 a, t_v3 b);
+t_v3		v3_multsc(t_v3 v, double scalar);
+void		v3_normalize(t_v3 *vec);
+t_v3		v3_get(double a, double b, double c);
+t_v3		v3_reflected(t_v3 vec, t_v3 n);
 /*
 **	render.c
 */
-void				matrix_apply(t_vec3f *vec, t_matrix m);
-t_matrix			init_matrix(t_vec3f angle);
+void				matrix_apply(t_v3 *vec, t_matrix m);
+t_matrix			init_matrix(t_v3 angle);
 void			render(t_main *m);
-void			set_pixel(t_main *m, int x, int y, t_vec3f color);
+void			set_pixel(t_main *m, int x, int y, t_v3 color);
 
-t_vec3f			trace(t_main *m, t_vec3f ray, int depth);
+t_v3			trace(t_main *m, t_v3 ray, int depth);
 
 
 #endif

@@ -1,7 +1,7 @@
 #include "rtv1.h"
 #include <fcntl.h>
 
-t_obj			*new_torus(t_vec3f *pos, t_vec3f dir,
+t_obj			*new_torus(t_v3 *pos, t_v3 dir,
 						double tor_rad, double tube_rad, SDL_Color color)
 {
 	t_torus		*tor;
@@ -13,7 +13,7 @@ t_obj			*new_torus(t_vec3f *pos, t_vec3f dir,
 	tor->tube_radius = tube_rad;
 	tor->pos = pos;
 	tor->dir = dir;
-	vec3f_normalize(&(tor->dir));
+	v3_normalize(&(tor->dir));
 	tor->color = color;
 	if (!(obj = (t_obj *)malloc(sizeof(t_obj))))
 		return (NULL);
@@ -103,8 +103,8 @@ static int		solve_quartic(complex double a, complex double b, complex double c,
 	return nroots;
 }
 
-bool			torus_intersect(void *data, t_vec3f o, t_vec3f dir,
-				t_vec3f *intersect)
+bool			torus_intersect(void *data, t_v3 o, t_v3 dir,
+				t_v3 *intersect)
 {
 	t_torus			*tor = data;
 	double			a4, a3, a2, a1, a0;
@@ -114,13 +114,13 @@ bool			torus_intersect(void *data, t_vec3f o, t_vec3f dir,
 	double			R2 = SQ(R);
 	double			r2 = SQ(r);
 
-	t_vec3f			oc = get_vec3f(*tor->pos, o);
+	t_v3			oc = get_v3(*tor->pos, o);
 	double	alph = 1.0;
-	double	beta = vec3f_dot(dir, oc);
-	double	gamm = vec3f_dot(oc, oc);
+	double	beta = v3_dot(dir, oc);
+	double	gamm = v3_dot(oc, oc);
 	double	delt = gamm + R2 - r2;
-/*	double	v0 = vec3f_dot(dir, tor->dir);
-	double	v1 = vec3f_dot(oc, tor->dir);*/
+/*	double	v0 = v3_dot(dir, tor->dir);
+	double	v1 = v3_dot(oc, tor->dir);*/
 
 	a4 = 1.0;
 	a3 = 4 * alph * beta;
@@ -143,7 +143,7 @@ bool			torus_intersect(void *data, t_vec3f o, t_vec3f dir,
 				t_min = creal(t[i]);
 		}
 
-	*intersect = (t_vec3f){
+	*intersect = (t_v3){
 		o.x + t_min * dir.x,
 		o.y + t_min * dir.y,
 		o.z + t_min * dir.z
@@ -151,7 +151,7 @@ bool			torus_intersect(void *data, t_vec3f o, t_vec3f dir,
 	return (t_min >= EPSILON);
 }
 
-SDL_Color		torus_color(void *data, t_vec3f intersect)
+SDL_Color		torus_color(void *data, t_v3 intersect)
 {
 	const t_torus	*torus = data;
 
@@ -159,32 +159,32 @@ SDL_Color		torus_color(void *data, t_vec3f intersect)
 	return (torus->color);
 }
 
-t_vec3f			torus_normalvec(void *data, t_vec3f P)
+t_v3			torus_normalvec(void *data, t_v3 P)
 {
 	const t_torus	*tor = data;
-	t_vec3f			N;
+	t_v3			N;
 	double	R = tor->radius;
 	double	r = tor->tube_radius;
-	t_vec3f C = *(tor->pos);
-	t_vec3f	V = tor->dir;
-	t_vec3f	CP = get_vec3f(C, P);
-	double	k = vec3f_dot(CP, V);
+	t_v3 C = *(tor->pos);
+	t_v3	V = tor->dir;
+	t_v3	CP = get_v3(C, P);
+	double	k = v3_dot(CP, V);
 	if (k > r)
 		k = r;
-	t_vec3f	A = (t_vec3f) {
+	t_v3	A = (t_v3) {
 		P.x - V.x * k,
 		P.y - V.y * k,
 		P.z - V.z * k
 	};
 	double m = sqrt(SQ(r) - SQ(k));
-	t_vec3f	AP = get_vec3f(A, P);
-	t_vec3f	AC = get_vec3f(A, C);
-	N = (t_vec3f) {
+	t_v3	AP = get_v3(A, P);
+	t_v3	AC = get_v3(A, C);
+	N = (t_v3) {
 		AP.x - AC.x * m / (R + m),
 		AP.y - AC.y * m / (R + m),
 		AP.z - AC.z * m / (R + m)
 	};
-	vec3f_normalize(&N);
+	v3_normalize(&N);
 	//printf("N: %.2f %.2f %.2f\n", N.x, N.y, N.z);
 	return (N);
 }

@@ -1,29 +1,29 @@
 #include "rtv1.h"
 
-t_vec3f				plane_normalvec(void *data, t_vec3f intersect)
+t_v3				plane_normalvec(void *data, t_v3 intersect)
 {
 	t_plane	*plane = (t_plane *)data;
 
 	(void)intersect;
-	vec3f_normalize(&(plane->normal));
+	v3_normalize(&(plane->normal));
 	return (plane->normal);
 }
 
-bool				plane_intersect(void *data, t_vec3f eye, t_vec3f rdir,
-										t_vec3f *intersect)
+bool				plane_intersect(void *data, t_v3 eye, t_v3 rdir,
+										t_v3 *intersect)
 {
 	const t_plane	*pln = data;
-	const t_vec3f	pos = *pln->pos;
-	const t_vec3f	dir = plane_normalvec(data, *intersect);
+	const t_v3	pos = *pln->pos;
+	const t_v3	dir = plane_normalvec(data, *intersect);
 	double			t;
 
-	t_vec3f			oc = pos - eye;
-	double			a = vec3f_dot(rdir, dir);
-	double			b = vec3f_dot(oc, dir);
+	t_v3			oc = pos - eye;
+	double			a = v3_dot(rdir, dir);
+	double			b = v3_dot(oc, dir);
 	if (fabs(a) <= EPSILON)
 		return (false);
 	t = (b / a);
-	*intersect = (t_vec3f){
+	*intersect = (t_v3){
 		eye[0] + t * rdir[0],
 		eye[1] + t * rdir[1],
 		eye[2] + t * rdir[2]
@@ -31,7 +31,7 @@ bool				plane_intersect(void *data, t_vec3f eye, t_vec3f rdir,
 	return (t > 0);
 }
 
-SDL_Color			plane_color(void *data, t_vec3f intersect)
+SDL_Color			plane_color(void *data, t_v3 intersect)
 {
 	const t_plane	*plane = (t_plane *)data;
 
@@ -48,7 +48,7 @@ void				plane_cleanup(void *data)
 	ft_memdel((void **)&plane);
 }
 
-t_obj				*new_plane(t_vec3f *center, t_vec3f dir, double radius,
+t_obj				*new_plane(t_v3 *center, t_v3 dir, double radius,
 							SDL_Color color)
 {
 	t_plane			*plane;

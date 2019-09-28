@@ -1,6 +1,6 @@
 #include "rtv1.h"
 
-t_obj			*new_triangle(t_vec3f *a, t_vec3f *b, t_vec3f *c,
+t_obj			*new_triangle(t_v3 *a, t_v3 *b, t_v3 *c,
 				SDL_Color color)
 {
 	t_triang	*tri;
@@ -23,34 +23,34 @@ t_obj			*new_triangle(t_vec3f *a, t_vec3f *b, t_vec3f *c,
 	return (obj);
 }
 
-bool			triangle_intersect(void *data, t_vec3f ray_start, t_vec3f ray,
-				t_vec3f *intersect)
+bool			triangle_intersect(void *data, t_v3 ray_start, t_v3 ray,
+				t_v3 *intersect)
 {
 	const t_triang	*tri = data;
 
-	t_vec3f			n = triangle_normalvec(data, *intersect);
-	double			d = vec3f_dot(n, *tri->a);
-	double			nr = vec3f_dot(n, ray);
+	t_v3			n = triangle_normalvec(data, *intersect);
+	double			d = v3_dot(n, *tri->a);
+	double			nr = v3_dot(n, ray);
 	if (fabs(nr) <= EPSILON)
 		return (false);
-	double			t = -(vec3f_dot(n, ray_start) + d) / nr;
-	*intersect = (t_vec3f){ ray_start.x + t * ray.x,
+	double			t = -(v3_dot(n, ray_start) + d) / nr;
+	*intersect = (t_v3){ ray_start.x + t * ray.x,
 							ray_start.y + t * ray.y,
 							ray_start.z + t * ray.z };
-	t_vec3f			edge0 = get_vec3f(*tri->a, *tri->b);
-	t_vec3f			edge1 = get_vec3f(*tri->b, *tri->c);
-	t_vec3f			edge2 = get_vec3f(*tri->c, *tri->a);
-	t_vec3f			c0 = get_vec3f(*tri->a, *intersect);
-	t_vec3f			c1 = get_vec3f(*tri->b, *intersect);
-	t_vec3f			c2 = get_vec3f(*tri->c, *intersect);
-	if (t > 0 && vec3f_dot(n, vec3f_cross(edge0, c0)) > 0 &&
-			vec3f_dot(n, vec3f_cross(edge1, c1)) > 0 &&
-			vec3f_dot(n, vec3f_cross(edge2, c2)) > 0)
+	t_v3			edge0 = get_v3(*tri->a, *tri->b);
+	t_v3			edge1 = get_v3(*tri->b, *tri->c);
+	t_v3			edge2 = get_v3(*tri->c, *tri->a);
+	t_v3			c0 = get_v3(*tri->a, *intersect);
+	t_v3			c1 = get_v3(*tri->b, *intersect);
+	t_v3			c2 = get_v3(*tri->c, *intersect);
+	if (t > 0 && v3_dot(n, v3_cross(edge0, c0)) > 0 &&
+			v3_dot(n, v3_cross(edge1, c1)) > 0 &&
+			v3_dot(n, v3_cross(edge2, c2)) > 0)
 		return (true);
 	return (false);
 }
 
-SDL_Color		triangle_color(void *data, t_vec3f intersect)
+SDL_Color		triangle_color(void *data, t_v3 intersect)
 {
 	const t_triang	*triang = data;
 
@@ -58,18 +58,18 @@ SDL_Color		triangle_color(void *data, t_vec3f intersect)
 	return (triang->color);
 }
 
-t_vec3f			triangle_normalvec(void *data, t_vec3f intersect)
+t_v3			triangle_normalvec(void *data, t_v3 intersect)
 {
 	const t_triang	*tri = data;
-	t_vec3f			v1;
-	t_vec3f			v2;
-	t_vec3f			n;
+	t_v3			v1;
+	t_v3			v2;
+	t_v3			n;
 
 	(void)intersect;
-	v1 = get_vec3f(*tri->a, *tri->b);
-	v2 = get_vec3f(*tri->a, *tri->c);
-	n = vec3f_cross(v1, v2);
-	vec3f_normalize(&n);
+	v1 = get_v3(*tri->a, *tri->b);
+	v2 = get_v3(*tri->a, *tri->c);
+	n = v3_cross(v1, v2);
+	v3_normalize(&n);
 	return (n);
 }
 

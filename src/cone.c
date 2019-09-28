@@ -1,26 +1,26 @@
 #include "rtv1.h"
 
-bool				cone_intersect(void *data, t_vec3f eye, t_vec3f rdir,
-						t_vec3f *intersect)
+bool				cone_intersect(void *data, t_v3 eye, t_v3 rdir,
+						t_v3 *intersect)
 {
 	const t_cone	*cone = data;
-	const t_vec3f	pos = *cone->pos;
+	const t_v3	pos = *cone->pos;
 	const double	a = (cone->angle * M_PI / 180.0);
-	const t_vec3f	dir = cone->dir;
+	const t_v3	dir = cone->dir;
 
-	t_vec3f		Va = dir - pos;
-	vec3f_normalize(&Va);
-	t_vec3f		CO = (eye - pos);
+	t_v3		Va = dir - pos;
+	v3_normalize(&Va);
+	t_v3		CO = (eye - pos);
 
-	double		DVa = vec3f_dot(rdir, Va);
-	double		COVa = vec3f_dot(CO, Va);
-	t_vec3f		DVaD = rdir - vec3f_multsc(Va, DVa);
-	t_vec3f		DVaCO = CO - vec3f_multsc(Va, COVa);
+	double		DVa = v3_dot(rdir, Va);
+	double		COVa = v3_dot(CO, Va);
+	t_v3		DVaD = rdir - v3_multsc(Va, DVa);
+	t_v3		DVaCO = CO - v3_multsc(Va, COVa);
 
-	double A = SQ(cos(a)) * vec3f_squared(DVaD) - SQ(sin(a)) * SQ(DVa);
-	double B = 2.0 * SQ(cos(a)) * vec3f_dot(DVaD, DVaCO)
+	double A = SQ(cos(a)) * v3_squared(DVaD) - SQ(sin(a)) * SQ(DVa);
+	double B = 2.0 * SQ(cos(a)) * v3_dot(DVaD, DVaCO)
 				- 2.0 * SQ(sin(a)) * DVa * COVa;
-	double C = SQ(cos(a)) * vec3f_squared(DVaCO) - SQ(sin(a)) * SQ(COVa);
+	double C = SQ(cos(a)) * v3_squared(DVaCO) - SQ(sin(a)) * SQ(COVa);
 	double d = SQ(B) - 4.0 * A * C;
 	if (d < 0)
 		return (false);
@@ -28,13 +28,13 @@ bool				cone_intersect(void *data, t_vec3f eye, t_vec3f rdir,
 	const double		t1 = (-B - sqrtd) / (2.0 * A);
 	const double		t2 = (-B + sqrtd) / (2.0 * A);
 	const double		t = (MIN(t1, t2) >= 0) ? MIN(t1, t2) : MAX(t1, t2);
-	*intersect = (t_vec3f){	eye[0] + t * rdir[0],
+	*intersect = (t_v3){	eye[0] + t * rdir[0],
 							eye[1] + t * rdir[1],
 							eye[2] + t * rdir[2]};
 	return (t > 0);
 }
 
-SDL_Color			cone_color(void *data, t_vec3f intersect)
+SDL_Color			cone_color(void *data, t_v3 intersect)
 {
 	const t_cone	*cone = data;
 
@@ -42,22 +42,22 @@ SDL_Color			cone_color(void *data, t_vec3f intersect)
 	return (cone->color);
 }
 
-t_vec3f				cone_normalvec(void *data, t_vec3f intersect)
+t_v3				cone_normalvec(void *data, t_v3 intersect)
 {
 	const t_cone	*cone = data;
-	t_vec3f			N, t;
-	t_vec3f			dir;
+	t_v3			N, t;
+	t_v3			dir;
 
 	dir = cone->dir;
-	t_vec3f CP = intersect - *(cone->pos);
+	t_v3 CP = intersect - *(cone->pos);
 	t = dir - *(cone->pos);
-	vec3f_normalize(&t);
-	t_vec3f CQ = vec3f_multsc(t, vec3f_dot(CP, t));
-	t_vec3f cp = CP;
-	vec3f_normalize(&cp);
-	t_vec3f CN = vec3f_multsc(cp, vec3f_dot(CQ, cp));
+	v3_normalize(&t);
+	t_v3 CQ = v3_multsc(t, v3_dot(CP, t));
+	t_v3 cp = CP;
+	v3_normalize(&cp);
+	t_v3 CN = v3_multsc(cp, v3_dot(CQ, cp));
 	N = CN - CQ;
-	vec3f_normalize(&N);
+	v3_normalize(&N);
 	return (N);
 }
 
@@ -70,7 +70,7 @@ void				cone_cleanup(void *data)
 	ft_memdel((void **)&cone);
 }
 
-t_obj				*new_cone(t_vec3f *pos, t_vec3f dir, double angle,
+t_obj				*new_cone(t_v3 *pos, t_v3 dir, double angle,
 						SDL_Color color)
 {
 	t_cone			*cone;

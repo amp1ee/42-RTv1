@@ -1,6 +1,6 @@
 #include "rtv1.h"
 
-void				set_pixel(t_main *m, int x, int y, t_vec3f color)
+void				set_pixel(t_main *m, int x, int y, t_v3 color)
 {
 	unsigned char	*pix;
 	unsigned char	b;
@@ -16,7 +16,7 @@ void				set_pixel(t_main *m, int x, int y, t_vec3f color)
 	}
 }
 
-t_matrix			init_matrix(t_vec3f angle)
+t_matrix			init_matrix(t_v3 angle)
 {
 	t_matrix		m;
 
@@ -30,31 +30,31 @@ t_matrix			init_matrix(t_vec3f angle)
 	m.cxsz = m.cx * m.sz;
 	m.cxcz = m.cx * m.cz;
 	m.sxcz = m.sx * m.cz;
-	m.m[0] = (t_vec3f){m.cy * m.cz, m.cy * m.sz, -m.sy };
-	m.m[1] = (t_vec3f){m.sxcz * m.sy - m.cxsz,
+	m.m[0] = (t_v3){m.cy * m.cz, m.cy * m.sz, -m.sy };
+	m.m[1] = (t_v3){m.sxcz * m.sy - m.cxsz,
 		m.sxsz * m.sy + m.cxcz, m.sx * m.cy};
-	m.m[2] = (t_vec3f){m.cxcz * m.sy + m.sxsz,
+	m.m[2] = (t_v3){m.cxcz * m.sy + m.sxsz,
 		m.cxsz * m.sy - m.sxcz, m.cx * m.cy};
 	return (m);
 }
 
-void				matrix_apply(t_vec3f *vec, t_matrix m)
+void				matrix_apply(t_v3 *vec, t_matrix m)
 {
-	t_vec3f			t;
+	t_v3			t;
 
 	t = *vec;
-	*vec = (t_vec3f){
-		vec3f_dot(m.m[0], t),
-		vec3f_dot(m.m[1], t),
-		vec3f_dot(m.m[2], t)
+	*vec = (t_v3){
+		v3_dot(m.m[0], t),
+		v3_dot(m.m[1], t),
+		v3_dot(m.m[2], t)
 	};
 }
 
-t_obj				*get_obstacle(t_main *m, t_vec3f rdir, t_vec3f *P, double t)
+t_obj				*get_obstacle(t_main *m, t_v3 rdir, t_v3 *p, double t)
 {
 	t_obj			*o;
 	t_obj			*closest;
-	t_vec3f			lP;
+	t_v3			lp;
 	double			dist;
 	int				i;
 
@@ -64,12 +64,12 @@ t_obj				*get_obstacle(t_main *m, t_vec3f rdir, t_vec3f *P, double t)
 	{
 		o = m->objects[i];
 		if (o->type != LIGHT_SOURCE &&
-			o->intersects(o->data, m->refl_point, rdir, &lP))
+			o->intersects(o->data, m->refl_point, rdir, &lp))
 		{
-			dist = vec3f_length(lP - m->refl_point);
+			dist = v3_length(lp - m->refl_point);
 			if (dist < t)
 			{
-				*P = lP;
+				*p = lp;
 				t = dist;
 				closest = o;
 			}
@@ -78,125 +78,114 @@ t_obj				*get_obstacle(t_main *m, t_vec3f rdir, t_vec3f *P, double t)
 	return (closest);
 }
 
-double				shed_lights(t_main *m, t_vec3f P, t_vec3f N)
+double				shed_lights(t_main *m, t_shedlight *l, t_v3 p, t_v3 n)
 {
-	int				j;
-	t_light			*light;
-	t_vec3f			light_dir;
-	t_vec3f			diffuse_light;
-	t_vec3f			specular_light;
-	double			diffuse_k;
-	double			atten;
-	double			dist;
-
-	diffuse_k = 0.0;
-	diffuse_light = (t_vec3f){0, 0, 0};
-	specular_light = (t_vec3f){0, 0, 0};
-	j = -1;
-	while (++j < m->obj_num)
+	l->diffuse_k = 0.0;
+	l->diffuse_light = (t_v3){0, 0, 0};
+	l->specular_light = (t_v3){0, 0, 0};
+	l->j = -1;
+	while (++l->j < m->obj_num)
 	{
-		if ((m->objects[j])->type == LIGHT_SOURCE)
+		if ((m->objects[l->j])->type == LIGHT_SOURCE)
 		{
-			light = (t_light *)m->objects[j]->data;
-			light_dir = *(light->pos) - P;
-			dist = vec3f_length(light_dir);
-			vec3f_normalize(&light_dir);
-			atten = 1 + SQ(dist / 34.0);
-			diffuse_k += MAX(0.0, vec3f_dot(N, light_dir)) / atten;
-			if (diffuse_k > 1e-3)
+			l->light = (t_light *)m->objects[l->j]->data;
+			l->light_dir = *(l->light->pos) - p;
+			l->dist = v3_length(l->light_dir);
+			v3_normalize(&(l->light_dir));
+			l->atten = 1 + SQ(l->dist / 34.0);
+			l->diffuse_k += MAX(0.0, v3_dot(n, l->light_dir)) / l->atten;
+			if (l->diffuse_k > 1e-3)
 			{
-				double shadow_dist = dist - 1e-4;
-				t_vec3f lp = P + vec3f_multsc(light_dir, 1e-4);
-				if ((get_obstacle(m, light_dir, &lp, shadow_dist)) == NULL)
-					diffuse_light += vec3f_multsc(vec3f_get(light->color.r,
-						light->color.g, light->color.b), diffuse_k);
+				l->spot = p + v3_multsc(l->light_dir, 1e-4);
+				if (!(get_obstacle(m, l->light_dir, &l->spot, l->dist - 1e-4)))
+					l->diffuse_light += v3_multsc(v3_get((l->light)->color.r,
+					(l->light)->color.g, (l->light)->color.b), l->diffuse_k);
 			}
 		}
 	}
-	return (diffuse_k);
+	return (l->diffuse_k);
 }
 
 /*
-*	for (each x)
-		for (each y)
-		{
-			find rdir ->
-			min_dist = INF;
-			color = BG;
-			for (each object)
-			{
-				if (intersecting with ray)
-				{
-					find dist to obj;
-					if (dist < min_dist)
-					{
-						calculate diff_k;
-						color *= diff_k;
-						min_dist = dist;
-					}
-				}
-			}
-		}
+**	for (each x)
+**		for (each y)
+**		{
+**			find rdir ->
+**			min_dist = INF;
+**			color = BG;
+**			for (each object)
+**			{
+**				if (intersecting with ray)
+**				{
+**					find dist to obj;
+**					if (dist < min_dist)
+**					{
+**						calculate diff_k;
+**						color *= diff_k;
+**						min_dist = dist;
+**					}
+**				}
+**			}
+**		}
 */
-t_vec3f 			trace(t_main *m, t_vec3f rdir, int depth)
-{
-	t_vec3f			color;
-	t_obj			*o;
-	t_vec3f			P;
-	t_vec3f			N;
-	double			t;
 
-	color = BGCOLOR;
-	t = INFINITY;
-	o = get_obstacle(m, rdir, &P, t);
+t_v3				trace(t_main *m, t_v3 rdir, int depth)
+{
+	t_trace			t;
+	t_shedlight		l;
+	t_obj			*o;
+
+	t.color = BGCOLOR;
+	t.t = INFINITY;
+	o = get_obstacle(m, rdir, &t.p, t.t);
 	if (o != NULL)
 	{
-		N = o->normal_vec(o->data, P);
-		SDL_Color c = o->get_color(o->data, P);
-		color = vec3f_get(c.r, c.g, c.b);
-		double k = shed_lights(m, P, N);
+		t.n = o->normal_vec(o->data, t.p);
+		t.c = o->get_color(o->data, t.p);
+		t.color = v3_get(t.c.r, t.c.g, t.c.b);
+		t.k = shed_lights(m, &l, t.p, t.n);
 		if (depth > 1)
 		{
-			t_vec3f refl = vec3f_reflected(-rdir, N);
-			m->refl_point = P + vec3f_multsc(refl, 1e-4);
-			color += trace(m, refl, depth - 1);
+			t.refl = v3_reflected(-rdir, t.n);
+			m->refl_point = t.p + v3_multsc(t.refl, 1e-4);
+			t.color += trace(m, t.refl, depth - 1);
 		}
-		color *= vec3f_get(k, k, k);
+		t.color *= v3_get(t.k, t.k, t.k);
 	}
-	return (color);
+	return (t.color);
 }
+
+/*
+**	static unsigned int frames;
+**	printf(" Frame #%u\tCamera @ (%.2f, %.2f, %.2f)\n", ++frames,
+**	(*m->cam->pos)[0], (*m->cam->pos)[1], (*m->cam->pos)[2]);
+*/
 
 void				render(t_main *m)
 {
-	int				i, j;
-	double			x, y;
-	t_vec3f			rgb;
-	//static unsigned int frames;
+	int				i;
+	int				j;
+	double			x;
+	double			y;
 
 	SDL_FillRect(m->screen, NULL, 0x000000);
 	m->cam->rot_mtx = init_matrix(m->cam->angle);
-	// Apply rotation to move in eye direction
-	m->cam->ray = (t_vec3f){ 0, 0, m->cam->focus };
+	m->cam->ray = (t_v3){ 0, 0, m->cam->focus };
 	matrix_apply(&(m->cam->ray), m->cam->rot_mtx);
-	j = 0;
-	while (j < H)
+	j = -1;
+	while (++j < H)
 	{
-		i = 0;
-		while (i < W)
+		i = -1;
+		while (++i < W)
 		{
 			x = i / (double)W - 0.5;
 			y = j / (double)H - 0.5;
-			t_vec3f rdir = (t_vec3f){x * ASPECT, y, m->cam->focus};
-			vec3f_normalize(&rdir);
-			matrix_apply(&rdir, m->cam->rot_mtx);
+			m->rdir = (t_v3){x * ASPECT, y, m->cam->focus};
+			v3_normalize(&(m->rdir));
+			matrix_apply(&(m->rdir), m->cam->rot_mtx);
 			m->refl_point = *(m->cam->pos);
-			rgb = trace(m, rdir, m->recur_depth);
-			set_pixel(m, i, j, rgb);
-			i++;
+			set_pixel(m, i, j, trace(m, m->rdir, m->recur_depth));
 		}
-		j++;
 	}
-	//printf(" Frame #%u\tCamera @ (%.2f, %.2f, %.2f)\n", ++frames, (*m->cam->pos)[0],
-	//	   (*m->cam->pos)[1], (*m->cam->pos)[2]);
 	SDL_UpdateWindowSurface(m->window);
 }

@@ -23,9 +23,9 @@ t_obj			**lst_to_arr(t_list **obj_list, int num)
 	return (objs);
 }
 
-t_vec3f			parse_vec3f(char *line)
+t_v3			parse_v3(char *line)
 {
-	t_vec3f		vec;
+	t_v3		vec;
 	size_t		pos;
 
 	vec[0] = atof(line);
@@ -44,9 +44,9 @@ t_vec3f			parse_vec3f(char *line)
 SDL_Color		parse_color(char *line)
 {
 	SDL_Color	color;
-	t_vec3f		tmp;
+	t_v3		tmp;
 
-	tmp = parse_vec3f(line);
+	tmp = parse_v3(line);
 	color = (SDL_Color){ tmp[0], tmp[1], tmp[2], 255 };
 	return (color);
 }
@@ -57,8 +57,8 @@ SDL_Color		parse_color(char *line)
 t_obj			*ft_new_object(t_of obj_creator, char *line)
 {
 	t_obj		*obj;
-	t_vec3f		*pos;
-	t_vec3f		dir;
+	t_v3		*pos;
+	t_v3		dir;
 	double		radius;
 	SDL_Color	color;
 
@@ -66,13 +66,13 @@ t_obj			*ft_new_object(t_of obj_creator, char *line)
 	{
 		if (*line == 'P')
 		{
-			if (!(pos = malloc(sizeof(t_vec3f))))
+			if (!(pos = malloc(sizeof(t_v3))))
 				return (NULL);
-			*pos = parse_vec3f(&line[2]);
+			*pos = parse_v3(&line[2]);
 		}
 		else if (*line == 'D')
 		{
-			dir = parse_vec3f(&line[2]);
+			dir = parse_v3(&line[2]);
 			printf("dir: %f %f %f\n", dir[0], dir[1], dir[2]);
 		}
 		else if (*line == 'R')

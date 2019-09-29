@@ -32,50 +32,67 @@ void	game_quit(t_main *m)
 #define DOT(a, b) v3_dot((a), (b))
 #define XPROD(a, b) v3_cross((a), (b))
 #define INV(a, b) sqrt(1 - SQ(DOT((a), (b))))
-#define uI ((t_v3){1, 0, 0})
-#define uJ ((t_v3){0, -1, 0})
-#define uK ((t_v3){0, 0, 1})
-/*
-**	presses w... angle (0.25, -0.5, 0)
-**	loc.x += 10 * dot(angle, (t_v3){1, 0, 0})
-*/
-void	handle_events(t_main *m, SDL_Event e)
+#define UI ((t_v3){1, 0, 0})
+#define UJ ((t_v3){0, -1, 0})
+#define UK ((t_v3){0, 0, 1})
+
+#define KEY_ISMOVE(k) (k == SDLK_w || k == SDLK_a || k == SDLK_s || \
+						k == SDLK_d || k == SDLK_q || k == SDLK_e)
+#define KEY_ISROT(k) (k == SDLK_DOWN || k == SDLK_UP || k == SDLK_x || \
+						k == SDLK_RIGHT || k == SDLK_LEFT || k == SDLK_z)
+
+static inline void	cam_move(t_main *m, SDL_Keycode key)
 {
-	char		c = 0;
-	t_v3		angle;
-	t_cam		*cam;
+	const t_cam		*cam = m->cam;
+	const t_v3		ray = cam->ray;
+	const t_v3		perpray = cam->perpray;
+
+	if (key == SDLK_w)
+		(*cam->pos) += v3_multsc((t_v3){ DOT(ray, UI), -DOT(ray, UJ), DOT(ray, UK) }, STEP);
+	else if (key == SDLK_s)
+		(*cam->pos) -= v3_multsc((t_v3){ DOT(ray, UI), -DOT(ray, UJ), DOT(ray, UK) }, STEP);
+	else if (key == SDLK_a)
+		(*cam->pos) -= v3_multsc((t_v3){ DOT(perpray, UI), 0, DOT(perpray, UK) }, STEP);
+	else if (key == SDLK_d)
+		(*cam->pos) += v3_multsc((t_v3){ DOT(perpray, UI), 0, DOT(perpray, UK) }, STEP);
+	else if (key == SDLK_q)
+		(*cam->pos)[1] -= STEP;
+	else
+		(*cam->pos)[1] += STEP;
+}
+
+static inline void	cam_rotate(t_main *m, SDL_Keycode key)
+{
+	const t_v3		angle = m->cam->angle;
+	t_cam			*cam;
 
 	cam = m->cam;
-	angle = cam->angle;
-	t_v3 ray = cam->ray;
-	t_v3 perpray;
-	perpray = XPROD(ray, uJ);
-
-	if (e.key.keysym.sym == SDLK_DOWN && ++c)
+	if (key == SDLK_DOWN)
 		cam->angle = (t_v3){ angle[0] + ANG, angle[1], angle[2]};
-	else if (e.key.keysym.sym == SDLK_UP && ++c)
+	else if (key == SDLK_UP)
 		cam->angle = (t_v3){ angle[0] - ANG, angle[1], angle[2]};
-	else if (e.key.keysym.sym == SDLK_RIGHT && ++c)
+	else if (key == SDLK_RIGHT)
 		cam->angle = (t_v3){ angle[0], (angle[1] - ANG), angle[2]};
-	else if (e.key.keysym.sym == SDLK_LEFT && ++c)
+	else if (key == SDLK_LEFT)
 		cam->angle = (t_v3){ angle[0], (angle[1] + ANG), angle[2]};
-	else if (e.key.keysym.sym == SDLK_x && ++c)
+	else if (key == SDLK_x)
 		cam->angle = (t_v3){ angle[0], angle[1], angle[2] + ANG};
-	else if (e.key.keysym.sym == SDLK_z && ++c)
+	else
 		cam->angle = (t_v3){ angle[0], angle[1], angle[2] - ANG};
-	else if (e.key.keysym.sym == SDLK_w && ++c)
-		(*cam->pos) += v3_multsc((t_v3){ DOT(ray, uI), -DOT(ray, uJ), DOT(ray, uK) }, STEP);
-	else if (e.key.keysym.sym == SDLK_s && ++c)
-		(*cam->pos) -= v3_multsc((t_v3){ DOT(ray, uI), -DOT(ray, uJ), DOT(ray, uK) }, STEP);
-	else if (e.key.keysym.sym == SDLK_a && ++c)
-		(*cam->pos) -= v3_multsc((t_v3){ DOT(perpray, uI), 0, DOT(perpray, uK) }, STEP);
-	else if (e.key.keysym.sym == SDLK_d && ++c)
-		(*cam->pos) += v3_multsc((t_v3){ DOT(perpray, uI), 0, DOT(perpray, uK) }, STEP);
-	else if (e.key.keysym.sym == SDLK_q && ++c)
-		(*cam->pos)[1] -= STEP;
-	else if (e.key.keysym.sym == SDLK_e && ++c)
-		(*cam->pos)[1] += STEP;
-	(c) ? render(m) : 0;
+}
+
+void				handle_events(t_main *m, SDL_Event e)
+{
+	char			to_render;
+
+	to_render = 0;
+	m->cam->perpray = XPROD(m->cam->ray, UJ);
+	if (KEY_ISROT(e.key.keysym.sym) && ++to_render)
+		cam_rotate(m, e.key.keysym.sym);
+	else if (KEY_ISMOVE(e.key.keysym.sym) && ++to_render)
+		cam_move(m, e.key.keysym.sym);
+	if (to_render)
+		render(m);
 }
 
 t_cam	*init_cam(t_v3 *pos, t_v3 angle)

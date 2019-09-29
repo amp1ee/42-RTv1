@@ -130,6 +130,7 @@ typedef struct	s_cam
 {
 	t_v3		*pos;
 	t_v3		ray;
+	t_v3		perpray;
 	t_v3		angle;
 	t_matrix	rot_mtx;
 	double		focus;

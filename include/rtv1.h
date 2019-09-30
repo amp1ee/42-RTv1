@@ -128,6 +128,7 @@ typedef struct	s_figure
 	t_v3		l;
 	t_v3		m;
 	t_v3		n;
+	t_v3		dir;
 }				t_figure;
 
 typedef struct	s_obj

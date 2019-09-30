@@ -25,6 +25,7 @@ void	game_quit(t_main *m)
 	SDL_FreeSurface(m->screen);
 	SDL_DestroyWindow(m->window);
 	SDL_Quit();
+	exit(0);
 }
 
 #define STEP	(50)
@@ -45,7 +46,7 @@ static inline void	cam_move(t_main *m, SDL_Keycode key)
 {
 	const t_cam		*cam = m->cam;
 	const t_v3		ray = cam->ray;
-	const t_v3		perpray = cam->perpray;
+	const t_v3		perpray = XPROD(m->cam->ray, UJ);
 
 	if (key == SDLK_w)
 		(*cam->pos) += v3_multsc((t_v3){ DOT(ray, UI), -DOT(ray, UJ), DOT(ray, UK) }, STEP);
@@ -83,19 +84,19 @@ static inline void	cam_rotate(t_main *m, SDL_Keycode key)
 
 void				handle_events(t_main *m, SDL_Event e)
 {
-	char			to_render;
-
-	to_render = 0;
-	m->cam->perpray = XPROD(m->cam->ray, UJ);
-	if (KEY_ISROT(e.key.keysym.sym) && ++to_render)
+	if (e.key.keysym.sym == SDLK_ESCAPE ||
+		(e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_CLOSE))
+		game_quit(m);
+	else if (KEY_ISROT(e.key.keysym.sym))
 		cam_rotate(m, e.key.keysym.sym);
-	else if (KEY_ISMOVE(e.key.keysym.sym) && ++to_render)
+	else if (KEY_ISMOVE(e.key.keysym.sym))
 		cam_move(m, e.key.keysym.sym);
-	if (to_render)
-		render(m);
+	else
+		return ;
+	render(m);
 }
 
-t_cam	*init_cam(t_v3 *pos, t_v3 angle)
+t_cam				*init_cam(t_v3 *pos, t_v3 angle)
 {
 	t_cam	*cam;
 
@@ -109,10 +110,10 @@ t_cam	*init_cam(t_v3 *pos, t_v3 angle)
 	return (cam);
 }
 
-int		main(int argc, char *argv[])
+int					main(int argc, char *argv[])
 {
-	t_main		*m;
-	SDL_Event	e;
+	t_main			*m;
+	SDL_Event		e;
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0
 		|| !(m = malloc(sizeof(t_main)))
@@ -135,17 +136,9 @@ int		main(int argc, char *argv[])
 	while (m->running)
 	{
 		while (SDL_PollEvent(&e))
-		{	
-			if (e.key.keysym.sym == SDLK_ESCAPE ||
-				(e.type == SDL_WINDOWEVENT &&
-				e.window.event == SDL_WINDOWEVENT_CLOSE))
-				game_quit(m);
-			else if (e.type == SDL_KEYDOWN)
-				handle_events(m, e);
-		}
+			handle_events(m, e);
 	}
 	ft_memdel((void **)&m);
 	//system("leaks RTv1");
-	exit(0);
 	return (0);
 }

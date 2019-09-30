@@ -1,7 +1,9 @@
 NAME	=RTv1
 CC		=clang
 CFLAGS	=-Wall -Wextra -Werror
-CFLAGS	+=-g
+ifdef DEBUG
+	CFLAGS	+=-g
+endif
 CFLAGS	+=-Ofast
 
 SRCDIR	=./src/

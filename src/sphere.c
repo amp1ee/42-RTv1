@@ -1,29 +1,29 @@
 #include "rtv1.h"
 
-bool		sphere_intersect(void *data, t_v3 ray_start, t_v3 ray,
-				t_v3 *intersect)
+bool				sphere_intersect(void *data, t_v3 ray_start, t_v3 ray,
+									t_v3 *intersect)
 {
 	const t_sphere	*sph = data;
-	t_v3			k = ray_start - *sph->pos;
+	t_figure		f;
 
-	double b,c;
-	b = v3_dot(ray, k);
-	c = v3_squared(k) - SQ(sph->radius);
-	double d = SQ(b) - c;
-	if (d < 0)
+	f.k = ray_start - *sph->pos;
+	f.b = v3_dot(ray, f.k);
+	f.c = v3_squared(f.k) - SQ(sph->radius);
+	f.d = SQ(f.b) - f.c;
+	if (f.d < 0)
 		return (false);
-	double sqrtd = sqrt(d);
-	const double		t1 = (-b - sqrtd);
-	const double		t2 = (-b + sqrtd);
-	const double		t = (MIN(t1, t2) >= 0) ? MIN(t1, t2) : MAX(t1, t2);
-	*intersect = (t_v3){	ray_start[0] + t * ray[0],
-							ray_start[1] + t * ray[1],
-							ray_start[2] + t * ray[2]
+	f.droot = sqrt(f.d);
+	f.t1 = (-f.b - f.droot);
+	f.t2 = (-f.b + f.droot);
+	f.t = (MIN(f.t1, f.t2) >= 0) ? MIN(f.t1, f.t2) : MAX(f.t1, f.t2);
+	*intersect = (t_v3){	ray_start[0] + f.t * ray[0],
+							ray_start[1] + f.t * ray[1],
+							ray_start[2] + f.t * ray[2]
 						};
-	return (t > 0);
+	return (f.t > 0);
 }
 
-SDL_Color	sphere_color(void *data, t_v3 intersect)
+SDL_Color			sphere_color(void *data, t_v3 intersect)
 {
 	const t_sphere	*sphere = data;
 
@@ -31,7 +31,7 @@ SDL_Color	sphere_color(void *data, t_v3 intersect)
 	return (sphere->color);
 }
 
-t_v3		sphere_normalvec(void *data, t_v3 hit)
+t_v3				sphere_normalvec(void *data, t_v3 hit)
 {
 	const t_sphere	*sphere = data;
 	t_v3			n;
@@ -41,29 +41,27 @@ t_v3		sphere_normalvec(void *data, t_v3 hit)
 	return (n);
 }
 
-void		sphere_cleanup(void *data)
+void				sphere_cleanup(void *data)
 {
-	t_sphere *sphere;
+	t_sphere		*sphere;
 
 	sphere = data;
 	ft_memdel((void **)&(sphere->pos));
 	ft_memdel((void **)&sphere);
 }
 
-t_obj		*new_sphere(t_v3 *pos, t_v3 dir, double radius, SDL_Color color)
+t_obj				*new_sphere(t_v3 *pos, t_v3 dir, double radius,
+								SDL_Color color)
 {
-	t_sphere	*sph;
-	t_obj		*obj;
+	t_sphere		*sph;
+	t_obj			*obj;
 
 	(void)dir;
 	if (!(sph = malloc(sizeof(t_sphere))))
 		return (NULL);
 	sph->pos = pos;
-	//printf("p.x: %f, p.y: %f, p.z: %f\n", (*pos)[0], (*pos)[1], (*pos)[2]);
 	sph->radius = radius;
-	//printf("%f\n", sph->radius);
 	sph->color = color;
-	//printf("c.r: %u, c.g: %u, c.b: %u, c.a: %u\n", color.r, color.g, color.b, color.a);
 	if (!(obj = malloc(sizeof(t_obj))))
 		return (NULL);
 	obj->type = SPHERE;

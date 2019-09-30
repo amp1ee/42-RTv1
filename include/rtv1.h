@@ -114,6 +114,21 @@ typedef struct	s_torus
 	SDL_Color	color;
 }				t_torus;
 
+typedef struct	s_figure
+{
+	double		a;
+	double		b;
+	double		c;
+	double		d;
+	double		t;
+	double		t1;
+	double		t2;
+	double		droot;
+	t_v3		k;
+	t_v3		l;
+	t_v3		m;
+	t_v3		n;
+}				t_figure;
 
 typedef struct	s_obj
 {

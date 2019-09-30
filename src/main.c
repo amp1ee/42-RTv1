@@ -98,7 +98,7 @@ void				handle_events(t_main *m, SDL_Event e)
 
 t_cam				*init_cam(t_v3 *pos, t_v3 angle)
 {
-	t_cam	*cam;
+	t_cam			*cam;
 
 	if (!(cam = malloc(sizeof(t_cam))))
 		return (NULL);
@@ -129,7 +129,6 @@ int					main(int argc, char *argv[])
 		return (10);
 	m->objects = parse_scene(m, argv[1]);
 	m->recur_depth = (argv[2]) ? ft_atoi(argv[2]) : 1;
-	m->bpp = m->screen->format->BytesPerPixel;
 	SDL_RaiseWindow(m->window);
 	m->running = true;
 	render(m);

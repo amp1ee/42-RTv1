@@ -2,17 +2,18 @@
 
 void				set_pixel(t_main *m, int x, int y, t_v3 color)
 {
-	unsigned char	*pix;
+	const unsigned	bpp = m->screen->format->BytesPerPixel;
+	unsigned char	*pixels;
 	unsigned char	b;
 	unsigned int	p;
 
 	p = (255 << 24 | (int)color[0] << 16 | (int)color[1] << 8 | (int)color[2]);
 	if (x < W && x >= 0 && y < H && y >= 0)
 	{
-		pix = (unsigned char *)m->screen->pixels;
+		pixels = (unsigned char *)m->screen->pixels;
 		b = -1;
-		while (++b < m->bpp)
-			pix[m->bpp * (y * m->screen->w + x) + b] = (p >> (b << 3)) & 0xFF;
+		while (++b < bpp)
+			pixels[bpp * (y * m->screen->w + x) + b] = (p >> (b << 3)) & 0xFF;
 	}
 }
 

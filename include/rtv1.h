@@ -145,7 +145,6 @@ typedef struct	s_main
 	t_v3		p;
 	t_v3		refl_point;
 	bool		running;
-	int			bpp;
 	int			obj_num;
 	int			recur_depth;
 }				t_main;

@@ -30,14 +30,22 @@
 # define H		720
 # define ASPECT	(W / (double)H)
 
+/*
+**  P - plane
+**  S - sphere
+**  C - cylinder
+**  c - cone
+**  L - light source
+*/
+
 typedef enum	e_figures
 {
-	TRIANGLE = 0,
-	PLANE,
+	PLANE = 0,
 	SPHERE,
 	CYLINDER,
 	CONE,
 	LIGHT_SOURCE,
+	TRIANGLE,
 	TORUS
 }				t_figures;
 

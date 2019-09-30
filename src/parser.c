@@ -95,6 +95,7 @@ t_obj			*ft_new_object(t_of obj_creator, char *line)
 **  c - cone
 **  L - light source
 */
+
 t_obj			**parse_scene(t_main *m, char *path)
 {
 	const char	*objs_str = "PSCcL";
@@ -108,8 +109,8 @@ t_obj			**parse_scene(t_main *m, char *path)
 	char		*line;
 	t_list		*obj_list;
 	t_obj		*obj;
+	int			type;
 	int			fd;
-	int			i;
 
 	fd = open(path, O_RDONLY);
 	if (fd < 0)
@@ -118,17 +119,17 @@ t_obj			**parse_scene(t_main *m, char *path)
 	obj_list = NULL;
 	while (get_next_line(fd, &line) > 0)
 	{
-		i = 0;
-		while (objs_str[i])
+		type = 0;
+		while (objs_str[type])
 		{
-			if (line[0] == objs_str[i])
+			if (line[0] == objs_str[type])
 			{
-				obj = ft_new_object((obj_func[i]), &line[2]);
+				obj = ft_new_object((obj_func[type]), &line[2]);
 				ft_lstadd(&obj_list, ft_lstnew(obj, sizeof(*obj)));
 				ft_memdel((void **)&obj);
 				m->obj_num++;
 			}
-			i++;
+			type++;
 		}
 		ft_strdel(&line);
 	}

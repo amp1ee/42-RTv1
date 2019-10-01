@@ -26,8 +26,8 @@
 # define BGCOLOR	((t_v3){ 12, 12, 12 })
 # define FOCUS	(0.7)
 # define TITLE	"rtv1"
-# define W		1280
-# define H		720
+# define W		(1280)
+# define H		(720)
 # define ASPECT	(W / (double)H)
 
 /*
@@ -180,6 +180,7 @@ typedef struct	s_shedlight
 	t_v3		spot;
 	t_v3		diffuse_light;
 	t_v3		specular_light;
+	t_v3		ambient_light;
 	double		diffuse_k;
 	double		atten;
 	double		dist;

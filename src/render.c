@@ -1,5 +1,32 @@
 #include "rtv1.h"
 
+/*
+**	Tracing algorhythm:
+**
+**	for (each x)
+**		for (each y)
+**		{
+**			find rdir ->
+**			min_dist = INF;
+**			color = BG;
+**			for (each object)
+**			{
+**				if (intersecting with ray)
+**				{
+**					find dist to obj;
+**					if (dist < min_dist)
+**					{
+**						calculate diff_k;
+**						color *= diff_k;
+**						min_dist = dist;
+**					}
+**				}
+**			}
+**		}
+*/
+
+#define AMBIENT_COEF (0.1)
+
 void				set_pixel(t_main *m, int x, int y, t_v3 color)
 {
 	const unsigned	bpp = m->screen->format->BytesPerPixel;
@@ -79,7 +106,7 @@ t_obj				*get_obstacle(t_main *m, t_v3 rdir, t_v3 *p, double t)
 	return (closest);
 }
 
-double				shed_lights(t_main *m, t_shedlight *l, t_v3 p, t_v3 n)
+double				shed_lights(t_main *m, t_shedlight *l, t_trace t)
 {
 	l->diffuse_k = 0.0;
 	l->diffuse_light = (t_v3){0, 0, 0};
@@ -90,14 +117,14 @@ double				shed_lights(t_main *m, t_shedlight *l, t_v3 p, t_v3 n)
 		if ((m->objects[l->j])->type == LIGHT_SOURCE)
 		{
 			l->light = (t_light *)m->objects[l->j]->data;
-			l->light_dir = *(l->light->pos) - p;
+			l->light_dir = *(l->light->pos) - t.p;
 			l->dist = v3_length(l->light_dir);
 			v3_normalize(&(l->light_dir));
 			l->atten = 1 + SQ(l->dist / 34.0);
-			l->diffuse_k += MAX(0.0, v3_dot(n, l->light_dir)) / l->atten;
+			l->diffuse_k += MAX(0.0, v3_dot(t.n, l->light_dir)) / l->atten;
 			if (l->diffuse_k > 1e-3)
 			{
-				l->spot = p + v3_multsc(l->light_dir, 1e-4);
+				l->spot = t.p + v3_multsc(l->light_dir, 1e-4);
 				if (!(get_obstacle(m, l->light_dir, &l->spot, l->dist - 1e-4)))
 					l->diffuse_light += v3_multsc(v3_get((l->light)->color.r,
 					(l->light)->color.g, (l->light)->color.b), l->diffuse_k);
@@ -106,29 +133,6 @@ double				shed_lights(t_main *m, t_shedlight *l, t_v3 p, t_v3 n)
 	}
 	return (l->diffuse_k);
 }
-
-/*
-**	for (each x)
-**		for (each y)
-**		{
-**			find rdir ->
-**			min_dist = INF;
-**			color = BG;
-**			for (each object)
-**			{
-**				if (intersecting with ray)
-**				{
-**					find dist to obj;
-**					if (dist < min_dist)
-**					{
-**						calculate diff_k;
-**						color *= diff_k;
-**						min_dist = dist;
-**					}
-**				}
-**			}
-**		}
-*/
 
 t_v3				trace(t_main *m, t_v3 rdir, int depth)
 {
@@ -144,7 +148,8 @@ t_v3				trace(t_main *m, t_v3 rdir, int depth)
 		t.n = o->normal_vec(o->data, t.p);
 		t.c = o->get_color(o->data, t.p);
 		t.color = v3_get(t.c.r, t.c.g, t.c.b);
-		t.k = shed_lights(m, &l, t.p, t.n);
+		l.ambient_light = v3_multsc(t.color, AMBIENT_COEF);
+		t.k = shed_lights(m, &l, t);
 		if (depth > 1)
 		{
 			t.refl = v3_reflected(-rdir, t.n);
@@ -152,6 +157,7 @@ t_v3				trace(t_main *m, t_v3 rdir, int depth)
 			t.color += trace(m, t.refl, depth - 1);
 		}
 		t.color *= v3_get(t.k, t.k, t.k);
+		t.color += l.ambient_light;
 	}
 	return (t.color);
 }

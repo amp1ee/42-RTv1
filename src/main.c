@@ -84,13 +84,20 @@ static inline void	cam_rotate(t_main *m, SDL_Keycode key)
 
 void				handle_events(t_main *m, SDL_Event e)
 {
-	if (e.key.keysym.sym == SDLK_ESCAPE ||
-		(e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_CLOSE))
+	if (e.type == SDL_KEYDOWN)
+	{
+		if (KEY_ISROT(e.key.keysym.sym))
+			cam_rotate(m, e.key.keysym.sym);
+		else if (KEY_ISMOVE(e.key.keysym.sym))
+			cam_move(m, e.key.keysym.sym);
+		else if (e.key.keysym.sym == SDLK_ESCAPE)
+			game_quit(m);
+	}
+	else if (e.type == SDL_WINDOWEVENT &&
+		e.window.event == SDL_WINDOWEVENT_CLOSE)
+	{
 		game_quit(m);
-	else if (KEY_ISROT(e.key.keysym.sym))
-		cam_rotate(m, e.key.keysym.sym);
-	else if (KEY_ISMOVE(e.key.keysym.sym))
-		cam_move(m, e.key.keysym.sym);
+	}
 	else
 		return ;
 	render(m);

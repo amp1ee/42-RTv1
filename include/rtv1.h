@@ -19,9 +19,9 @@
 # define QR(n)			(pow(n, 4))
 # define MIN(t1, t2)	(t1 < t2) ? (t1) : (t2)
 # define MAX(t1, t2)	(t1 > t2) ? (t1) : (t2)
-# define EPSILON		(1e-6)
+# define EPSILON		(1e-4)
 # define INF			(2147483647)
-# define ALBEDO			(0.26s)
+# define ALBEDO			(0.26)
 
 # define BGCOLOR	((t_v3){ 12, 12, 12 })
 # define FOCUS	(0.7)

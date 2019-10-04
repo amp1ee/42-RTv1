@@ -120,14 +120,11 @@ double				shed_lights(t_main *m, t_shedlight *l, t_trace t)
 			l->light_dir = *(l->light->pos) - t.p;
 			l->dist = v3_length(l->light_dir);
 			v3_normalize(&(l->light_dir));
-			l->atten = 1 + SQ(l->dist / 34.0);
-			l->diffuse_k += MAX(0.0, v3_dot(t.n, l->light_dir)) / l->atten;
-			if (l->diffuse_k > 1e-3)
+			l->spot = t.p + v3_multsc(l->light_dir, EPSILON);
+			if (!(get_obstacle(m, l->light_dir, &l->spot, l->dist - EPSILON)))
 			{
-				l->spot = t.p + v3_multsc(l->light_dir, 1e-4);
-				if (!(get_obstacle(m, l->light_dir, &l->spot, l->dist - 1e-4)))
-					l->diffuse_light += v3_multsc(v3_get((l->light)->color.r,
-					(l->light)->color.g, (l->light)->color.b), l->diffuse_k);
+				l->atten = 1 + SQ(l->dist / 34.0);
+				l->diffuse_k += MAX(0.0, v3_dot(t.n, l->light_dir)) / l->atten;
 			}
 		}
 	}
@@ -149,11 +146,12 @@ t_v3				trace(t_main *m, t_v3 rdir, int depth)
 		t.c = o->get_color(o->data, t.p);
 		t.color = v3_get(t.c.r, t.c.g, t.c.b);
 		l.ambient_light = v3_multsc(t.color, AMBIENT_COEF);
+		m->refl_point = t.p + v3_multsc(t.n, EPSILON);
 		t.k = shed_lights(m, &l, t);
 		if (depth > 1)
 		{
 			t.refl = v3_reflected(-rdir, t.n);
-			m->refl_point = t.p + v3_multsc(t.refl, 1e-4);
+			m->refl_point = t.p + v3_multsc(t.refl, EPSILON);
 			t.color += trace(m, t.refl, depth - 1);
 		}
 		t.color *= v3_get(t.k, t.k, t.k);

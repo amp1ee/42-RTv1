@@ -25,7 +25,7 @@
 **		}
 */
 
-#define AMBIENT_COEF (0.1)
+#define AMBIENT_COEF (0.07)
 
 void				set_pixel(t_main *m, int x, int y, t_v3 color)
 {
@@ -106,11 +106,46 @@ t_obj				*get_obstacle(t_main *m, t_v3 rdir, t_v3 *p, double t)
 	return (closest);
 }
 
-double				shed_lights(t_main *m, t_shedlight *l, t_trace t)
+static inline t_v3	clamp(t_v3 color)
 {
+	color[0] = (color[0] > 255) ? 255 : color[0];
+	color[1] = (color[1] > 255) ? 255 : color[1];
+	color[2] = (color[2] > 255) ? 255 : color[2];
+	return (color);
+}
+
+static inline t_v3		color_lerp(t_v3 a, t_v3 b, double p)
+{
+	t_v3				new;
+
+	new = v3_get(p * a[0] + (1.0 - p) * b[0],
+				p * a[1] + (1.0 - p) * b[1],
+				p * a[2] + (1.0 - p) * b[2]);
+	return (clamp(new));
+}
+
+static inline t_v3		spec_light(t_main *m, t_v3 ldir, SDL_Color lrgb, t_trace t)
+{
+	const int			smooth = 8;
+	t_v3				refl;
+	t_v3				spec_rgb;
+	double				dot;
+	double				spec_k;
+
+	refl = v3_reflected(ldir, t.n);
+	v3_normalize(&refl);
+	dot = v3_dot(-refl, m->rdir);
+	spec_k = pow(MAX(0.0, dot), smooth);
+	spec_rgb = color_lerp(t.color, (t_v3){lrgb.r, lrgb.g, lrgb.b}, 0.5);
+	return (v3_multsc(spec_rgb, spec_k * 0.7));
+}
+
+static inline double	shed_lights(t_main *m, t_shedlight *l, t_trace t)
+{
+	t_trace				tm;
+
+	ft_memcpy(&tm, &t, sizeof(tm));
 	l->diffuse_k = 0.0;
-	l->diffuse_light = (t_v3){0, 0, 0};
-	l->specular_light = (t_v3){0, 0, 0};
 	l->j = -1;
 	while (++l->j < m->obj_num)
 	{
@@ -125,6 +160,8 @@ double				shed_lights(t_main *m, t_shedlight *l, t_trace t)
 			{
 				l->atten = 1 + SQ(l->dist / 34.0);
 				l->diffuse_k += MAX(0.0, v3_dot(t.n, l->light_dir)) / l->atten;
+				l->specular_light = spec_light(m , l->light_dir,
+												l->light->color, tm);
 			}
 		}
 	}
@@ -155,9 +192,10 @@ t_v3				trace(t_main *m, t_v3 rdir, int depth)
 			t.color += trace(m, t.refl, depth - 1);
 		}
 		t.color *= v3_get(t.k, t.k, t.k);
+		t.color += l.specular_light;
 		t.color += l.ambient_light;
 	}
-	return (t.color);
+	return (clamp(t.color));
 }
 
 /*

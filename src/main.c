@@ -135,7 +135,7 @@ int					main(int argc, char *argv[])
 	if (argc < 2)
 		return (10);
 	m->objects = parse_scene(m, argv[1]);
-	m->recur_depth = (argv[2]) ? ft_atoi(argv[2]) : 1;
+	m->recur_depth = (argv[2]) ? ft_atoi(argv[2]) : 3;
 	SDL_RaiseWindow(m->window);
 	m->running = true;
 	render(m);

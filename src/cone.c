@@ -8,7 +8,7 @@ bool				cone_intersect(void *data, t_v3 eye, t_v3 rdir,
 	const double	a = (cone->angle * M_PI / 180.0);
 	const t_v3	dir = cone->dir;
 
-	t_v3		Va = dir - pos;
+	t_v3		Va = dir;
 	v3_normalize(&Va);
 	t_v3		CO = (eye - pos);
 
@@ -50,7 +50,7 @@ t_v3				cone_normalvec(void *data, t_v3 intersect)
 
 	dir = cone->dir;
 	t_v3 CP = intersect - *(cone->pos);
-	t = dir - *(cone->pos);
+	t = dir;
 	v3_normalize(&t);
 	t_v3 CQ = v3_multsc(t, v3_dot(CP, t));
 	t_v3 cp = CP;

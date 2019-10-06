@@ -8,7 +8,7 @@ bool		cylinder_intersect(void *data, t_v3 eye, t_v3 rdir,
 	const double	r = cyl->radius;
 	const t_v3	dir = cyl->dir;
 
-	t_v3		Va = dir - pos;
+	t_v3		Va = dir;
 	v3_normalize(&Va);
 	t_v3		D_Va = rdir - (v3_multsc(Va, v3_dot(rdir, Va)));
 
@@ -47,7 +47,7 @@ t_v3		cylinder_normalvec(void *data, t_v3 intersect)
 
 	dir = cyl->dir;
 	n = intersect - *(cyl->pos);
-	t = dir - *(cyl->pos);
+	t = dir;
 	v3_normalize(&t);
 	n = n - v3_multsc(t, v3_dot(n, t));
 	v3_normalize(&n);

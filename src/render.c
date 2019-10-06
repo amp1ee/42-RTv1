@@ -126,15 +126,15 @@ static inline t_v3		color_lerp(t_v3 a, t_v3 b, double p)
 
 static inline t_v3		spec_light(t_main *m, t_v3 ldir, SDL_Color lrgb, t_trace t)
 {
-	const int			smooth = 5;
-	t_v3				refl;
+	const int			smooth = 32;
 	t_v3				spec_rgb;
+	t_v3				h;
 	double				dot;
 	double				spec_k;
 
-	refl = v3_reflected(ldir, t.n);
-	v3_normalize(&refl);
-	dot = v3_dot(-refl, m->rdir);
+	h = ldir - m->rdir;
+	v3_normalize(&h);
+	dot = v3_dot(t.n, h);
 	spec_k = 0.7 * pow(MAX(0.0, dot), smooth);
 	spec_rgb = color_lerp(t.color, (t_v3){lrgb.r, lrgb.g, lrgb.b}, 0.5);
 	return (v3_multsc(spec_rgb, spec_k));

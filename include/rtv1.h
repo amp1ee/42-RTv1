@@ -128,6 +128,8 @@ typedef struct	s_figure
 	double		b;
 	double		c;
 	double		d;
+	double		e;
+	double		f;
 	double		t;
 	double		t1;
 	double		t2;

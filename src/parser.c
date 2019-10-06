@@ -73,12 +73,10 @@ t_obj			*ft_new_object(t_of obj_creator, char *line)
 		else if (*line == 'D')
 		{
 			dir = parse_v3(&line[2]);
-			printf("dir: %f %f %f\n", dir[0], dir[1], dir[2]);
 		}
 		else if (*line == 'R')
 		{
 			radius = atof(&line[2]);
-			//printf("R: %f\n", radius);
 		}
 		else if (*line == 'C')
 			color = parse_color(&line[2]);

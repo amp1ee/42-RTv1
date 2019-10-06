@@ -23,7 +23,7 @@
 # define INF			(2147483647)
 # define ALBEDO			(0.26)
 
-# define BGCOLOR	((t_v3){ 12, 12, 12 })
+# define BGCOLOR	((t_v3){ 0, 0, 0 })
 # define FOCUS	(0.7)
 # define TITLE	"rtv1"
 # define W		(1280)

@@ -126,7 +126,7 @@ static inline t_v3		color_lerp(t_v3 a, t_v3 b, double p)
 
 static inline t_v3		spec_light(t_main *m, t_v3 ldir, SDL_Color lrgb, t_trace t)
 {
-	const int			smooth = 8;
+	const int			smooth = 5;
 	t_v3				refl;
 	t_v3				spec_rgb;
 	double				dot;
@@ -135,9 +135,9 @@ static inline t_v3		spec_light(t_main *m, t_v3 ldir, SDL_Color lrgb, t_trace t)
 	refl = v3_reflected(ldir, t.n);
 	v3_normalize(&refl);
 	dot = v3_dot(-refl, m->rdir);
-	spec_k = pow(MAX(0.0, dot), smooth);
+	spec_k = 0.7 * pow(MAX(0.0, dot), smooth);
 	spec_rgb = color_lerp(t.color, (t_v3){lrgb.r, lrgb.g, lrgb.b}, 0.5);
-	return (v3_multsc(spec_rgb, spec_k * 0.7));
+	return (v3_multsc(spec_rgb, spec_k));
 }
 
 static inline double	shed_lights(t_main *m, t_shedlight *l, t_trace t)
@@ -145,6 +145,7 @@ static inline double	shed_lights(t_main *m, t_shedlight *l, t_trace t)
 	t_trace				tm;
 
 	ft_memcpy(&tm, &t, sizeof(tm));
+	l->specular_light = v3_get(0, 0, 0);
 	l->diffuse_k = 0.0;
 	l->j = -1;
 	while (++l->j < m->obj_num)
@@ -160,7 +161,7 @@ static inline double	shed_lights(t_main *m, t_shedlight *l, t_trace t)
 			{
 				l->atten = 1 + SQ(l->dist / 34.0);
 				l->diffuse_k += MAX(0.0, v3_dot(t.n, l->light_dir)) / l->atten;
-				l->specular_light = spec_light(m , l->light_dir,
+				l->specular_light += spec_light(m , l->light_dir,
 												l->light->color, tm);
 			}
 		}
@@ -191,11 +192,11 @@ t_v3				trace(t_main *m, t_v3 rdir, int depth)
 			m->refl_point = t.p + v3_multsc(t.refl, EPSILON);
 			t.color += trace(m, t.refl, depth - 1);
 		}
-		t.color *= v3_get(t.k, t.k, t.k);
 		t.color += l.specular_light;
+		t.color *= v3_get(t.k, t.k, t.k);
 		t.color += l.ambient_light;
 	}
-	return (clamp(t.color));
+	return (t.color);
 }
 
 /*
@@ -227,7 +228,7 @@ void				render(t_main *m)
 			v3_normalize(&(m->rdir));
 			matrix_apply(&(m->rdir), m->cam->rot_mtx);
 			m->refl_point = *(m->cam->pos);
-			set_pixel(m, i, j, trace(m, m->rdir, m->recur_depth));
+			set_pixel(m, i, j, clamp(trace(m, m->rdir, m->recur_depth)));
 		}
 	}
 	SDL_UpdateWindowSurface(m->window);

@@ -62,12 +62,12 @@ t_obj			*ft_new_object(t_of obj_creator, char *line)
 	double		radius;
 	SDL_Color	color;
 
+	if (!(pos = malloc(sizeof(t_v3))))
+		return (NULL);
 	while (*line && *line != '#')
 	{
 		if (*line == 'P')
 		{
-			if (!(pos = malloc(sizeof(t_v3))))
-				return (NULL);
 			*pos = parse_v3(&line[2]);
 		}
 		else if (*line == 'D')

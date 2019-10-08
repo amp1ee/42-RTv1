@@ -26,6 +26,7 @@ void	rtv1_quit(t_main *m)
 	SDL_FreeSurface(m->screen);
 	SDL_DestroyWindow(m->window);
 	SDL_Quit();
+	ft_memdel((void **)&m);
 	exit(0);
 }
 
@@ -159,7 +160,6 @@ void				main_loop(t_main *m)
 		while (SDL_PollEvent(&e))
 			handle_events(m, e);
 	}
-	ft_memdel((void **)&m);
 }
 
 int					main(int argc, char *argv[])

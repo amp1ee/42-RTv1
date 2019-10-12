@@ -212,7 +212,6 @@ void				render(t_main *m)
 	double			x;
 	double			y;
 
-	SDL_FillRect(m->screen, NULL, 0x000000);
 	m->cam->rot_mtx = init_matrix(m->cam->angle);
 	m->cam->ray = (t_v3){ 0, 0, m->cam->focus };
 	matrix_apply(&(m->cam->ray), m->cam->rot_mtx);
@@ -230,6 +229,6 @@ void				render(t_main *m)
 			m->refl_point = *(m->cam->pos);
 			set_pixel(m, i, j, clamp(trace(m, m->rdir, m->recur_depth)));
 		}
+		SDL_UpdateWindowSurface(m->window);
 	}
-	SDL_UpdateWindowSurface(m->window);
 }

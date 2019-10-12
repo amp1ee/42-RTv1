@@ -15,6 +15,10 @@ void	free_mem(t_main *m)
 	ft_memdel((void **)&(m->cam));
 }
 
+/*
+**	system("leaks RTv1"); // Append to check for memory leaks;
+*/
+
 void	rtv1_quit(t_main *m)
 {
 	m->running = false;
@@ -25,7 +29,6 @@ void	rtv1_quit(t_main *m)
 	SDL_Log("The surface's pixelformat is %s", surfacePixelFormatName);
 	SDL_FreeSurface(m->screen);
 	SDL_DestroyWindow(m->window);
-	SDL_Quit();
 	ft_memdel((void **)&m);
 	exit(0);
 }
@@ -93,16 +96,17 @@ void				handle_events(t_main *m, SDL_Event e)
 		else if (KEY_ISMOVE(e.key.keysym.sym))
 			cam_move(m, e.key.keysym.sym);
 		else if (e.key.keysym.sym == SDLK_ESCAPE)
-			rtv1_quit(m);
+			m->running = false;
 	}
 	else if (e.type == SDL_WINDOWEVENT &&
 		e.window.event == SDL_WINDOWEVENT_CLOSE)
 	{
-		rtv1_quit(m);
+		m->running = false;
 	}
 	else
 		return ;
-	render(m);
+	if (m->running)
+		render(m);
 }
 
 t_cam				*init_cam(t_v3 angle)
@@ -144,15 +148,12 @@ t_main				*rtv1_init(char **argv)
 	return (m);
 }
 
-/*
-**	system("leaks RTv1") // Append to check for memory leaks;
-*/
-
 void				main_loop(t_main *m)
 {
 	SDL_Event		e;
 
 	SDL_RaiseWindow(m->window);
+	SDL_FillRect(m->screen, NULL, 0x000000);
 	m->running = true;
 	render(m);
 	while (m->running)
@@ -160,6 +161,7 @@ void				main_loop(t_main *m)
 		while (SDL_PollEvent(&e))
 			handle_events(m, e);
 	}
+	rtv1_quit(m);
 }
 
 int					main(int argc, char *argv[])

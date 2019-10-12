@@ -1,8 +1,5 @@
 #include "rtv1.h"
 
-// TODO:
-// double			ft_atof()
-
 t_obj			**lst_to_arr(t_list **obj_list, int num)
 {
 	t_list		*elem;
@@ -28,15 +25,15 @@ t_v3			parse_v3(char *line)
 	t_v3		vec;
 	size_t		pos;
 
-	vec[0] = atof(line);
+	vec[0] = ft_atof(line);
 	//printf("vec.x: %f\n", vec[0]);
 	pos = ft_strpos(line, '_');
 	line += (pos + 1);
-	vec[1] = atof(line);
+	vec[1] = ft_atof(line);
 	//printf("vec.y: %f\n", vec[1]);
 	pos = ft_strpos(line, '_');
 	line += (pos + 1);
-	vec[2] = atof(line);
+	vec[2] = ft_atof(line);
 	//printf("vec.z: %f\n", vec[2]);
 	return (vec);
 }

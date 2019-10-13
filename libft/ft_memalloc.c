@@ -18,10 +18,6 @@ void	*ft_memalloc(size_t size)
 
 	mem = (unsigned char *)malloc(size);
 	if (mem)
-	{
-		while (size > 0)
-			mem[size--] = 0;
-		mem[0] = 0;
-	}
+		ft_bzero(mem, size);
 	return (mem);
 }

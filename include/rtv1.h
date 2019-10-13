@@ -20,7 +20,6 @@
 # define MIN(t1, t2)	(t1 < t2) ? (t1) : (t2)
 # define MAX(t1, t2)	(t1 > t2) ? (t1) : (t2)
 # define EPSILON		(1e-4)
-# define INF			(2147483647)
 # define ALBEDO			(0.26)
 
 # define BGCOLOR	((t_v3){ 0, 0, 0 })
@@ -44,8 +43,7 @@ typedef enum	e_figures
 	SPHERE,
 	CYLINDER,
 	CONE,
-	LIGHT_SOURCE,
-	TRIANGLE
+	LIGHT_SOURCE
 }				t_figures;
 
 typedef double	t_v3 __attribute__((vector_size(sizeof(double)*3)));
@@ -101,16 +99,6 @@ typedef struct	s_cone
 	double		angle;
 	SDL_Color	color;
 }				t_cone;
-
-typedef struct	s_triang
-{
-	t_v3		*a;
-	t_v3		*b;
-	t_v3		*c;
-	t_v3		*normal;
-	SDL_Color	color;
-	double		dist;
-}				t_triang;
 
 typedef struct	s_figure
 {
@@ -218,16 +206,6 @@ SDL_Color		sphere_color(void *data, t_v3 intersect);
 t_v3			sphere_normalvec(void *data, t_v3 intersect);
 void			sphere_cleanup(void *data);
 bool			sphere_intersect(void *data, t_v3 ray_start, t_v3 ray,
-				t_v3 *intersect);
-/*
-**	triangle.c
-*/
-t_obj			*new_triangle(t_v3 *a, t_v3 *b, t_v3 *c,
-			SDL_Color color);
-SDL_Color		triangle_color(void *data, t_v3 intersect);
-t_v3			triangle_normalvec(void *data, t_v3 intersect);
-void			triangle_cleanup(void *data);
-bool			triangle_intersect(void *data, t_v3 ray_start, t_v3 ray,
 				t_v3 *intersect);
 
 /*

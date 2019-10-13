@@ -25,7 +25,8 @@
 **		}
 */
 
-#define AMBIENT_COEF (0.07)
+#define		AMBIENT_COEF (0.07)
+#define		SPEC_SMOOTHNESS 32
 
 void				set_pixel(t_main *m, int x, int y, t_v3 color)
 {
@@ -124,18 +125,18 @@ static inline t_v3		color_lerp(t_v3 a, t_v3 b, double p)
 	return (clamp(new));
 }
 
-static inline t_v3		spec_light(t_main *m, t_v3 ldir, SDL_Color lrgb, t_trace t)
+static inline t_v3		spec_light(t_main *m, t_shedlight *l, t_trace t)
 {
-	const int			smooth = 32;
+	const SDL_Color		lrgb = l->light->color;
 	t_v3				spec_rgb;
 	t_v3				h;
 	double				dot;
 	double				spec_k;
 
-	h = ldir - m->rdir;
+	h = l->light_dir - m->rdir;
 	v3_normalize(&h);
 	dot = v3_dot(t.n, h);
-	spec_k = 0.7 * pow(MAX(0.0, dot), smooth);
+	spec_k = l->light->brightness * 0.7 * pow(MAX(0.0, dot), SPEC_SMOOTHNESS);
 	spec_rgb = color_lerp(t.color, (t_v3){lrgb.r, lrgb.g, lrgb.b}, 0.5);
 	return (v3_multsc(spec_rgb, spec_k));
 }
@@ -160,9 +161,9 @@ static inline double	shed_lights(t_main *m, t_shedlight *l, t_trace t)
 			if (!(get_obstacle(m, l->light_dir, &l->spot, l->dist - EPSILON)))
 			{
 				l->atten = 1 + SQ(l->dist / 34.0);
-				l->diffuse_k += MAX(0.0, v3_dot(t.n, l->light_dir)) / l->atten;
-				l->specular_light += spec_light(m , l->light_dir,
-												l->light->color, tm);
+				l->diffuse_k += l->light->brightness *
+							(MAX(0.0, v3_dot(t.n, l->light_dir))) / l->atten;
+				l->specular_light += spec_light(m , l, tm);
 			}
 		}
 	}
@@ -172,9 +173,11 @@ static inline double	shed_lights(t_main *m, t_shedlight *l, t_trace t)
 t_v3				trace(t_main *m, t_v3 rdir, int depth)
 {
 	t_trace			t;
-	t_shedlight		l;
+	t_shedlight		*l;
 	t_obj			*o;
 
+	if (!(l = malloc(sizeof(t_shedlight))))
+		return (v3_get(0, 0, 0));
 	t.color = BGCOLOR;
 	t.t = INFINITY;
 	o = get_obstacle(m, rdir, &t.p, t.t);
@@ -183,18 +186,18 @@ t_v3				trace(t_main *m, t_v3 rdir, int depth)
 		t.n = o->normal_vec(o->data, t.p);
 		t.c = o->get_color(o->data, t.p);
 		t.color = v3_get(t.c.r, t.c.g, t.c.b);
-		l.ambient_light = v3_multsc(t.color, AMBIENT_COEF);
+		l->ambient_light = v3_multsc(t.color, AMBIENT_COEF);
 		m->refl_point = t.p + v3_multsc(t.n, EPSILON);
-		t.k = shed_lights(m, &l, t);
+		t.k = shed_lights(m, l, t);
 		if (depth > 1)
 		{
 			t.refl = v3_reflected(-rdir, t.n);
 			m->refl_point = t.p + v3_multsc(t.refl, EPSILON);
 			t.color += trace(m, t.refl, depth - 1);
 		}
-		t.color += l.specular_light;
+		t.color += l->specular_light;
 		t.color *= v3_get(t.k, t.k, t.k);
-		t.color += l.ambient_light;
+		t.color += l->ambient_light;
 	}
 	return (t.color);
 }
@@ -204,6 +207,7 @@ t_v3				trace(t_main *m, t_v3 rdir, int depth)
 **	printf(" Frame #%u\tCamera @ (%.2f, %.2f, %.2f)\n", ++frames,
 **	(*m->cam->pos)[0], (*m->cam->pos)[1], (*m->cam->pos)[2]);
 */
+#include <time.h>
 
 void				render(t_main *m)
 {
@@ -211,6 +215,9 @@ void				render(t_main *m)
 	int				j;
 	double			x;
 	double			y;
+
+	struct timespec	s, e;
+	clock_gettime(CLOCK_MONOTONIC_RAW, &s);
 
 	SDL_FillRect(m->screen, NULL, 0x000000);
 	m->cam->rot_mtx = init_matrix(m->cam->angle);
@@ -231,5 +238,10 @@ void				render(t_main *m)
 			set_pixel(m, i, j, clamp(trace(m, m->rdir, m->recur_depth)));
 		}
 	}
+
+	clock_gettime(CLOCK_MONOTONIC_RAW, &e);
+	double elapsed_t = (e.tv_sec - s.tv_sec) + (e.tv_nsec - s.tv_nsec) / 1e9;
+	printf("Frame rendered in %f seconds\n", elapsed_t);
+
 	SDL_UpdateWindowSurface(m->window);
 }

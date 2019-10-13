@@ -45,8 +45,7 @@ typedef enum	e_figures
 	CYLINDER,
 	CONE,
 	LIGHT_SOURCE,
-	TRIANGLE,
-	TORUS
+	TRIANGLE
 }				t_figures;
 
 typedef double	t_v3 __attribute__((vector_size(sizeof(double)*3)));
@@ -112,15 +111,6 @@ typedef struct	s_triang
 	SDL_Color	color;
 	double		dist;
 }				t_triang;
-
-typedef struct	s_torus
-{
-	t_v3		*pos;
-	t_v3		dir;
-	double		radius;
-	double		tube_radius;
-	SDL_Color	color;
-}				t_torus;
 
 typedef struct	s_figure
 {
@@ -239,15 +229,6 @@ t_v3			triangle_normalvec(void *data, t_v3 intersect);
 void			triangle_cleanup(void *data);
 bool			triangle_intersect(void *data, t_v3 ray_start, t_v3 ray,
 				t_v3 *intersect);
-
-t_obj			*new_torus(t_v3 *center, t_v3 dir, double tor_rad,
-							double tube_rad, SDL_Color color);
-bool			torus_intersect(void *data, t_v3 o, t_v3 dir,
-				t_v3 *intersect);
-SDL_Color		torus_color(void *data, t_v3 intersect);
-t_v3			torus_normalvec(void *data, t_v3 intersect);
-void			torus_cleanup(void *data);
-
 
 /*
 **	v3.c

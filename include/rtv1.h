@@ -29,6 +29,31 @@
 # define H		(720)
 # define ASPECT	(W / (double)H)
 
+# define USAGE "Usage: ./RTv1 scene.scn [recursive depth]\n"
+
+# define SCENE_FORMAT \
+		"=== Scene format: ===\n\n"\
+		"\t[Camera position]\n"\
+		"\t[Object type] [Position] [Direction] "\
+		"[Radius/Radiance] [Color]\n\n"\
+		"\tCamera position:\ts:[x_y_z]\t*if unspecified, default is 0_0_0\n"\
+		"\tObject types:\n"\
+		"\t\t\t\tP - Plane\n"\
+		"\t\t\t\tS - Sphere\n"\
+		"\t\t\t\tC - Cylinder\n"\
+		"\t\t\t\tc - Cone\n"\
+		"\t\t\t\tL - Light source\n"\
+		"\tPosition/Direction:\tP/D:[x_y_z]\n"\
+		"\tRadius/Radiance:\tR:1.0\n"\
+		"\tColor:\t\t\tC:[r_g_b] in 0..255 range\n"\
+		"\tUse '#' for comments\n"
+
+# define CONTROLS \
+		"=== Controls: ===\n\n"\
+		"\tW/A/S/D:\t\tMove forward/left/backward/right\n"\
+		"\tQ/E\t\t\tMove camera up/down\n"\
+		"\tZ/X/Arrow keys\t\tRotate camera\n"
+
 /*
 **  P - plane
 **  S - sphere
@@ -163,6 +188,7 @@ typedef struct	s_shedlight
 	t_v3		specular_light;
 	t_v3		ambient_light;
 	double		diffuse_k;
+	double		spec_k;
 	double		atten;
 	double		dist;
 	int			j;

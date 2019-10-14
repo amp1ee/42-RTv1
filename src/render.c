@@ -131,14 +131,13 @@ static inline t_v3		spec_light(t_main *m, t_shedlight *l, t_trace t)
 	t_v3				spec_rgb;
 	t_v3				h;
 	double				dot;
-	double				spec_k;
 
 	h = l->light_dir - m->rdir;
 	v3_normalize(&h);
 	dot = v3_dot(t.n, h);
-	spec_k = l->light->brightness * 0.7 * pow(MAX(0.0, dot), SPEC_SMOOTHNESS);
+	l->spec_k = l->light->brightness * 0.7 * pow(MAX(0.0, dot), SPEC_SMOOTHNESS);
 	spec_rgb = color_lerp(t.color, (t_v3){lrgb.r, lrgb.g, lrgb.b}, 0.5);
-	return (v3_multsc(spec_rgb, spec_k));
+	return (v3_multsc(spec_rgb, l->spec_k));
 }
 
 static inline double	shed_lights(t_main *m, t_shedlight *l, t_trace t)

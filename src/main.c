@@ -124,20 +124,24 @@ t_main				*rtv1_init(char **argv)
 
 	if (!(m = malloc(sizeof(t_main))))
 		return (NULL);
+	m->objects = parse_scene(m, argv[1]);
+	if (m->objects == NULL)
+	{
+		ft_putendl("Error on scene parsing");
+		ft_memdel((void **)&m);
+		return (NULL);
+	}
+	if (!(m->cam = init_cam(m->start_pos)))
+	{
+		ft_memdel((void **)&m);
+		return (NULL);
+	}
+	m->recur_depth = (argv[2]) ? ft_atoi(argv[2]) : 3;
 	if (SDL_Init(SDL_INIT_VIDEO) != 0 ||
 		!(m->window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_CENTERED,
 										SDL_WINDOWPOS_CENTERED, W, H, 0)) ||
 		!(m->screen = SDL_GetWindowSurface(m->window)))
 		return (NULL);
-	m->objects = parse_scene(m, argv[1]);
-	if (m->objects == NULL)
-	{
-		ft_putendl("Error on scene parsing");
-		return (NULL);
-	}
-	if (!(m->cam = init_cam(m->start_pos)))
-		return (NULL);
-	m->recur_depth = (argv[2]) ? ft_atoi(argv[2]) : 3;
 	return (m);
 }
 
@@ -157,7 +161,14 @@ void				main_loop(t_main *m)
 
 void				leakage(void)
 {
-	system("leaks RTv1");
+	system("leaks RTv1 2>/dev/null");
+}
+
+void				print_help(void)
+{
+	ft_putendl(USAGE);
+	ft_putendl(SCENE_FORMAT);
+	ft_putendl(CONTROLS);
 }
 
 int					main(int argc, char *argv[])
@@ -166,10 +177,16 @@ int					main(int argc, char *argv[])
 
 	if (argc < 2 || argc > 3)
 	{
-		ft_putendl("Usage: ./RTv1 scene.scn [recursive depth]");
+		ft_putendl(USAGE);
+		ft_putendl("./RTv1 --help for details");
 		return (1);
 	}
 	atexit(leakage);
+	if (ft_strequ(argv[1], "--help"))
+	{
+		print_help();
+		return (0);
+	}
 	m = rtv1_init(argv);
 	if (m == NULL)
 	{

@@ -26,15 +26,12 @@ t_v3			parse_v3(char *line)
 	size_t		pos;
 
 	vec[0] = ft_atof(line);
-	//printf("vec.x: %f\n", vec[0]);
 	pos = ft_strpos(line, '_');
 	line += (pos + 1);
 	vec[1] = ft_atof(line);
-	//printf("vec.y: %f\n", vec[1]);
 	pos = ft_strpos(line, '_');
 	line += (pos + 1);
 	vec[2] = ft_atof(line);
-	//printf("vec.z: %f\n", vec[2]);
 	return (vec);
 }
 
@@ -73,7 +70,7 @@ t_obj			*ft_new_object(t_of obj_creator, char *line)
 		}
 		else if (*line == 'R')
 		{
-			radius = atof(&line[2]);
+			radius = ft_atof(&line[2]);
 		}
 		else if (*line == 'C')
 			color = parse_color(&line[2]);
@@ -81,6 +78,11 @@ t_obj			*ft_new_object(t_of obj_creator, char *line)
 	}
 	obj = obj_creator(pos, dir, radius, color);
 	return (obj);
+}
+
+void			print_vec(t_v3 v)
+{
+	printf("%.2f %.2f %.2f\n", v[0], v[1], v[2]);
 }
 
 /*
@@ -111,6 +113,7 @@ t_obj			**parse_scene(t_main *m, char *path)
 	if (fd < 0)
 		return (NULL);
 	m->obj_num = 0;
+	m->start_pos = (t_v3){0, 0, 0};
 	obj_list = NULL;
 	while (get_next_line(fd, &line) > 0)
 	{
@@ -126,6 +129,8 @@ t_obj			**parse_scene(t_main *m, char *path)
 			}
 			type++;
 		}
+		if (line[0] == 's')
+			m->start_pos = parse_v3(&line[2]);
 		ft_strdel(&line);
 	}
 	close(fd);

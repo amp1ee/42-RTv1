@@ -199,13 +199,14 @@ t_v3				trace(t_main *m, t_v3 rdir, int depth)
 		t.color *= v3_get(t.k, t.k, t.k);
 		t.color += l->ambient_light;
 	}
+	ft_memdel((void **)&l);
 	return (t.color);
 }
 
 /*
 **	static unsigned int frames;
 **	printf(" Frame #%u\tCamera @ (%.2f, %.2f, %.2f)\n", ++frames,
-**	(*m->cam->pos)[0], (*m->cam->pos)[1], (*m->cam->pos)[2]);
+**	(m->cam->pos)[0], (m->cam->pos)[1], (m->cam->pos)[2]);
 */
 #include <time.h>
 
@@ -234,7 +235,7 @@ void				render(t_main *m)
 			m->rdir = (t_v3){x * ASPECT, y, m->cam->focus};
 			v3_normalize(&(m->rdir));
 			matrix_apply(&(m->rdir), m->cam->rot_mtx);
-			m->refl_point = *(m->cam->pos);
+			m->refl_point = m->cam->pos;
 			set_pixel(m, i, j, clamp(trace(m, m->rdir, m->recur_depth)));
 		}
 	}

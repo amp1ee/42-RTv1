@@ -1,3 +1,4 @@
+s:0_0_-160                                      # start position
 P P:70.0_70.0_0.0 D:0_-1_0 C:158_180_255	# floor plane
 P P:70.0_-80.0_0.0 D:0_1_0 C:255_0_135		# ceiling plane
 P P:-80.0_70.0_-70.0 D:1_0_0 C:198_180_35	# left wall

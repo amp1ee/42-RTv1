@@ -132,7 +132,7 @@ typedef struct	s_obj
 
 typedef struct	s_cam
 {
-	t_v3		*pos;
+	t_v3		pos;
 	t_v3		ray;
 	t_v3		angle;
 	t_matrix	rot_mtx;
@@ -148,6 +148,7 @@ typedef struct	s_main
 	t_v3		rdir;
 	t_v3		p;
 	t_v3		refl_point;
+	t_v3		start_pos;
 	bool		running;
 	int			obj_num;
 	int			recur_depth;

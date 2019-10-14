@@ -11,7 +11,6 @@ void	free_mem(t_main *m)
 		ft_memdel((void **)&(m->objects[obj_num]));
 	}
 	ft_memdel((void **)&(m->objects));
-	ft_memdel((void **)&(m->cam->pos));
 	ft_memdel((void **)&(m->cam));
 }
 
@@ -25,7 +24,6 @@ void	rtv1_quit(t_main *m)
 	SDL_Log("The surface's pixelformat is %s", surfacePixelFormatName);
 	SDL_FreeSurface(m->screen);
 	SDL_DestroyWindow(m->window);
-	SDL_Quit();
 	ft_memdel((void **)&m);
 	exit(0);
 }
@@ -46,22 +44,23 @@ void	rtv1_quit(t_main *m)
 
 static inline void	cam_move(t_main *m, SDL_Keycode key)
 {
-	const t_cam		*cam = m->cam;
-	const t_v3		ray = cam->ray;
+	const t_v3		ray = m->cam->ray;
 	const t_v3		perpray = XPROD(m->cam->ray, UJ);
+	t_cam			*cam;
 
+	cam = m->cam;
 	if (key == SDLK_w)
-		(*cam->pos) += v3_multsc((t_v3){ DOT(ray, UI), -DOT(ray, UJ), DOT(ray, UK) }, STEP);
+		(cam->pos) += v3_multsc((t_v3){ DOT(ray, UI), -DOT(ray, UJ), DOT(ray, UK) }, STEP);
 	else if (key == SDLK_s)
-		(*cam->pos) -= v3_multsc((t_v3){ DOT(ray, UI), -DOT(ray, UJ), DOT(ray, UK) }, STEP);
+		(cam->pos) -= v3_multsc((t_v3){ DOT(ray, UI), -DOT(ray, UJ), DOT(ray, UK) }, STEP);
 	else if (key == SDLK_a)
-		(*cam->pos) -= v3_multsc((t_v3){ DOT(perpray, UI), 0, DOT(perpray, UK) }, STEP);
+		(cam->pos) -= v3_multsc((t_v3){ DOT(perpray, UI), 0, DOT(perpray, UK) }, STEP);
 	else if (key == SDLK_d)
-		(*cam->pos) += v3_multsc((t_v3){ DOT(perpray, UI), 0, DOT(perpray, UK) }, STEP);
+		(cam->pos) += v3_multsc((t_v3){ DOT(perpray, UI), 0, DOT(perpray, UK) }, STEP);
 	else if (key == SDLK_q)
-		(*cam->pos)[1] -= STEP;
+		(cam->pos)[1] -= STEP;
 	else
-		(*cam->pos)[1] += STEP;
+		(cam->pos)[1] += STEP;
 }
 
 static inline void	cam_rotate(t_main *m, SDL_Keycode key)
@@ -105,18 +104,16 @@ void				handle_events(t_main *m, SDL_Event e)
 	render(m);
 }
 
-t_cam				*init_cam(t_v3 angle)
+t_cam				*init_cam(t_v3 start_pos)
 {
 	t_cam			*cam;
 
 	if (!(cam = malloc(sizeof(t_cam))))
 		return (NULL);
-	if (!(cam->pos = malloc(sizeof(t_v3))))
-		return (NULL);
-	ft_memcpy(cam->pos, &(t_v3){ 0, 0, -160 }, sizeof(t_v3));
-	cam->angle = angle;
-	cam->rot_mtx = init_matrix(angle);
-	matrix_apply(cam->pos, cam->rot_mtx);
+	cam->angle = (t_v3){ 0, 0, 0 };
+	cam->rot_mtx = init_matrix(cam->angle);
+	cam->pos = start_pos;
+	matrix_apply(&(cam->pos), cam->rot_mtx);
 	cam->focus = FOCUS;
 	return (cam);
 }
@@ -132,21 +129,17 @@ t_main				*rtv1_init(char **argv)
 										SDL_WINDOWPOS_CENTERED, W, H, 0)) ||
 		!(m->screen = SDL_GetWindowSurface(m->window)))
 		return (NULL);
-	if (!(m->cam = init_cam((t_v3){0, 0, 0})))
-		return (NULL);
 	m->objects = parse_scene(m, argv[1]);
 	if (m->objects == NULL)
 	{
 		ft_putendl("Error on scene parsing");
 		return (NULL);
 	}
+	if (!(m->cam = init_cam(m->start_pos)))
+		return (NULL);
 	m->recur_depth = (argv[2]) ? ft_atoi(argv[2]) : 3;
 	return (m);
 }
-
-/*
-**	system("leaks RTv1") // Append to check for memory leaks;
-*/
 
 void				main_loop(t_main *m)
 {
@@ -162,6 +155,11 @@ void				main_loop(t_main *m)
 	}
 }
 
+void				leakage(void)
+{
+	system("leaks RTv1");
+}
+
 int					main(int argc, char *argv[])
 {
 	t_main			*m;
@@ -171,6 +169,7 @@ int					main(int argc, char *argv[])
 		ft_putendl("Usage: ./RTv1 scene.scn [recursive depth]");
 		return (1);
 	}
+	atexit(leakage);
 	m = rtv1_init(argv);
 	if (m == NULL)
 	{

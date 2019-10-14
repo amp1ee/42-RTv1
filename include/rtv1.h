@@ -65,28 +65,28 @@ typedef struct	s_matrix
 
 typedef struct	s_light
 {
-	t_v3		*pos;
+	t_v3		pos;
 	double		brightness;
 	SDL_Color	color;
 }				t_light;
 
 typedef struct	s_plane
 {
-	t_v3		*pos;
+	t_v3		pos;
 	t_v3		normal;
 	SDL_Color	color;
 }				t_plane;
 
 typedef struct	s_sphere
 {
-	t_v3		*pos;
+	t_v3		pos;
 	double		radius;
 	SDL_Color	color;
 }				t_sphere;
 
 typedef struct	s_cylind
 {
-	t_v3		*pos;
+	t_v3		pos;
 	t_v3		dir;
 	double		radius;
 	SDL_Color	color;
@@ -94,7 +94,7 @@ typedef struct	s_cylind
 
 typedef struct	s_cone
 {
-	t_v3		*pos;
+	t_v3		pos;
 	t_v3		dir;
 	double		angle;
 	SDL_Color	color;
@@ -180,18 +180,18 @@ typedef struct	s_trace
 	double		k;
 }				t_trace;
 
-typedef t_obj	*(*t_of)(t_v3 *, t_v3, double, SDL_Color);
+typedef t_obj	*(*t_of)(t_v3, t_v3, double, SDL_Color);
 
 t_obj			**parse_scene(t_main *m, char *path);
 
-t_obj			*new_cylinder(t_v3 *center, t_v3 dir, double radius, SDL_Color color);
-t_obj			*new_cone(t_v3 *center, t_v3 dir, double radius, SDL_Color color);
+t_obj			*new_cylinder(t_v3 center, t_v3 dir, double radius, SDL_Color color);
+t_obj			*new_cone(t_v3 center, t_v3 dir, double radius, SDL_Color color);
 
 SDL_Color		lights_color(void *data, t_v3 intersect);
 void			lights_cleanup(void *data);
-t_obj			*new_light(t_v3 *location, t_v3 dir, double brightness, SDL_Color color);
+t_obj			*new_light(t_v3 location, t_v3 dir, double brightness, SDL_Color color);
 
-t_obj				*new_plane(t_v3 *center, t_v3 dir, double radius,
+t_obj				*new_plane(t_v3 center, t_v3 dir, double radius,
 							SDL_Color color);
 bool				plane_intersect(void *data, t_v3 eye, t_v3 rdir,
 										t_v3 *intersect);
@@ -202,7 +202,7 @@ void				plane_cleanup(void *data);
 /*
 **	sphere.c
 */
-t_obj			*new_sphere(t_v3 *center, t_v3 dir, double radius, SDL_Color color);
+t_obj			*new_sphere(t_v3 center, t_v3 dir, double radius, SDL_Color color);
 SDL_Color		sphere_color(void *data, t_v3 intersect);
 t_v3			sphere_normalvec(void *data, t_v3 intersect);
 void			sphere_cleanup(void *data);

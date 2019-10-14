@@ -16,7 +16,7 @@ bool				cone_intersect(void *data, t_v3 eye, t_v3 rdir,
 						t_v3 *intersect)
 {
 	const t_cone	*cone = data;
-	const t_v3		pos = *cone->pos;
+	const t_v3		pos = cone->pos;
 	const double	a = (cone->angle * M_PI / 180.0);
 	t_figure		f;
 
@@ -56,7 +56,7 @@ t_v3				cone_normalvec(void *data, t_v3 intersect)
 	t_figure		f;
 	t_v3			n;
 
-	f.k = intersect - *(cone->pos);
+	f.k = intersect - cone->pos;
 	v3_normalize(&f.k);
 	f.m = v3_multsc(cone->dir, v3_dot(f.k, cone->dir));
 	f.n = v3_multsc(f.k, v3_dot(f.m, f.k));
@@ -70,11 +70,10 @@ void				cone_cleanup(void *data)
 	t_cone			*cone;
 
 	cone = data;
-	ft_memdel((void **)&(cone->pos));
 	ft_memdel((void **)&cone);
 }
 
-t_obj				*new_cone(t_v3 *pos, t_v3 dir, double angle,
+t_obj				*new_cone(t_v3 pos, t_v3 dir, double angle,
 						SDL_Color color)
 {
 	t_cone			*cone;

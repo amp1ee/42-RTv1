@@ -51,18 +51,16 @@ SDL_Color		parse_color(char *line)
 t_obj			*ft_new_object(t_of obj_creator, char *line)
 {
 	t_obj		*obj;
-	t_v3		*pos;
+	t_v3		pos;
 	t_v3		dir;
 	double		radius;
 	SDL_Color	color;
 
-	if (!(pos = malloc(sizeof(t_v3))))
-		return (NULL);
 	while (*line && *line != '#')
 	{
 		if (*line == 'P')
 		{
-			*pos = parse_v3(&line[2]);
+			pos = parse_v3(&line[2]);
 		}
 		else if (*line == 'D')
 		{

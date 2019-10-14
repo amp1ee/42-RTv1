@@ -154,7 +154,7 @@ static inline double	shed_lights(t_main *m, t_shedlight *l, t_trace t)
 		if ((m->objects[l->j])->type == LIGHT_SOURCE)
 		{
 			l->light = (t_light *)m->objects[l->j]->data;
-			l->light_dir = *(l->light->pos) - t.p;
+			l->light_dir = l->light->pos - t.p;
 			l->dist = v3_length(l->light_dir);
 			v3_normalize(&(l->light_dir));
 			l->spot = t.p + v3_multsc(l->light_dir, EPSILON);

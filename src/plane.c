@@ -19,7 +19,7 @@ bool				plane_intersect(void *data, t_v3 ray_start, t_v3 ray_dir,
 	t_figure		f;
 
 	f.dir = plane_normalvec(data, *intersect);
-	f.k = *pln->pos - ray_start;
+	f.k = pln->pos - ray_start;
 	f.a = v3_dot(ray_dir, f.dir);
 	f.b = v3_dot(f.k, f.dir);
 	if (fabs(f.a) <= EPSILON)
@@ -54,11 +54,10 @@ void				plane_cleanup(void *data)
 	t_plane			*plane;
 
 	plane = (t_plane *)data;
-	ft_memdel((void **)&(plane->pos));
 	ft_memdel((void **)&plane);
 }
 
-t_obj				*new_plane(t_v3 *center, t_v3 dir, double radius,
+t_obj				*new_plane(t_v3 center, t_v3 dir, double radius,
 							SDL_Color color)
 {
 	t_plane			*plane;

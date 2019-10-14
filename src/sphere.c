@@ -6,7 +6,7 @@ bool				sphere_intersect(void *data, t_v3 ray_start, t_v3 ray,
 	const t_sphere	*sph = data;
 	t_figure		f;
 
-	f.k = ray_start - *sph->pos;
+	f.k = ray_start - sph->pos;
 	f.b = v3_dot(ray, f.k);
 	f.c = v3_squared(f.k) - SQ(sph->radius);
 	f.d = SQ(f.b) - f.c;
@@ -36,7 +36,7 @@ t_v3				sphere_normalvec(void *data, t_v3 hit)
 	const t_sphere	*sphere = data;
 	t_v3			n;
 
-	n = hit - *(sphere->pos);
+	n = hit - sphere->pos;
 	v3_normalize(&n);
 	return (n);
 }
@@ -46,11 +46,10 @@ void				sphere_cleanup(void *data)
 	t_sphere		*sphere;
 
 	sphere = data;
-	ft_memdel((void **)&(sphere->pos));
 	ft_memdel((void **)&sphere);
 }
 
-t_obj				*new_sphere(t_v3 *pos, t_v3 dir, double radius,
+t_obj				*new_sphere(t_v3 pos, t_v3 dir, double radius,
 								SDL_Color color)
 {
 	t_sphere		*sph;

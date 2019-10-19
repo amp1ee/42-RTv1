@@ -21,8 +21,8 @@ bool				cylinder_intersect(void *data, t_v3 eye, t_v3 rdir,
 	t_figure		f;
 
 	f.k = (eye - pos);
-	f.l = rdir - (v3_multsc(dir, v3_dot(rdir, dir)));
-	f.m = f.k - v3_multsc(dir, v3_dot(dir, f.k));
+	f.l = rdir - (v3_mult_scalar(dir, v3_dot(rdir, dir)));
+	f.m = f.k - v3_mult_scalar(dir, v3_dot(dir, f.k));
 	f.a = v3_squared(f.l);
 	f.b = 2.0 * v3_dot(f.l, f.m);
 	f.c = v3_squared(f.m) - SQ(cyl->radius);
@@ -55,7 +55,7 @@ t_v3				cylinder_normalvec(void *data, t_v3 intersect)
 
 	dir = cyl->dir;
 	n = intersect - cyl->pos;
-	n = n - v3_multsc(dir, v3_dot(n, dir));
+	n = n - v3_mult_scalar(dir, v3_dot(n, dir));
 	v3_normalize(&n);
 	return (n);
 }

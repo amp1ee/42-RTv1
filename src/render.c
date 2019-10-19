@@ -1,30 +1,5 @@
 #include "rtv1.h"
 
-/*
-**	Tracing algorhythm:
-**
-**	for (each x)
-**		for (each y)
-**		{
-**			find rdir ->
-**			min_dist = INF;
-**			color = BG;
-**			for (each object)
-**			{
-**				if (intersecting with ray)
-**				{
-**					find dist to obj;
-**					if (dist < min_dist)
-**					{
-**						calculate diff_k;
-**						color *= diff_k;
-**						min_dist = dist;
-**					}
-**				}
-**			}
-**		}
-*/
-
 #define		AMBIENT_COEF (0.07)
 #define		SPEC_SMOOTHNESS 32
 
@@ -137,7 +112,7 @@ static inline t_v3		spec_light(t_main *m, t_shedlight *l, t_trace t)
 	dot = v3_dot(t.n, h);
 	l->spec_k = l->light->brightness * 0.7 * pow(MAX(0.0, dot), SPEC_SMOOTHNESS);
 	spec_rgb = color_lerp(t.color, (t_v3){lrgb.r, lrgb.g, lrgb.b}, 0.5);
-	return (v3_multsc(spec_rgb, l->spec_k));
+	return (v3_mult_scalar(spec_rgb, l->spec_k));
 }
 
 static inline double	shed_lights(t_main *m, t_shedlight *l, t_trace t)
@@ -156,7 +131,7 @@ static inline double	shed_lights(t_main *m, t_shedlight *l, t_trace t)
 			l->light_dir = l->light->pos - t.p;
 			l->dist = v3_length(l->light_dir);
 			v3_normalize(&(l->light_dir));
-			l->spot = t.p + v3_multsc(l->light_dir, EPSILON);
+			l->spot = t.p + v3_mult_scalar(l->light_dir, EPSILON);
 			if (!(get_obstacle(m, l->light_dir, &l->spot, l->dist - EPSILON)))
 			{
 				l->atten = 1 + SQ(l->dist / 34.0);
@@ -185,13 +160,13 @@ t_v3				trace(t_main *m, t_v3 rdir, int depth)
 		t.n = o->normal_vec(o->data, t.p);
 		t.c = o->get_color(o->data, t.p);
 		t.color = v3_get(t.c.r, t.c.g, t.c.b);
-		l->ambient_light = v3_multsc(t.color, AMBIENT_COEF);
-		m->refl_point = t.p + v3_multsc(t.n, EPSILON);
+		l->ambient_light = v3_mult_scalar(t.color, AMBIENT_COEF);
+		m->refl_point = t.p + v3_mult_scalar(t.n, EPSILON);
 		t.k = shed_lights(m, l, t);
 		if (depth > 1)
 		{
 			t.refl = v3_reflected(-rdir, t.n);
-			m->refl_point = t.p + v3_multsc(t.refl, EPSILON);
+			m->refl_point = t.p + v3_mult_scalar(t.refl, EPSILON);
 			t.color += trace(m, t.refl, depth - 1);
 		}
 		t.color += l->specular_light;

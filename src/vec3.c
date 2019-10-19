@@ -41,7 +41,7 @@ t_v3		v3_cross(t_v3 a, t_v3 b)
 	return (xprod);
 }
 
-t_v3		v3_multsc(t_v3 v, double scalar)
+t_v3		v3_mult_scalar(t_v3 v, double scalar)
 {
 	t_v3	res;
 
@@ -71,6 +71,6 @@ t_v3		v3_reflected(t_v3 vec, t_v3 n)
 	norm = n;
 	v3_normalize(&norm);
 	v = v3_dot(vec, norm);
-	refl = v3_multsc(norm, v + v) - vec;
+	refl = v3_mult_scalar(norm, v + v) - vec;
 	return (refl);
 }

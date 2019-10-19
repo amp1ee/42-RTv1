@@ -17,20 +17,21 @@
 # define SQ(n)			(pow(n, 2))
 # define CB(n)			(pow(n, 3))
 # define QR(n)			(pow(n, 4))
+# define UI				((t_v3){1, 0, 0})
+# define UJ				((t_v3){0, -1, 0})
+# define UK				((t_v3){0, 0, 1})
 # define MIN(t1, t2)	(t1 < t2) ? (t1) : (t2)
 # define MAX(t1, t2)	(t1 > t2) ? (t1) : (t2)
 # define EPSILON		(1e-4)
 # define ALBEDO			(0.26)
-
-# define BGCOLOR	((t_v3){ 0, 0, 0 })
-# define FOCUS	(0.7)
-# define TITLE	"rtv1"
-# define W		(1280)
-# define H		(720)
-# define ASPECT	(W / (double)H)
+# define BGCOLOR		((t_v3){ 0, 0, 0 })
+# define FOCUS			(0.7)
+# define TITLE			"rtv1"
+# define W				(1280)
+# define H				(720)
+# define ASPECT			(W / (double)H)
 
 # define USAGE "Usage: ./RTv1 scene.scn [recursive depth]\n"
-
 # define SCENE_FORMAT \
 		"=== Scene format: ===\n\n"\
 		"\t[Camera position]\n"\
@@ -47,7 +48,6 @@
 		"\tRadius/Radiance:\tR:1.0\n"\
 		"\tColor:\t\t\tC:[r_g_b] in 0..255 range\n"\
 		"\tUse '#' for comments\n"
-
 # define CONTROLS \
 		"=== Controls: ===\n\n"\
 		"\tW/A/S/D:\t\tMove forward/left/backward/right\n"\
@@ -236,13 +236,13 @@ bool			sphere_intersect(void *data, t_v3 ray_start, t_v3 ray,
 				t_v3 *intersect);
 
 /*
-**	v3.c
+**	vec3.c
 */
 double		v3_dot(t_v3 a, t_v3 b);
 double		v3_squared(t_v3 v);
 double		v3_length(t_v3 vec);
 t_v3		v3_cross(t_v3 a, t_v3 b);
-t_v3		v3_multsc(t_v3 v, double scalar);
+t_v3		v3_mult_scalar(t_v3 v, double scalar);
 void		v3_normalize(t_v3 *vec);
 t_v3		v3_get(double a, double b, double c);
 t_v3		v3_reflected(t_v3 vec, t_v3 n);
@@ -255,6 +255,7 @@ void			render(t_main *m);
 void			set_pixel(t_main *m, int x, int y, t_v3 color);
 
 t_v3			trace(t_main *m, t_v3 ray, int depth);
-
+void			handle_events(t_main *m, SDL_Event e);
+void			free_mem(t_main *m);
 
 #endif

@@ -23,8 +23,8 @@ bool				cone_intersect(void *data, t_v3 eye, t_v3 rdir,
 	f.k = (eye - pos);
 	f.e = v3_dot(rdir, cone->dir);
 	f.f = v3_dot(f.k, cone->dir);
-	f.l = rdir - v3_multsc(cone->dir, f.e);
-	f.m = f.k - v3_multsc(cone->dir, f.f);
+	f.l = rdir - v3_mult_scalar(cone->dir, f.e);
+	f.m = f.k - v3_mult_scalar(cone->dir, f.f);
 	f.a = SQ(cos(a)) * v3_squared(f.l) - SQ(sin(a)) * SQ(f.e);
 	f.b = 2.0 * SQ(cos(a)) * v3_dot(f.l, f.m)
 				- 2.0 * SQ(sin(a)) * f.e * f.f;
@@ -58,8 +58,8 @@ t_v3				cone_normalvec(void *data, t_v3 intersect)
 
 	f.k = intersect - cone->pos;
 	v3_normalize(&f.k);
-	f.m = v3_multsc(cone->dir, v3_dot(f.k, cone->dir));
-	f.n = v3_multsc(f.k, v3_dot(f.m, f.k));
+	f.m = v3_mult_scalar(cone->dir, v3_dot(f.k, cone->dir));
+	f.n = v3_mult_scalar(f.k, v3_dot(f.m, f.k));
 	n = f.n - f.m;
 	v3_normalize(&n);
 	return (n);

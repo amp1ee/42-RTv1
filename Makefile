@@ -17,6 +17,7 @@ SRC		=$(addprefix $(SRCDIR),	\
 			render.c			\
 			parser.c			\
 			controls.c			\
+			misc.c				\
 			lights.c			\
 			plane.c				\
 			sphere.c			\

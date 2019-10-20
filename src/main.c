@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: oahieiev <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/10/20 18:45:00 by oahieiev          #+#    #+#             */
+/*   Updated: 2019/10/20 18:45:02 by oahieiev         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "rtv1.h"
 
 void				free_mem(t_main *m)
@@ -69,11 +81,6 @@ void				main_loop(t_main *m)
 	}
 }
 
-void				leakage(void)
-{
-	system("leaks RTv1 2>/dev/null");
-}
-
 int					main(int argc, char *argv[])
 {
 	t_main			*m;
@@ -84,7 +91,7 @@ int					main(int argc, char *argv[])
 		ft_putendl("./RTv1 --help for details");
 		return (1);
 	}
-	atexit(leakage);
+	atexit(check_leakage);
 	if (ft_strequ(argv[1], "--help"))
 	{
 		ft_putendl(USAGE);

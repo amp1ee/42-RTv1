@@ -1,29 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parser.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: oahieiev <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/10/20 19:00:20 by oahieiev          #+#    #+#             */
+/*   Updated: 2019/10/20 19:00:22 by oahieiev         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "rtv1.h"
 
-t_obj			**lst_to_arr(t_list **obj_list, int num)
+static t_v3			parse_vector(char *line)
 {
-	t_list		*elem;
-	t_obj		**objs;
-
-	ft_lstreverse(obj_list);
-	if (!(objs = malloc(num * sizeof(*objs))))
-		return (NULL);
-	elem = *obj_list;
-	while (elem)
-	{
-		if (!(objs[--num] = malloc(sizeof(t_obj))))
-			return (NULL);
-		ft_memcpy(objs[num], (t_obj *)(elem->content), sizeof(t_obj));
-		elem = elem->next;
-	}
-	ft_lstdel(obj_list, ft_bzero);
-	return (objs);
-}
-
-t_v3			parse_v3(char *line)
-{
-	t_v3		vec;
-	size_t		pos;
+	t_v3			vec;
+	size_t			pos;
 
 	vec[0] = ft_atof(line);
 	pos = ft_strpos(line, ',');
@@ -35,33 +27,32 @@ t_v3			parse_v3(char *line)
 	return (vec);
 }
 
-SDL_Color		parse_color(char *line)
+static SDL_Color	parse_color(char *line)
 {
-	SDL_Color	color;
-	t_v3		tmp;
+	SDL_Color		color;
+	t_v3			tmp;
 
-	tmp = parse_v3(line);
+	tmp = parse_vector(line);
 	color = (SDL_Color){ tmp[0], tmp[1], tmp[2], 255 };
 	return (color);
 }
 
-t_obj			*ft_new_object(t_of obj_creator, char *line)
+t_obj				*ft_new_object(t_newobj obj_creator, char *line)
 {
-	t_obj		*obj;
-	t_v3		pos;
-	t_v3		dir;
-	double		radius;
-	SDL_Color	color;
+	t_v3			pos;
+	t_v3			dir;
+	double			radius;
+	SDL_Color		color;
 
 	while (*line && *line != '#')
 	{
 		if (*line == 'P')
 		{
-			pos = parse_v3(&line[2]);
+			pos = parse_vector(&line[2]);
 		}
 		else if (*line == 'D')
 		{
-			dir = parse_v3(&line[2]);
+			dir = parse_vector(&line[2]);
 		}
 		else if (*line == 'R')
 		{
@@ -71,8 +62,34 @@ t_obj			*ft_new_object(t_of obj_creator, char *line)
 			color = parse_color(&line[2]);
 		line++;
 	}
-	obj = obj_creator(pos, dir, radius, color);
-	return (obj);
+	return (obj_creator(pos, dir, radius, color));
+}
+
+void				parsing_loop(t_main *m, int fd, char *object_types,
+								t_newobj *object_creators)
+{
+	char			*line;
+	int				type;
+	t_obj			*obj;
+
+	while (get_next_line(fd, &line) > 0)
+	{
+		type = 0;
+		while (object_types[type])
+		{
+			if (line[0] == object_types[type])
+			{
+				obj = ft_new_object((object_creators[type]), &line[2]);
+				ft_lstadd(&(m->obj_list), ft_lstnew(obj, sizeof(*obj)));
+				ft_memdel((void **)&obj);
+				m->obj_num++;
+			}
+			type++;
+		}
+		if (line[0] == 's')
+			m->start_pos = parse_vector(&line[2]);
+		ft_strdel(&line);
+	}
 }
 
 /*
@@ -83,46 +100,24 @@ t_obj			*ft_new_object(t_of obj_creator, char *line)
 **  L - light source
 */
 
-t_obj			**parse_scene(t_main *m, char *path)
+t_obj				**parse_scene(t_main *m, char *path)
 {
-	const char	*objs_str = "PSCcL";
-	const t_of	obj_func[] = {
+	const char		*object_types = "PSCcL";
+	const t_newobj	object_creators[] = {
 		&new_plane,
 		&new_sphere,
 		&new_cylinder,
 		&new_cone,
 		&new_light
 	};
-	char		*line;
-	t_list		*obj_list;
-	t_obj		*obj;
-	int			type;
-	int			fd;
+	int				fd;
 
-	fd = open(path, O_RDONLY);
-	if (fd < 0)
+	if ((fd = open(path, O_RDONLY)) < 0)
 		return (NULL);
 	m->obj_num = 0;
+	m->obj_list = NULL;
 	m->start_pos = (t_v3){0, 0, 0};
-	obj_list = NULL;
-	while (get_next_line(fd, &line) > 0)
-	{
-		type = 0;
-		while (objs_str[type])
-		{
-			if (line[0] == objs_str[type])
-			{
-				obj = ft_new_object((obj_func[type]), &line[2]);
-				ft_lstadd(&obj_list, ft_lstnew(obj, sizeof(*obj)));
-				ft_memdel((void **)&obj);
-				m->obj_num++;
-			}
-			type++;
-		}
-		if (line[0] == 's')
-			m->start_pos = parse_v3(&line[2]);
-		ft_strdel(&line);
-	}
+	parsing_loop(m, fd, (char *)object_types, (t_newobj *)object_creators);
 	close(fd);
-	return (lst_to_arr(&obj_list, m->obj_num));
+	return (list_to_array(&(m->obj_list), m->obj_num));
 }

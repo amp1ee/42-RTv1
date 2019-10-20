@@ -1,21 +1,25 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   controls.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: oahieiev <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/10/20 18:46:42 by oahieiev          #+#    #+#             */
+/*   Updated: 2019/10/20 18:47:13 by oahieiev         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "rtv1.h"
 
-#define KEY_ISMOVE(k)	(k == SDLK_w || k == SDLK_a || k == SDLK_s || \
-						k == SDLK_d || k == SDLK_q || k == SDLK_e)
-#define KEY_ISROT(k)	(k == SDLK_DOWN || k == SDLK_UP || k == SDLK_x || \
-						k == SDLK_RIGHT || k == SDLK_LEFT || k == SDLK_z)
-#define STEP			(50)
-#define ANG				(8 * (M_PI) / 180.0)
-#define DOT(a, b)		v3_dot((a), (b))
+#define STEP		(50)
+#define ANG			(8 * (M_PI) / 180.0)
+#define DOT(a, b)	v3_dot((a), (b))
 
 void				rtv1_quit(t_main *m)
 {
 	m->running = false;
 	free_mem(m);
-	SDL_PixelFormat* pixelFormat = m->screen->format;
-	Uint32 pixelFormatEnum = pixelFormat->format;
-	const char* surfacePixelFormatName = SDL_GetPixelFormatName(pixelFormatEnum);
-	SDL_Log("The surface's pixelformat is %s", surfacePixelFormatName);
 	SDL_FreeSurface(m->screen);
 	SDL_DestroyWindow(m->window);
 	ft_memdel((void **)&m);
@@ -71,9 +75,9 @@ void				handle_events(t_main *m, SDL_Event e)
 {
 	if (e.type == SDL_KEYDOWN)
 	{
-		if (KEY_ISROT(e.key.keysym.sym))
+		if (key_is_rotate(e.key.keysym.sym))
 			cam_rotate(m, e.key.keysym.sym);
-		else if (KEY_ISMOVE(e.key.keysym.sym))
+		else if (key_is_move(e.key.keysym.sym))
 			cam_move(m, e.key.keysym.sym);
 		else if (e.key.keysym.sym == SDLK_ESCAPE)
 			rtv1_quit(m);

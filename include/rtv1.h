@@ -54,6 +54,8 @@
 		"\tQ/E\t\t\tMove camera up/down\n"\
 		"\tArrow keys\t\tRotate camera\n"
 
+#define		print_vec(v)	printf("%.4f %.4f %.4f\n", (v)[0], (v)[1], (v)[2]);
+
 /*
 **  P - plane
 **  S - sphere
@@ -169,6 +171,7 @@ typedef struct	s_main
 	SDL_Window	*window;
 	SDL_Surface	*screen;
 	t_cam		*cam;
+	t_list		*obj_list;
 	t_obj		**objects;
 	t_v3		rdir;
 	t_v3		p;
@@ -206,7 +209,7 @@ typedef struct	s_trace
 	double		k;
 }				t_trace;
 
-typedef t_obj	*(*t_of)(t_v3, t_v3, double, SDL_Color);
+typedef t_obj	*(*t_newobj)(t_v3, t_v3, double, SDL_Color);
 
 t_obj			**parse_scene(t_main *m, char *path);
 
@@ -249,13 +252,21 @@ t_v3		v3_reflected(t_v3 vec, t_v3 n);
 /*
 **	render.c
 */
-void				matrix_apply(t_v3 *vec, t_matrix m);
-t_matrix			init_matrix(t_v3 angle);
-void			render(t_main *m);
+void			matrix_apply(t_v3 *vec, t_matrix m);
+t_matrix		init_matrix(t_v3 angle);
 void			set_pixel(t_main *m, int x, int y, t_v3 color);
-
 t_v3			trace(t_main *m, t_v3 ray, int depth);
+void			render(t_main *m);
+
 void			handle_events(t_main *m, SDL_Event e);
 void			free_mem(t_main *m);
+
+/*
+**	misc.c
+*/
+bool			key_is_rotate(SDL_Keycode k);
+bool			key_is_move(SDL_Keycode k);
+void			check_leakage(void);
+t_obj			**list_to_array(t_list **obj_list, int num);
 
 #endif

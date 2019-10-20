@@ -49,22 +49,22 @@ static inline void	cam_move(t_main *m, SDL_Keycode key)
 
 static inline void	cam_rotate(t_main *m, SDL_Keycode key)
 {
-	const t_v3		angle = m->cam->angle;
+	const t_v3		a = m->cam->angle;
 	t_cam			*cam;
 
 	cam = m->cam;
 	if (key == SDLK_DOWN)
-		cam->angle = v3_get(angle[0] + ANG, angle[1], angle[2]);
+		cam->angle = v3_get(a[0] + ANG, a[1], a[2]);
 	else if (key == SDLK_UP)
-		cam->angle = v3_get(angle[0] - ANG, angle[1], angle[2]);
+		cam->angle = v3_get(a[0] - ANG, a[1], a[2]);
 	else if (key == SDLK_RIGHT)
-		cam->angle = v3_get(angle[0], (angle[1] - ANG), angle[2]);
+		cam->angle = v3_get(a[0], (a[1] - ANG), a[2]);
 	else if (key == SDLK_LEFT)
-		cam->angle = v3_get(angle[0], (angle[1] + ANG), angle[2]);
+		cam->angle = v3_get(a[0], (a[1] + ANG), a[2]);
 	else if (key == SDLK_x)
-		cam->angle = v3_get(angle[0], angle[1], angle[2] + ANG);
+		cam->angle = v3_get(a[0], a[1], a[2] + ANG);
 	else
-		cam->angle = v3_get(angle[0], angle[1], angle[2] - ANG);
+		cam->angle = v3_get(a[0], a[1], a[2] - ANG);
 }
 
 void				handle_events(t_main *m, SDL_Event e)

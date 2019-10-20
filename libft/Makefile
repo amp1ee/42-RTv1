@@ -37,6 +37,7 @@ SRC		= ft_memcpy.c	ft_putstr.c		\
 
 .PHONY: all clean fclean re
 
+CC=clang
 OBJ=$(SRC:%.c=%.o)
 
 $(NAME): $(OBJ)
@@ -46,7 +47,7 @@ $(NAME): $(OBJ)
 
 %.o: %.c
 	@printf '\t\tCompiling $(NAME) sources\r'
-	@gcc -fPIC -Wall -Wextra -Werror -o $@ -c $^
+	@$(CC) -fPIC -Wall -Wextra -Werror -o $@ -c $^
 
 all: $(NAME)
 

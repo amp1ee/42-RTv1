@@ -26,10 +26,10 @@ t_v3			parse_v3(char *line)
 	size_t		pos;
 
 	vec[0] = ft_atof(line);
-	pos = ft_strpos(line, '_');
+	pos = ft_strpos(line, ',');
 	line += (pos + 1);
 	vec[1] = ft_atof(line);
-	pos = ft_strpos(line, '_');
+	pos = ft_strpos(line, ',');
 	line += (pos + 1);
 	vec[2] = ft_atof(line);
 	return (vec);
@@ -45,9 +45,6 @@ SDL_Color		parse_color(char *line)
 	return (color);
 }
 
-/*
-**	S P:10.0_10.0_10.0 D:0_0_0 R:12.0 C:128_12_2
-*/
 t_obj			*ft_new_object(t_of obj_creator, char *line)
 {
 	t_obj		*obj;
@@ -76,11 +73,6 @@ t_obj			*ft_new_object(t_of obj_creator, char *line)
 	}
 	obj = obj_creator(pos, dir, radius, color);
 	return (obj);
-}
-
-void			print_vec(t_v3 v)
-{
-	printf("%.2f %.2f %.2f\n", v[0], v[1], v[2]);
 }
 
 /*

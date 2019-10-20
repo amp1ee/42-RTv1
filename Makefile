@@ -23,7 +23,8 @@ SRC		=$(addprefix $(SRCDIR),	\
 			sphere.c			\
 			cylinder.c			\
 			cone.c				\
-			vec3.c)
+			vec3_basic.c		\
+			vec3_utils.c)
 OBJ		=$(SRC:$(SRCDIR)%.c=$(OBJDIR)%.o)
 INCLUDE	=-I$(INCLDIR) -I$(LIBFTDIR)
 HEADERS	=$(addprefix $(INCLDIR), rtv1.h)

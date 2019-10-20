@@ -209,7 +209,7 @@ typedef struct	s_trace
 	double		k;
 }				t_trace;
 
-typedef t_obj	*(*t_newobj)(t_v3, t_v3, double, SDL_Color);
+typedef t_obj	*(*t_new_obj)(t_v3, t_v3, double, SDL_Color);
 
 t_obj			**parse_scene(t_main *m, char *path);
 
@@ -254,7 +254,6 @@ t_v3		v3_reflected(t_v3 vec, t_v3 n);
 */
 void			matrix_apply(t_v3 *vec, t_matrix m);
 t_matrix		init_matrix(t_v3 angle);
-void			set_pixel(t_main *m, int x, int y, t_v3 color);
 t_v3			trace(t_main *m, t_v3 ray, int depth);
 void			render(t_main *m);
 

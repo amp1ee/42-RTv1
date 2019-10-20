@@ -1,9 +1,9 @@
 #include "rtv1.h"
 
-#define		AMBIENT_COEF (0.07)
-#define		SPEC_SMOOTHNESS 32
+#define		AMBIENT_COEF	(0.07)
+#define		SPEC_SMOOTHNESS	32
 
-void				set_pixel(t_main *m, int x, int y, t_v3 color)
+static inline void	set_pixel(t_main *m, int x, int y, t_v3 color)
 {
 	const unsigned	bpp = m->screen->format->BytesPerPixel;
 	unsigned char	*pixels;
@@ -18,40 +18,6 @@ void				set_pixel(t_main *m, int x, int y, t_v3 color)
 		while (++b < bpp)
 			pixels[bpp * (y * m->screen->w + x) + b] = (p >> (b << 3)) & 0xFF;
 	}
-}
-
-t_matrix			init_matrix(t_v3 angle)
-{
-	t_matrix		m;
-
-	m.cx = cos(angle[0]);
-	m.cy = cos(angle[1]);
-	m.cz = cos(angle[2]);
-	m.sx = sin(angle[0]);
-	m.sy = sin(angle[1]);
-	m.sz = sin(angle[2]);
-	m.sxsz = m.sx * m.sz;
-	m.cxsz = m.cx * m.sz;
-	m.cxcz = m.cx * m.cz;
-	m.sxcz = m.sx * m.cz;
-	m.m[0] = (t_v3){m.cy * m.cz, m.cy * m.sz, -m.sy };
-	m.m[1] = (t_v3){m.sxcz * m.sy - m.cxsz,
-		m.sxsz * m.sy + m.cxcz, m.sx * m.cy};
-	m.m[2] = (t_v3){m.cxcz * m.sy + m.sxsz,
-		m.cxsz * m.sy - m.sxcz, m.cx * m.cy};
-	return (m);
-}
-
-void				matrix_apply(t_v3 *vec, t_matrix m)
-{
-	t_v3			t;
-
-	t = *vec;
-	*vec = (t_v3){
-		v3_dot(m.m[0], t),
-		v3_dot(m.m[1], t),
-		v3_dot(m.m[2], t)
-	};
 }
 
 t_obj				*get_obstacle(t_main *m, t_v3 rdir, t_v3 *p, double t)
@@ -204,8 +170,8 @@ void				render(t_main *m)
 		i = -1;
 		while (++i < W)
 		{
-			x = i / (double)W - 0.5;
-			y = j / (double)H - 0.5;
+			x = (unsigned)i / (double)W - 0.5;
+			y = (unsigned)j / (double)H - 0.5;
 			m->rdir = (t_v3){x * ASPECT, y, m->cam->focus};
 			v3_normalize(&(m->rdir));
 			matrix_apply(&(m->rdir), m->cam->rot_mtx);

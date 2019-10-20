@@ -37,7 +37,7 @@ static SDL_Color	parse_color(char *line)
 	return (color);
 }
 
-t_obj				*ft_new_object(t_newobj obj_creator, char *line)
+t_obj				*ft_new_object(t_new_obj obj_creator, char *line)
 {
 	t_v3			pos;
 	t_v3			dir;
@@ -66,7 +66,7 @@ t_obj				*ft_new_object(t_newobj obj_creator, char *line)
 }
 
 void				parsing_loop(t_main *m, int fd, char *object_types,
-								t_newobj *object_creators)
+								t_new_obj *object_creators)
 {
 	char			*line;
 	int				type;
@@ -103,7 +103,7 @@ void				parsing_loop(t_main *m, int fd, char *object_types,
 t_obj				**parse_scene(t_main *m, char *path)
 {
 	const char		*object_types = "PSCcL";
-	const t_newobj	object_creators[] = {
+	const t_new_obj	object_creators[] = {
 		&new_plane,
 		&new_sphere,
 		&new_cylinder,
@@ -117,7 +117,7 @@ t_obj				**parse_scene(t_main *m, char *path)
 	m->obj_num = 0;
 	m->obj_list = NULL;
 	m->start_pos = (t_v3){0, 0, 0};
-	parsing_loop(m, fd, (char *)object_types, (t_newobj *)object_creators);
+	parsing_loop(m, fd, (char *)object_types, (t_new_obj *)object_creators);
 	close(fd);
 	return (list_to_array(&(m->obj_list), m->obj_num));
 }

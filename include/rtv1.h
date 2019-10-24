@@ -235,6 +235,9 @@ t_v3			v3_reflected(t_v3 vec, t_v3 n);
 */
 void			matrix_apply(t_v3 *vec, t_matrix m);
 t_matrix		init_matrix(t_v3 angle);
+t_v3			clamp(t_v3 color);
+t_v3			color_lerp(t_v3 a, t_v3 b, double p);
+void			set_pixel(t_main *m, int x, int y, t_v3 color);
 void			render(t_main *m);
 
 void			handle_events(t_main *m, SDL_Event e);

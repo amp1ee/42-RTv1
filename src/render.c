@@ -1,32 +1,15 @@
 #include "rtv1.h"
 
-#define		AMBIENT_COEF	(0.07)
-#define		SPEC_SMOOTHNESS	32
+#define AMBIENT_COEF	(0.07)
+#define SPEC_SMOOTHNESS	32
 
-static inline void	set_pixel(t_main *m, int x, int y, t_v3 color)
+t_obj					*get_obstacle(t_main *m, t_v3 rdir, t_v3 *p, double t)
 {
-	const unsigned	bpp = m->screen->format->BytesPerPixel;
-	unsigned char	*pixels;
-	unsigned char	b;
-	unsigned int	p;
-
-	p = (255 << 24 | (int)color[0] << 16 | (int)color[1] << 8 | (int)color[2]);
-	if (x < W && x >= 0 && y < H && y >= 0)
-	{
-		pixels = (unsigned char *)m->screen->pixels;
-		b = -1;
-		while (++b < bpp)
-			pixels[bpp * (y * m->screen->w + x) + b] = (p >> (b << 3)) & 0xFF;
-	}
-}
-
-t_obj				*get_obstacle(t_main *m, t_v3 rdir, t_v3 *p, double t)
-{
-	t_obj			*o;
-	t_obj			*closest;
-	t_v3			lp;
-	double			dist;
-	int				i;
+	t_obj				*o;
+	t_obj				*closest;
+	t_v3				lp;
+	double				dist;
+	int					i;
 
 	closest = NULL;
 	i = -1;
@@ -48,24 +31,6 @@ t_obj				*get_obstacle(t_main *m, t_v3 rdir, t_v3 *p, double t)
 	return (closest);
 }
 
-static inline t_v3	clamp(t_v3 color)
-{
-	color[0] = (color[0] > 255) ? 255 : color[0];
-	color[1] = (color[1] > 255) ? 255 : color[1];
-	color[2] = (color[2] > 255) ? 255 : color[2];
-	return (color);
-}
-
-static inline t_v3		color_lerp(t_v3 a, t_v3 b, double p)
-{
-	t_v3				new;
-
-	new = v3_get(p * a[0] + (1.0 - p) * b[0],
-				p * a[1] + (1.0 - p) * b[1],
-				p * a[2] + (1.0 - p) * b[2]);
-	return (clamp(new));
-}
-
 static inline t_v3		spec_light(t_main *m, t_shedlight *l, t_trace t)
 {
 	const t_v3			lrgb = l->light->color;
@@ -76,7 +41,7 @@ static inline t_v3		spec_light(t_main *m, t_shedlight *l, t_trace t)
 	h = l->light_dir - m->rdir;
 	v3_normalize(&h);
 	dot = v3_dot(t.n, h);
-	l->spec_k = l->light->brightness * 0.7 * pow(MAX(0.0, dot), SPEC_SMOOTHNESS);
+	l->spec_k = l->light->brightness * 0.7 * pow(MAX(0, dot), SPEC_SMOOTHNESS);
 	spec_rgb = color_lerp(t.color, lrgb, 0.5);
 	return (v3_mult_scalar(spec_rgb, l->spec_k));
 }
@@ -110,11 +75,11 @@ static inline double	shed_lights(t_main *m, t_shedlight *l, t_trace t)
 	return (l->diffuse_k);
 }
 
-t_v3				trace(t_main *m, t_v3 rdir, int depth)
+t_v3					trace(t_main *m, t_v3 rdir, int depth)
 {
-	t_trace			t;
-	t_shedlight		*l;
-	t_obj			*o;
+	t_trace				t;
+	t_shedlight			*l;
+	t_obj				*o;
 
 	if (!(l = malloc(sizeof(t_shedlight))))
 		return (v3_get(0, 0, 0));
@@ -141,12 +106,12 @@ t_v3				trace(t_main *m, t_v3 rdir, int depth)
 
 #include <time.h>
 
-void				render(t_main *m)
+void					render(t_main *m)
 {
-	int				i;
-	int				j;
-	double			x;
-	double			y;
+	int					i;
+	int					j;
+	double				x;
+	double				y;
 
 	struct timespec	s, e;
 	clock_gettime(CLOCK_MONOTONIC_RAW, &s);

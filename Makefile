@@ -15,6 +15,7 @@ SDLDIR	=./sdl2/
 SRC		=$(addprefix $(SRCDIR),	\
 			main.c				\
 			render.c			\
+			render_utils.c		\
 			vec3_basic.c		\
 			vec3_utils.c		\
 			parser.c			\

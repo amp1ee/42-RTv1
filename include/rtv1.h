@@ -93,38 +93,38 @@ typedef struct	s_matrix
 typedef struct	s_light
 {
 	t_v3		pos;
+	t_v3		color;
 	double		brightness;
-	SDL_Color	color;
 }				t_light;
 
 typedef struct	s_plane
 {
 	t_v3		pos;
 	t_v3		normal;
-	SDL_Color	color;
+	t_v3		color;
 }				t_plane;
 
 typedef struct	s_sphere
 {
 	t_v3		pos;
+	t_v3		color;
 	double		radius;
-	SDL_Color	color;
 }				t_sphere;
 
 typedef struct	s_cylind
 {
 	t_v3		pos;
 	t_v3		dir;
+	t_v3		color;
 	double		radius;
-	SDL_Color	color;
 }				t_cylind;
 
 typedef struct	s_cone
 {
 	t_v3		pos;
 	t_v3		dir;
+	t_v3		color;
 	double		angle;
-	SDL_Color	color;
 }				t_cone;
 
 typedef struct	s_figure
@@ -151,8 +151,8 @@ typedef struct	s_obj
 	int			type;
 	void		*data;
 	bool		(*intersects)(void *data, t_v3 ray_start,
-			t_v3 ray, t_v3 *intersect);
-	SDL_Color	(*get_color)(void *data, t_v3 intersect);
+					t_v3 ray, t_v3 *intersect);
+	t_v3		(*get_color)(void *data, t_v3 intersect);
 	t_v3		(*normal_vec)(void *data, t_v3 intersect);
 	void		(*cleanup)(void *data);
 }				t_obj;
@@ -188,8 +188,8 @@ typedef struct	s_shedlight
 	t_v3		light_dir;
 	t_v3		spot;
 	t_v3		diffuse_light;
-	t_v3		specular_light;
-	t_v3		ambient_light;
+	t_v3		spec_light;
+	t_v3		ambi_light;
 	double		diffuse_k;
 	double		spec_k;
 	double		atten;
@@ -200,7 +200,6 @@ typedef struct	s_shedlight
 typedef struct	s_trace
 {
 	t_v3		color;
-	SDL_Color	c;
 	t_obj		*o;
 	t_v3		p;
 	t_v3		n;
@@ -209,52 +208,33 @@ typedef struct	s_trace
 	double		k;
 }				t_trace;
 
-typedef t_obj	*(*t_new_obj)(t_v3, t_v3, double, SDL_Color);
+typedef t_obj	*(*t_new_obj)(t_v3, t_v3, double, t_v3);
 
 t_obj			**parse_scene(t_main *m, char *path);
 
-t_obj			*new_cylinder(t_v3 center, t_v3 dir, double radius, SDL_Color color);
-t_obj			*new_cone(t_v3 center, t_v3 dir, double radius, SDL_Color color);
-
-SDL_Color		lights_color(void *data, t_v3 intersect);
-void			lights_cleanup(void *data);
-t_obj			*new_light(t_v3 location, t_v3 dir, double brightness, SDL_Color color);
-
-t_obj				*new_plane(t_v3 center, t_v3 dir, double radius,
-							SDL_Color color);
-bool				plane_intersect(void *data, t_v3 eye, t_v3 rdir,
-										t_v3 *intersect);
-t_v3				plane_normalvec(void *data, t_v3 intersect);
-SDL_Color			plane_color(void *data, t_v3 intersect);
-void				plane_cleanup(void *data);
-
-/*
-**	sphere.c
-*/
-t_obj			*new_sphere(t_v3 center, t_v3 dir, double radius, SDL_Color color);
-SDL_Color		sphere_color(void *data, t_v3 intersect);
-t_v3			sphere_normalvec(void *data, t_v3 intersect);
-void			sphere_cleanup(void *data);
-bool			sphere_intersect(void *data, t_v3 ray_start, t_v3 ray,
-				t_v3 *intersect);
+t_obj			*new_cylinder(t_v3 center, t_v3 dir, double radius, t_v3 color);
+t_obj			*new_cone(t_v3 center, t_v3 dir, double radius, t_v3 color);
+t_obj			*new_light(t_v3 location, t_v3 dir, double intens, t_v3 color);
+t_obj			*new_plane(t_v3 center, t_v3 dir, double radius, t_v3 color);
+t_obj			*new_sphere(t_v3 center, t_v3 dir, double radius, t_v3 color);
 
 /*
 **	vec3.c
 */
-double		v3_dot(t_v3 a, t_v3 b);
-double		v3_squared(t_v3 v);
-double		v3_length(t_v3 vec);
-t_v3		v3_cross(t_v3 a, t_v3 b);
-t_v3		v3_mult_scalar(t_v3 v, double scalar);
-void		v3_normalize(t_v3 *vec);
-t_v3		v3_get(double a, double b, double c);
-t_v3		v3_reflected(t_v3 vec, t_v3 n);
+double			v3_dot(t_v3 a, t_v3 b);
+double			v3_squared(t_v3 v);
+double			v3_length(t_v3 vec);
+t_v3			v3_cross(t_v3 a, t_v3 b);
+t_v3			v3_mult_scalar(t_v3 v, double scalar);
+void			v3_normalize(t_v3 *vec);
+t_v3			v3_get(double a, double b, double c);
+t_v3			v3_reflected(t_v3 vec, t_v3 n);
+
 /*
 **	render.c
 */
 void			matrix_apply(t_v3 *vec, t_matrix m);
 t_matrix		init_matrix(t_v3 angle);
-t_v3			trace(t_main *m, t_v3 ray, int depth);
 void			render(t_main *m);
 
 void			handle_events(t_main *m, SDL_Event e);

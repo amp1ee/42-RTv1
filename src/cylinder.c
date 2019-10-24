@@ -39,7 +39,7 @@ bool				cylinder_intersect(void *data, t_v3 eye, t_v3 rdir,
 	return (f.t > 0);
 }
 
-SDL_Color			cylinder_color(void *data, t_v3 intersect)
+t_v3				cylinder_color(void *data, t_v3 intersect)
 {
 	const t_cylind	*cylinder = data;
 
@@ -68,8 +68,7 @@ void				cylinder_cleanup(void *data)
 	ft_memdel((void **)&cylinder);
 }
 
-t_obj				*new_cylinder(t_v3 pos, t_v3 dir, double radius,
-									SDL_Color color)
+t_obj				*new_cylinder(t_v3 pos, t_v3 dir, double radius, t_v3 color)
 {
 	t_cylind		*cyl;
 	t_obj			*obj;

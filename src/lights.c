@@ -12,7 +12,7 @@
 
 #include "rtv1.h"
 
-SDL_Color			lights_color(void *data, t_v3 intersect)
+t_v3				lights_color(void *data, t_v3 intersect)
 {
 	const t_light	*light = data;
 
@@ -29,7 +29,7 @@ void				lights_cleanup(void *data)
 }
 
 t_obj				*new_light(t_v3 pos, t_v3 dir, double brightness,
-								SDL_Color color)
+								t_v3 color)
 {
 	t_light			*light;
 	t_obj			*obj;

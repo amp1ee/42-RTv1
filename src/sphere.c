@@ -35,7 +35,7 @@ bool				sphere_intersect(void *data, t_v3 ray_start, t_v3 ray,
 	return (f.t > 0);
 }
 
-SDL_Color			sphere_color(void *data, t_v3 intersect)
+t_v3				sphere_color(void *data, t_v3 intersect)
 {
 	const t_sphere	*sphere = data;
 
@@ -61,8 +61,7 @@ void				sphere_cleanup(void *data)
 	ft_memdel((void **)&sphere);
 }
 
-t_obj				*new_sphere(t_v3 pos, t_v3 dir, double radius,
-								SDL_Color color)
+t_obj				*new_sphere(t_v3 pos, t_v3 dir, double radius, t_v3 color)
 {
 	t_sphere		*sph;
 	t_obj			*obj;

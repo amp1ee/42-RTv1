@@ -68,7 +68,7 @@ static inline t_v3		color_lerp(t_v3 a, t_v3 b, double p)
 
 static inline t_v3		spec_light(t_main *m, t_shedlight *l, t_trace t)
 {
-	const SDL_Color		lrgb = l->light->color;
+	const t_v3			lrgb = l->light->color;
 	t_v3				spec_rgb;
 	t_v3				h;
 	double				dot;
@@ -77,7 +77,7 @@ static inline t_v3		spec_light(t_main *m, t_shedlight *l, t_trace t)
 	v3_normalize(&h);
 	dot = v3_dot(t.n, h);
 	l->spec_k = l->light->brightness * 0.7 * pow(MAX(0.0, dot), SPEC_SMOOTHNESS);
-	spec_rgb = color_lerp(t.color, (t_v3){lrgb.r, lrgb.g, lrgb.b}, 0.5);
+	spec_rgb = color_lerp(t.color, lrgb, 0.5);
 	return (v3_mult_scalar(spec_rgb, l->spec_k));
 }
 
@@ -86,7 +86,7 @@ static inline double	shed_lights(t_main *m, t_shedlight *l, t_trace t)
 	t_trace				tm;
 
 	ft_memcpy(&tm, &t, sizeof(tm));
-	l->specular_light = v3_get(0, 0, 0);
+	l->spec_light = v3_get(0, 0, 0);
 	l->diffuse_k = 0.0;
 	l->j = -1;
 	while (++l->j < m->obj_num)
@@ -103,7 +103,7 @@ static inline double	shed_lights(t_main *m, t_shedlight *l, t_trace t)
 				l->atten = 1 + SQ(l->dist / 34.0);
 				l->diffuse_k += l->light->brightness *
 							(MAX(0.0, v3_dot(t.n, l->light_dir))) / l->atten;
-				l->specular_light += spec_light(m , l, tm);
+				l->spec_light += spec_light(m , l, tm);
 			}
 		}
 	}
@@ -120,13 +120,11 @@ t_v3				trace(t_main *m, t_v3 rdir, int depth)
 		return (v3_get(0, 0, 0));
 	t.color = BGCOLOR;
 	t.t = INFINITY;
-	o = get_obstacle(m, rdir, &t.p, t.t);
-	if (o != NULL)
+	if ((o = get_obstacle(m, rdir, &t.p, t.t)) != NULL)
 	{
 		t.n = o->normal_vec(o->data, t.p);
-		t.c = o->get_color(o->data, t.p);
-		t.color = v3_get(t.c.r, t.c.g, t.c.b);
-		l->ambient_light = v3_mult_scalar(t.color, AMBIENT_COEF);
+		t.color = o->get_color(o->data, t.p);
+		l->ambi_light = v3_mult_scalar(t.color, AMBIENT_COEF);
 		m->refl_point = t.p + v3_mult_scalar(t.n, EPSILON);
 		t.k = shed_lights(m, l, t);
 		if (depth > 1)
@@ -135,19 +133,12 @@ t_v3				trace(t_main *m, t_v3 rdir, int depth)
 			m->refl_point = t.p + v3_mult_scalar(t.refl, EPSILON);
 			t.color += trace(m, t.refl, depth - 1);
 		}
-		t.color += l->specular_light;
-		t.color *= v3_get(t.k, t.k, t.k);
-		t.color += l->ambient_light;
+		t.color = v3_mult_scalar(t.color + l->spec_light, t.k) + l->ambi_light;
 	}
 	ft_memdel((void **)&l);
 	return (t.color);
 }
 
-/*
-**	static unsigned int frames;
-**	printf(" Frame #%u\tCamera @ (%.2f, %.2f, %.2f)\n", ++frames,
-**	(m->cam->pos)[0], (m->cam->pos)[1], (m->cam->pos)[2]);
-*/
 #include <time.h>
 
 void				render(t_main *m)

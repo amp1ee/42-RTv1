@@ -15,6 +15,8 @@ SDLDIR	=./sdl2/
 SRC		=$(addprefix $(SRCDIR),	\
 			main.c				\
 			render.c			\
+			vec3_basic.c		\
+			vec3_utils.c		\
 			parser.c			\
 			controls.c			\
 			misc.c				\
@@ -22,9 +24,7 @@ SRC		=$(addprefix $(SRCDIR),	\
 			plane.c				\
 			sphere.c			\
 			cylinder.c			\
-			cone.c				\
-			vec3_basic.c		\
-			vec3_utils.c)
+			cone.c				)
 OBJ		=$(SRC:$(SRCDIR)%.c=$(OBJDIR)%.o)
 INCLUDE	=-I$(INCLDIR) -I$(LIBFTDIR)
 HEADERS	=$(addprefix $(INCLDIR), rtv1.h)

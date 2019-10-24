@@ -42,7 +42,7 @@ bool				cone_intersect(void *data, t_v3 eye, t_v3 rdir,
 	return (f.t > 0);
 }
 
-SDL_Color			cone_color(void *data, t_v3 intersect)
+t_v3				cone_color(void *data, t_v3 intersect)
 {
 	const t_cone	*cone = data;
 
@@ -73,8 +73,7 @@ void				cone_cleanup(void *data)
 	ft_memdel((void **)&cone);
 }
 
-t_obj				*new_cone(t_v3 pos, t_v3 dir, double angle,
-						SDL_Color color)
+t_obj				*new_cone(t_v3 pos, t_v3 dir, double angle, t_v3 color)
 {
 	t_cone			*cone;
 	t_obj			*obj;

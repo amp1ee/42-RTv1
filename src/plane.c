@@ -12,6 +12,14 @@
 
 #include "rtv1.h"
 
+t_v3				plane_normalvec(void *data, t_v3 intersect)
+{
+	const t_plane	*plane = data;
+
+	(void)intersect;
+	return (plane->normal);
+}
+
 bool				plane_intersect(void *data, t_v3 ray_start, t_v3 ray_dir,
 									t_v3 *intersect)
 {
@@ -33,20 +41,12 @@ bool				plane_intersect(void *data, t_v3 ray_start, t_v3 ray_dir,
 	return (f.t > 0);
 }
 
-SDL_Color			plane_color(void *data, t_v3 intersect)
+t_v3				plane_color(void *data, t_v3 intersect)
 {
 	const t_plane	*plane = data;
 
 	(void)intersect;
 	return (plane->color);
-}
-
-t_v3				plane_normalvec(void *data, t_v3 intersect)
-{
-	const t_plane	*plane = data;
-
-	(void)intersect;
-	return (plane->normal);
 }
 
 void				plane_cleanup(void *data)
@@ -57,8 +57,7 @@ void				plane_cleanup(void *data)
 	ft_memdel((void **)&plane);
 }
 
-t_obj				*new_plane(t_v3 center, t_v3 dir, double radius,
-							SDL_Color color)
+t_obj				*new_plane(t_v3 center, t_v3 dir, double radius, t_v3 color)
 {
 	t_plane			*plane;
 	t_obj			*obj;

@@ -27,14 +27,9 @@ static t_v3			parse_vector(char *line)
 	return (vec);
 }
 
-static SDL_Color	parse_color(char *line)
+static t_v3			parse_color(char *line)
 {
-	SDL_Color		color;
-	t_v3			tmp;
-
-	tmp = parse_vector(line);
-	color = (SDL_Color){ tmp[0], tmp[1], tmp[2], 255 };
-	return (color);
+	return (parse_vector(line));
 }
 
 t_obj				*ft_new_object(t_new_obj obj_creator, char *line)
@@ -42,7 +37,7 @@ t_obj				*ft_new_object(t_new_obj obj_creator, char *line)
 	t_v3			pos;
 	t_v3			dir;
 	double			radius;
-	SDL_Color		color;
+	t_v3			color;
 
 	while (*line && *line != '#')
 	{

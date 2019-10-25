@@ -49,7 +49,7 @@ t_main				*rtv1_init(char **argv)
 	m->objects = parse_scene(m, argv[1]);
 	if (m->objects == NULL)
 	{
-		ft_putendl("Error on scene parsing");
+		perror(argv[1]);
 		ft_memdel((void **)&m);
 		return (NULL);
 	}

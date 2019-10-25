@@ -6,6 +6,7 @@
 # include <fcntl.h>
 # include <stdbool.h>
 # include <complex.h> 
+# include <errno.h>
 # include "libft.h"
 
 # ifdef __linux__
@@ -15,18 +16,15 @@
 # endif
 
 # define SQ(n)			(pow(n, 2))
-# define CB(n)			(pow(n, 3))
-# define QR(n)			(pow(n, 4))
 # define UI				((t_v3){1, 0, 0})
 # define UJ				((t_v3){0, -1, 0})
 # define UK				((t_v3){0, 0, 1})
 # define MIN(t1, t2)	(t1 < t2) ? (t1) : (t2)
 # define MAX(t1, t2)	(t1 > t2) ? (t1) : (t2)
 # define EPSILON		(1e-4)
-# define ALBEDO			(0.26)
 # define BGCOLOR		((t_v3){ 0, 0, 0 })
 # define FOCUS			(0.7)
-# define TITLE			"rtv1"
+# define TITLE			"RTv1"
 # define W				(1280)
 # define H				(720)
 # define ASPECT			(W / (double)H)
@@ -53,8 +51,6 @@
 		"\tW/A/S/D:\t\tMove forward/left/backward/right\n"\
 		"\tQ/E\t\t\tMove camera up/down\n"\
 		"\tArrow keys\t\tRotate camera\n"
-
-#define		print_vec(v)	printf("%.4f %.4f %.4f\n", (v)[0], (v)[1], (v)[2]);
 
 /*
 **  P - plane

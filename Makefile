@@ -47,21 +47,26 @@ endif
 all: $(NAME)
 
 $(NAME): $(OBJ) $(LIBFT)
-	$(CC) $(OBJ) -o $(NAME) $(LFLAGS) $(CG_LIBS)
+	$(info Linking objects)
+	@$(CC) $(OBJ) -o $(NAME) $(LFLAGS) $(CG_LIBS)
+	$(info Done.)
 
 $(OBJDIR)%.o: $(SRCDIR)%.c $(HEADERS)
-	mkdir -p $(OBJDIR)
-	$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDE)
+	$(info Compiling $<)
+	@mkdir -p $(OBJDIR)
+	@$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDE)
 
 $(LIBFT):
-	make -sC $(LIBFTDIR)
+	@make -sC $(LIBFTDIR)
 
 clean:
-	rm -rf $(OBJDIR)
-	make -sC $(LIBFTDIR) clean
+	$(info Deleting objects)
+	@rm -rf $(OBJDIR)
+	@make -sC $(LIBFTDIR) clean
 
 fclean: clean
-	rm -rf $(NAME)
-	make -sC $(LIBFTDIR) fclean
+	$(info Deleting $(NAME))
+	@rm -rf $(NAME)
+	@make -sC $(LIBFTDIR) fclean
 
 re: fclean all

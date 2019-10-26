@@ -1,7 +1,10 @@
-NAME	=rtv1
-CC		=gcc
-CFLAGS	=-Wall -Wextra -Werror -g
-#CFLAGS	+=-O3
+NAME	=RTv1
+CC		=clang
+CFLAGS	=-Wall -Wextra -Werror
+ifdef DEBUG
+	CFLAGS	+=-g
+endif
+CFLAGS	+=-Ofast
 
 SRCDIR	=./src/
 OBJDIR	=./obj/
@@ -12,14 +15,17 @@ SDLDIR	=./sdl2/
 SRC		=$(addprefix $(SRCDIR),	\
 			main.c				\
 			render.c			\
+			render_utils.c		\
+			vec3_basic.c		\
+			vec3_utils.c		\
 			parser.c			\
-			sphere.c			\
-			triangle.c			\
+			controls.c			\
+			misc.c				\
+			lights.c			\
 			plane.c				\
+			sphere.c			\
 			cylinder.c			\
-			cone.c				\
-			torus.c				\
-			vec3f.c)
+			cone.c				)
 OBJ		=$(SRC:$(SRCDIR)%.c=$(OBJDIR)%.o)
 INCLUDE	=-I$(INCLDIR) -I$(LIBFTDIR)
 HEADERS	=$(addprefix $(INCLDIR), rtv1.h)
@@ -59,5 +65,3 @@ fclean: clean
 	make -sC $(LIBFTDIR) fclean
 
 re: fclean all
-#
-#

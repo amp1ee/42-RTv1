@@ -33,10 +33,11 @@ SRC		= ft_memcpy.c	ft_putstr.c		\
 		ft_striter.c	ft_strnew.c		\
 		ft_lstfold.c	ft_itoa_base.c	\
 		get_next_line.c	ft_atoi_base.c	\
-		ft_lstreverse.c	ft_strpos.c
+		ft_lstreverse.c	ft_strpos.c ft_atof.c
 
 .PHONY: all clean fclean re
 
+CC=clang
 OBJ=$(SRC:%.c=%.o)
 
 $(NAME): $(OBJ)
@@ -46,7 +47,7 @@ $(NAME): $(OBJ)
 
 %.o: %.c
 	@printf '\t\tCompiling $(NAME) sources\r'
-	@gcc -fPIC -Wall -Wextra -Werror -o $@ -c $^
+	@$(CC) -fPIC -Wall -Wextra -Werror -o $@ -c $^
 
 all: $(NAME)
 

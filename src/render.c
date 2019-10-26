@@ -1,116 +1,146 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   render.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: oahieiev <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/10/26 15:17:12 by oahieiev          #+#    #+#             */
+/*   Updated: 2019/10/26 15:17:13 by oahieiev         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "rtv1.h"
 
-void				set_pixel(t_main *m, int x, int y, unsigned int p)
+#define AMBIENT_COEF	(0.07)
+#define SPEC_SMOOTHNESS	32
+
+t_obj					*get_obstacle(t_main *m, t_v3 rdir, t_v3 *p, double t)
 {
-	unsigned char	*pix;
-	unsigned char	b;
+	t_obj				*o;
+	t_obj				*closest;
+	t_v3				lp;
+	double				dist;
+	int					i;
 
-	if (x < W && x >= 0 && y < H && y >= 0)
-	{
-		pix = (unsigned char *)m->screen->pixels;
-		b = -1;
-		while (++b < m->bpp)
-			pix[m->bpp * (y * m->screen->w + x) + b] = (p >> (b << 3)) & 0xFF;
-	}
-}
-
-static inline t_vec3f
-rot_vec_x(const t_vec3f p,
-				const double sin_al,
-				const double cos_al) {
-	const double y = p.y * cos_al - p.z * sin_al;
-	const double z = p.y * sin_al + p.z * cos_al;
-	return (t_vec3f){p.x, y, z};
-}
-
-static inline t_vec3f
-rot_vec_y(const t_vec3f p,
-				const double sin_al,
-				const double cos_al) {
-	const double x = p.x * cos_al - p.z * sin_al;
-	const double z = p.x * sin_al + p.z * cos_al;
-	return (t_vec3f){x, p.y, z};
-}
-
-static inline t_vec3f
-rot_vec_z(const t_vec3f p,
-				const double sin_al,
-				const double cos_al) {
-	const double x = p.x * cos_al - p.y * sin_al;
-	const double y = p.x * sin_al + p.y * cos_al;
-	return (t_vec3f){x, y, p.z};
-}
-
-unsigned int		trace(t_main *m, t_vec3f rdir)
-{
-	SDL_Color		color;
-	t_obj			*o;
-	int				i;
-	t_vec3f			P;
-	t_vec3f			N;
-	const t_cam		*cam = m->cam;
-
-	vec3f_normalize(&rdir);
-	rdir = rot_vec_y(rot_vec_z(rot_vec_x(rdir, cam->xsin, cam->xcos), cam->zsin,
-										cam->zcos), cam->ysin, cam->ycos);
-	color = /*(SDL_Color){255,255,255,255};//*/BGCOLOR;
+	closest = NULL;
 	i = -1;
 	while (++i < m->obj_num)
 	{
-		double k = 0.0f;
 		o = m->objects[i];
-		if (o->intersects(o->data, *cam->loc, rdir, &P))
+		if (o->type != LIGHT_SOURCE &&
+			o->intersects(o->data, m->refl_point, rdir, &lp))
 		{
-			color = o->get_color(o->data, P);
-			N = o->normal_vec(o->data, P);
-			int j = -1;
-			while (++j < LIGHT)
+			dist = v3_length(lp - m->refl_point);
+			if (dist < t)
 			{
-				t_vec3f light_dir = get_vec3f(P, *m->lights[j]->loc);
-				
-				t_vec3f L = (t_vec3f){
-					light_dir.x * -1,
-					light_dir.y * -1,
-					light_dir.z * -1
-				};
-
-				k += ((ALBEDO / 255)*M_PI) * m->lights[j]->brightness *
-					(MAX(0.0f, -vec3f_dot(N, L)));
+				*p = lp;
+				t = dist;
+				closest = o;
 			}
-			color.r *= k;
-			color.g *= k;
-			color.b *= k;
 		}
 	}
-	
-	return (color.r << 16 | color.g << 8 | color.b);
+	return (closest);
 }
 
-void				render(t_main *m)
+static inline t_v3		spec_light(t_main *m, t_shedlight *l, t_trace t)
 {
-	int				i, j;
-	double			x, y;
-	unsigned int	rgb;
-	static unsigned int frames;
-	//SDL_Color		*color;
+	const t_v3			lrgb = l->light->color;
+	t_v3				spec_rgb;
+	t_v3				h;
+	double				dot;
+
+	h = l->light_dir - m->rdir;
+	v3_normalize(&h);
+	dot = v3_dot(t.n, h);
+	l->spec_k = l->light->brightness * 0.7 * pow(MAX(0, dot), SPEC_SMOOTHNESS);
+	spec_rgb = color_lerp(t.color, lrgb, 0.5);
+	return (v3_mult_scalar(spec_rgb, l->spec_k));
+}
+
+static inline double	shed_lights(t_main *m, t_shedlight *l, t_trace t)
+{
+	t_trace				tm;
+
+	ft_memcpy(&tm, &t, sizeof(tm));
+	l->spec_light = v3_get(0, 0, 0);
+	l->diffuse_k = 0.0;
+	l->j = -1;
+	while (++l->j < m->obj_num)
+	{
+		if ((m->objects[l->j])->type == LIGHT_SOURCE)
+		{
+			l->light = (t_light *)m->objects[l->j]->data;
+			l->light_dir = l->light->pos - t.p;
+			l->dist = v3_length(l->light_dir);
+			v3_normalize(&(l->light_dir));
+			l->spot = t.p + v3_mult_scalar(l->light_dir, EPSILON);
+			if (!(get_obstacle(m, l->light_dir, &l->spot, l->dist - EPSILON)))
+			{
+				l->atten = 1 + SQ(l->dist / 34.0);
+				l->diffuse_k += l->light->brightness *
+							(MAX(0.0, v3_dot(t.n, l->light_dir))) / l->atten;
+				l->spec_light += spec_light(m, l, tm);
+			}
+		}
+	}
+	return (l->diffuse_k);
+}
+
+static t_v3				trace(t_main *m, t_v3 rdir, int depth)
+{
+	t_trace				t;
+	t_shedlight			*l;
+	t_obj				*o;
+
+	if (!(l = malloc(sizeof(t_shedlight))))
+		return (v3_get(0, 0, 0));
+	t.color = BGCOLOR;
+	t.t = INFINITY;
+	if ((o = get_obstacle(m, rdir, &t.p, t.t)) != NULL)
+	{
+		t.n = o->normal_vec(o->data, t.p);
+		t.color = o->get_color(o->data, t.p);
+		l->ambi_light = v3_mult_scalar(t.color, AMBIENT_COEF);
+		m->refl_point = t.p + v3_mult_scalar(t.n, EPSILON);
+		t.k = shed_lights(m, l, t);
+		if (depth > 1)
+		{
+			t.refl = v3_reflected(-rdir, t.n);
+			m->refl_point = t.p + v3_mult_scalar(t.refl, EPSILON);
+			t.color += trace(m, t.refl, depth - 1);
+		}
+		t.color = v3_mult_scalar(t.color + l->spec_light, t.k) + l->ambi_light;
+	}
+	ft_memdel((void **)&l);
+	return (t.color);
+}
+
+void					render(t_main *m)
+{
+	int					i;
+	int					j;
+	double				x;
+	double				y;
 
 	SDL_FillRect(m->screen, NULL, 0x000000);
-	i = 0;
-	while (i < W)
+	m->cam->rot_mtx = init_matrix(m->cam->angle);
+	m->cam->ray = (t_v3){ 0, 0, m->cam->focus };
+	matrix_apply(&(m->cam->ray), m->cam->rot_mtx);
+	j = -1;
+	while (++j < H)
 	{
-		j = 0;
-		while (j < H)
+		i = -1;
+		while (++i < W)
 		{
-			x = (i - W / 2.0);
-			y = (j - H / 2.0);
-			t_vec3f rdir = (t_vec3f){x, y, 320};
-			rgb = trace(m, rdir);
-			set_pixel(m, i, j, rgb);
-			j++;
+			x = (unsigned)i / (double)W - 0.5;
+			y = (unsigned)j / (double)H - 0.5;
+			m->rdir = (t_v3){x * ASPECT, y, m->cam->focus};
+			v3_normalize(&(m->rdir));
+			matrix_apply(&(m->rdir), m->cam->rot_mtx);
+			m->refl_point = m->cam->pos;
+			set_pixel(m, i, j, clamp(trace(m, m->rdir, m->recur_depth)));
 		}
-		i++;
 	}
-	printf(" Frame #%u\tCamera @ (%.2f, %.2f, %.2f)\n", ++frames, m->cam->loc->x,
-		   m->cam->loc->y, m->cam->loc->z);
 	SDL_UpdateWindowSurface(m->window);
 }

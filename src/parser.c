@@ -61,8 +61,8 @@ static int			parsing_loop(t_main *m, int fd, char *object_types,
 
 	while ((ret = get_next_line(fd, &line)) > 0)
 	{
-		type = 0;
-		while (object_types[type])
+		type = -1;
+		while (object_types[++type])
 		{
 			if (line[0] == object_types[type] && (len = ft_strlen(line)) > 5)
 			{
@@ -71,12 +71,12 @@ static int			parsing_loop(t_main *m, int fd, char *object_types,
 				ft_memdel((void **)&obj);
 				m->obj_num++;
 			}
-			type++;
 		}
 		if (line[0] == 's' && ft_strlen(line) > 6)
 			m->start_pos = parse_vector(&line[2]);
 		ft_strdel(&line);
 	}
+	ft_strdel(&line);
 	return (ret);
 }
 

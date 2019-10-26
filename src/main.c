@@ -81,6 +81,11 @@ void				main_loop(t_main *m)
 	}
 }
 
+/*
+**	To check for memory leaks add to main():
+**		atexit(check_leakage);
+*/
+
 int					main(int argc, char *argv[])
 {
 	t_main			*m;
@@ -91,7 +96,6 @@ int					main(int argc, char *argv[])
 		ft_putendl("./RTv1 --help for details");
 		return (1);
 	}
-	atexit(check_leakage);
 	if (ft_strequ(argv[1], "--help"))
 	{
 		ft_putendl(USAGE);

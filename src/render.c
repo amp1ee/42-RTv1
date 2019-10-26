@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   render.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: oahieiev <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/10/26 15:17:12 by oahieiev          #+#    #+#             */
+/*   Updated: 2019/10/26 15:17:13 by oahieiev         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "rtv1.h"
 
 #define AMBIENT_COEF	(0.07)
@@ -68,14 +80,14 @@ static inline double	shed_lights(t_main *m, t_shedlight *l, t_trace t)
 				l->atten = 1 + SQ(l->dist / 34.0);
 				l->diffuse_k += l->light->brightness *
 							(MAX(0.0, v3_dot(t.n, l->light_dir))) / l->atten;
-				l->spec_light += spec_light(m , l, tm);
+				l->spec_light += spec_light(m, l, tm);
 			}
 		}
 	}
 	return (l->diffuse_k);
 }
 
-t_v3					trace(t_main *m, t_v3 rdir, int depth)
+static t_v3				trace(t_main *m, t_v3 rdir, int depth)
 {
 	t_trace				t;
 	t_shedlight			*l;
@@ -104,17 +116,12 @@ t_v3					trace(t_main *m, t_v3 rdir, int depth)
 	return (t.color);
 }
 
-#include <time.h>
-
 void					render(t_main *m)
 {
 	int					i;
 	int					j;
 	double				x;
 	double				y;
-
-	struct timespec	s, e;
-	clock_gettime(CLOCK_MONOTONIC_RAW, &s);
 
 	SDL_FillRect(m->screen, NULL, 0x000000);
 	m->cam->rot_mtx = init_matrix(m->cam->angle);
@@ -135,10 +142,5 @@ void					render(t_main *m)
 			set_pixel(m, i, j, clamp(trace(m, m->rdir, m->recur_depth)));
 		}
 	}
-
-	clock_gettime(CLOCK_MONOTONIC_RAW, &e);
-	double elapsed_t = (e.tv_sec - s.tv_sec) + (e.tv_nsec - s.tv_nsec) / 1e9;
-	printf("Frame rendered in %f seconds\n", elapsed_t);
-
 	SDL_UpdateWindowSurface(m->window);
 }

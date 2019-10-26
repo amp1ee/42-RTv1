@@ -95,8 +95,7 @@ int					main(int argc, char *argv[])
 	if (ft_strequ(argv[1], "--help"))
 	{
 		ft_putendl(USAGE);
-		ft_putendl(SCENE_FORMAT);
-		ft_putendl(CONTROLS);
+		print_help();
 		return (0);
 	}
 	m = rtv1_init(argv);

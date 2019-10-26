@@ -16,7 +16,7 @@
 #define ANG			(8 * (M_PI) / 180.0)
 #define DOT(a, b)	v3_dot((a), (b))
 
-void				rtv1_quit(t_main *m)
+static void			rtv1_quit(t_main *m)
 {
 	m->running = false;
 	free_mem(m);

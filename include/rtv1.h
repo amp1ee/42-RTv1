@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   rtv1.h                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: oahieiev <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/10/26 15:18:27 by oahieiev          #+#    #+#             */
+/*   Updated: 2019/10/26 15:18:29 by oahieiev         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef RTV1_H
 # define RTV1_H
 
@@ -5,7 +17,6 @@
 # include <stdlib.h>
 # include <fcntl.h>
 # include <stdbool.h>
-# include <complex.h> 
 # include <errno.h>
 # include "libft.h"
 
@@ -30,27 +41,6 @@
 # define ASPECT			(W / (double)H)
 
 # define USAGE "Usage: ./RTv1 scene.scn [recursive depth]\n"
-# define SCENE_FORMAT \
-		"=== Scene format: ===\n\n"\
-		"\t[Camera position]\n"\
-		"\t[Object type] [Position] [Direction] "\
-		"[Radius/Radiance] [Color]\n\n"\
-		"\tCamera position:\ts:[x,y,z]\t*if unspecified, default is 0,0,0\n"\
-		"\tObject types:\n"\
-		"\t\t\t\tP - Plane\n"\
-		"\t\t\t\tS - Sphere\n"\
-		"\t\t\t\tC - Cylinder\n"\
-		"\t\t\t\tc - Cone\n"\
-		"\t\t\t\tL - Light source\n"\
-		"\tPosition/Direction:\tP/D:[x,y,z]\n"\
-		"\tRadius/Radiance:\tR:1.0\n"\
-		"\tColor:\t\t\tC:[r,g,b] in 0..255 range\n"\
-		"\tUse '#' for comments\n"
-# define CONTROLS \
-		"=== Controls: ===\n\n"\
-		"\tW/A/S/D:\t\tMove forward/left/backward/right\n"\
-		"\tQ/E\t\t\tMove camera up/down\n"\
-		"\tArrow keys\t\tRotate camera\n"
 
 /*
 **  P - plane
@@ -59,7 +49,6 @@
 **  c - cone
 **  L - light source
 */
-
 typedef enum	e_figures
 {
 	PLANE = 0,
@@ -125,6 +114,11 @@ typedef struct	s_cone
 
 typedef struct	s_figure
 {
+	t_v3		k;
+	t_v3		l;
+	t_v3		m;
+	t_v3		n;
+	t_v3		dir;
 	double		a;
 	double		b;
 	double		c;
@@ -135,57 +129,52 @@ typedef struct	s_figure
 	double		t1;
 	double		t2;
 	double		droot;
-	t_v3		k;
-	t_v3		l;
-	t_v3		m;
-	t_v3		n;
-	t_v3		dir;
 }				t_figure;
 
 typedef struct	s_obj
 {
-	int			type;
 	void		*data;
 	bool		(*intersects)(void *data, t_v3 ray_start,
 					t_v3 ray, t_v3 *intersect);
 	t_v3		(*get_color)(void *data, t_v3 intersect);
 	t_v3		(*normal_vec)(void *data, t_v3 intersect);
 	void		(*cleanup)(void *data);
+	int			type;
 }				t_obj;
 
 typedef struct	s_cam
 {
+	t_matrix	rot_mtx;
 	t_v3		pos;
 	t_v3		ray;
 	t_v3		angle;
-	t_matrix	rot_mtx;
 	double		focus;
 }				t_cam;
 
 typedef struct	s_main
 {
+	t_v3		rdir;
+	t_v3		p;
+	t_v3		refl_point;
+	t_v3		start_pos;
 	SDL_Window	*window;
 	SDL_Surface	*screen;
 	t_cam		*cam;
 	t_list		*obj_list;
 	t_obj		**objects;
-	t_v3		rdir;
-	t_v3		p;
-	t_v3		refl_point;
-	t_v3		start_pos;
-	bool		running;
 	int			obj_num;
 	int			recur_depth;
+	bool		running;
 }				t_main;
 
 typedef struct	s_shedlight
 {
-	t_light		*light;
 	t_v3		light_dir;
 	t_v3		spot;
 	t_v3		diffuse_light;
 	t_v3		spec_light;
 	t_v3		ambi_light;
+	t_light		*light;
 	double		diffuse_k;
 	double		spec_k;
 	double		atten;
@@ -196,18 +185,27 @@ typedef struct	s_shedlight
 typedef struct	s_trace
 {
 	t_v3		color;
-	t_obj		*o;
 	t_v3		p;
 	t_v3		n;
 	t_v3		refl;
+	t_obj		*o;
 	double		t;
 	double		k;
 }				t_trace;
 
 typedef t_obj	*(*t_new_obj)(t_v3, t_v3, double, t_v3);
 
+/*
+**	main functions
+*/
 t_obj			**parse_scene(t_main *m, char *path);
+void			render(t_main *m);
+void			handle_events(t_main *m, SDL_Event e);
+void			free_mem(t_main *m);
 
+/*
+**	objects
+*/
 t_obj			*new_cylinder(t_v3 center, t_v3 dir, double radius, t_v3 color);
 t_obj			*new_cone(t_v3 center, t_v3 dir, double radius, t_v3 color);
 t_obj			*new_light(t_v3 location, t_v3 dir, double intens, t_v3 color);
@@ -215,7 +213,7 @@ t_obj			*new_plane(t_v3 center, t_v3 dir, double radius, t_v3 color);
 t_obj			*new_sphere(t_v3 center, t_v3 dir, double radius, t_v3 color);
 
 /*
-**	vec3.c
+**	vectors and matrices
 */
 double			v3_dot(t_v3 a, t_v3 b);
 double			v3_squared(t_v3 v);
@@ -225,19 +223,15 @@ t_v3			v3_mult_scalar(t_v3 v, double scalar);
 void			v3_normalize(t_v3 *vec);
 t_v3			v3_get(double a, double b, double c);
 t_v3			v3_reflected(t_v3 vec, t_v3 n);
-
-/*
-**	render.c
-*/
 void			matrix_apply(t_v3 *vec, t_matrix m);
 t_matrix		init_matrix(t_v3 angle);
+
+/*
+**	render_utils.c
+*/
+void			set_pixel(t_main *m, int x, int y, t_v3 color);
 t_v3			clamp(t_v3 color);
 t_v3			color_lerp(t_v3 a, t_v3 b, double p);
-void			set_pixel(t_main *m, int x, int y, t_v3 color);
-void			render(t_main *m);
-
-void			handle_events(t_main *m, SDL_Event e);
-void			free_mem(t_main *m);
 
 /*
 **	misc.c
@@ -245,6 +239,7 @@ void			free_mem(t_main *m);
 bool			key_is_rotate(SDL_Keycode k);
 bool			key_is_move(SDL_Keycode k);
 void			check_leakage(void);
+void			print_help(void);
 t_obj			**list_to_array(t_list **obj_list, int num);
 
 #endif

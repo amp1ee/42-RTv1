@@ -29,6 +29,29 @@ void			check_leakage(void)
 	system("leaks RTv1 2>/dev/null");
 }
 
+void			print_help(void)
+{
+	ft_putstr("=== Scene format: ===\n\n"\
+		"\t[Camera position]\n"\
+		"\t[Object type] [Position] [Direction] "\
+		"[Radius/Radiance] [Color]\n\n"\
+		"\tCamera position:\ts:[x,y,z]\t*if unspecified, default is 0,0,0\n"\
+		"\tObject types:\n"\
+		"\t\t\t\tP - Plane\n"\
+		"\t\t\t\tS - Sphere\n"\
+		"\t\t\t\tC - Cylinder\n"\
+		"\t\t\t\tc - Cone\n"\
+		"\t\t\t\tL - Light source\n"\
+		"\tPosition/Direction:\tP/D:[x,y,z]\n"\
+		"\tRadius/Radiance:\tR:1.0\n"\
+		"\tColor:\t\t\tC:[r,g,b] in 0..255 range\n"\
+		"\tUse '#' for comments\n");
+	ft_putstr("=== Controls: ===\n\n"\
+		"\tW/A/S/D:\t\tMove forward/left/backward/right\n"\
+		"\tQ/E\t\t\tMove camera up/down\n"\
+		"\tArrow keys/Z/X\t\tRotate camera\n");
+}
+
 t_obj			**list_to_array(t_list **obj_list, int num)
 {
 	t_list		*elem;

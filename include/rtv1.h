@@ -58,7 +58,7 @@ typedef enum	e_figures
 	LIGHT_SOURCE
 }				t_figures;
 
-typedef double	t_v3 __attribute__((vector_size(sizeof(double)*3)));
+typedef double	t_v3 __attribute__((vector_size(sizeof(double)*4)));
 
 typedef struct	s_matrix
 {

@@ -1,5 +1,6 @@
 RTv1
 obj/
+.vscode/
 *.a
 *.o
 *.DS_Store

@@ -1,6 +1,7 @@
 NAME	=RTv1
-CC		=clang
-CFLAGS	=-Wall -Wextra -Werror
+#CC		=clang
+CC		=gcc
+CFLAGS	=-Wall -Wextra -Wno-error
 ifdef DEBUG
 	CFLAGS	+=-g
 endif

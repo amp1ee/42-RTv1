@@ -89,5 +89,4 @@ void				handle_events(t_main *m, SDL_Event e)
 	}
 	else
 		return ;
-	render(m);
 }

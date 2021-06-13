@@ -76,8 +76,10 @@ void				main_loop(t_main *m)
 	render(m);
 	while (m->running)
 	{
-		while (SDL_PollEvent(&e))
+		while (SDL_PollEvent(&e)) {
 			handle_events(m, e);
+			render(m);
+		}
 	}
 }
 
